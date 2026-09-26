@@ -1,0 +1,3085 @@
+openapi: 3.0.3
+info:
+  title: TramFlow implementation contract
+  version: 1.0.0
+  description: 'Team-agreed implementation baseline, not a claim of a deployed service. Model A predicts labels_day_*.boardings
+    for route/date/hour. Scenario Engine is deterministic. UI views: day/week/month; no year. place_id is a depot;
+    stop/segment predictions are unavailable. Physical fleet observed via successful validations is a proxy, not
+    measured full service supply. All bundled examples and mock responses are SYNTHETIC. Normative companion docs:
+    CALCULATIONS, BACKEND, FRONTEND, ML_DATA, CSV, WEATHER_MAP. Public and private ML boundaries are separated:
+    no internal ML HTTP API is needed. PostgreSQL with PostGIS is the mandatory operational/runtime source of
+    truth for versioned data, snapshot registry and the active snapshot pointer. ONNX, feature schemas,
+    manifests and golden vectors remain immutable filesystem artifacts. Local memory is a bounded cache,
+    not an authoritative registry. This storage revision preserves the public HTTP contract.'
+servers:
+- url: http://localhost:8080
+  description: Local mock/development; production uses same-origin HTTPS.
+- url: /
+  description: Same-origin deployed service.
+security:
+- BasicAuth: []
+tags:
+- name: Operations
+- name: Catalog
+- name: Map
+- name: Forecast
+- name: Scenario
+- name: Weather
+- name: Quality
+- name: Export
+paths:
+  /health/live:
+    get:
+      operationId: getLiveness
+      tags:
+      - Operations
+      summary: HTTP process liveness
+      description: HTTP process liveness
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+      security: []
+  /health/ready:
+    get:
+      operationId: getReadiness
+      tags:
+      - Operations
+      summary: PostgreSQL/PostGIS, published snapshot and ONNX readiness
+      description: 200 when PostgreSQL/PostGIS and required migrations, a complete published snapshot, its prepared
+        data and immutable model artifacts/ONNX session are usable. External weather and basemap services need
+        not be available. 503 application/problem+json when not ready. No external probes per request; no
+        fallback to a local file registry.
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '503':
+          $ref: '#/components/responses/Error503'
+      security: []
+  /api/v1/bootstrap:
+    get:
+      operationId: getBootstrap
+      tags:
+      - Catalog
+      summary: Get pinned snapshot, defaults and UI capabilities
+      description: Cache-Control:no-store. Resolve the authoritative active snapshot and its metadata
+        consistently from PostgreSQL. Use returned default_selection; never infer dataset dates or route IDs
+        from examples. Active data are synthetic only in the original mock.
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bootstrap'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+  /api/v1/snapshots/{forecast_snapshot_id}:
+    get:
+      operationId: getSnapshot
+      tags:
+      - Catalog
+      summary: Read immutable forecast snapshot metadata
+      description: Cache-Control:private,no-cache. Read published snapshot metadata from the PostgreSQL registry.
+        Keep previous snapshots and all required data/model versions at least the advertised retention after
+        deactivation. Unfinished candidates are not public; cache misses do not mean the snapshot is absent.
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snapshot'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+        '304':
+          description: Not modified. Body omitted. Authentication still checked.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+      parameters:
+      - name: forecast_snapshot_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: If-None-Match
+        in: header
+        required: false
+        schema:
+          type: string
+  /api/v1/routes:
+    get:
+      operationId: listRoutes
+      tags:
+      - Catalog
+      summary: List the ten supported route catalog entries
+      description: List the ten supported route catalog entries
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteList'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+        '304':
+          description: Not modified. Body omitted. Authentication still checked.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+      parameters:
+      - name: network_version
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: If-None-Match
+        in: header
+        required: false
+        schema:
+          type: string
+  /api/v1/routes/{route_id}:
+    get:
+      operationId: getRoute
+      tags:
+      - Catalog
+      summary: Get route directions and geographic stop catalog
+      description: Get route directions and geographic stop catalog
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteDetail'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+        '304':
+          description: Not modified. Body omitted. Authentication still checked.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+      parameters:
+      - name: route_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: network_version
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: If-None-Match
+        in: header
+        required: false
+        schema:
+          type: string
+  /api/v1/routes/{route_id}/geometry:
+    get:
+      operationId: getRouteGeometry
+      tags:
+      - Map
+      summary: Read versioned route GeoJSON backed by PostGIS
+      description: Cache-Control:private,no-cache. Read prepared geometry for network_version+route_id from
+        PostgreSQL/PostGIS, or its version-keyed cache, and return the existing GeoJSON contract. No Overpass
+        call on this path. Unsupported/missing geometry returns 404 GEOMETRY_UNAVAILABLE; empty geometry is not
+        fabricated.
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteGeometry'
+              examples:
+                synthetic:
+                  $ref: '#/components/examples/Geometry'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+        '304':
+          description: Not modified. Body omitted. Authentication still checked.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+      parameters:
+      - name: route_id
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: network_version
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: If-None-Match
+        in: header
+        required: false
+        schema:
+          type: string
+  /api/v1/forecasts/query:
+    post:
+      operationId: queryForecast
+      tags:
+      - Forecast
+      summary: Batch forecast route boardings and baseline intensity
+      description: Pure read. One batch of hourly ONNX rows, cached by pinned dependencies, then optional day aggregation.
+        DAY returns <=24 frames. No training, no persisted evaluation, no synchronous weather call. All requested
+        routes must have full coverage. Cache-Control:no-store (bounded application cache allowed).
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationResponse'
+              examples:
+                synthetic:
+                  $ref: '#/components/examples/ForecastResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '413':
+          $ref: '#/components/responses/Error413'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+        '415':
+          $ref: '#/components/responses/Error415'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForecastQuery'
+            examples:
+              synthetic:
+                $ref: '#/components/examples/ForecastRequest'
+  /api/v1/scenarios/evaluate:
+    post:
+      operationId: evaluateScenario
+      tags:
+      - Scenario
+      summary: Evaluate formula-based fleet and manual-demand scenario
+      description: Pure read. Reuses Model A boardings. Changing fleet or manual multipliers never retrains/reruns
+        Model A when pinned baseline is cached. Formulas apply hourly within effective_window, then aggregate. No
+        real dispatch operation. Negative resulting fleet or unknown baseline for a delta ->422.
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CalculationResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '413':
+          $ref: '#/components/responses/Error413'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+        '415':
+          $ref: '#/components/responses/Error415'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScenarioQuery'
+            examples:
+              synthetic:
+                $ref: '#/components/examples/ScenarioRequest'
+  /api/v1/weather:
+    get:
+      operationId: getWeather
+      tags:
+      - Weather
+      summary: Read pinned weather features and provenance
+      description: Return hourly values actually pinned by snapshot, including marked climatology or missing values.
+        Bounds aligned to hours, <=744h and within route coverage. Never proxy arbitrary coordinates or a user-supplied
+        URL.
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+        '304':
+          description: Not modified. Body omitted. Authentication still checked.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+      parameters:
+      - name: forecast_snapshot_id
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: route_id
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - name: If-None-Match
+        in: header
+        required: false
+        schema:
+          type: string
+  /api/v1/model-quality:
+    get:
+      operationId: getModelQuality
+      tags:
+      - Quality
+      summary: Read measured or explicitly unmeasured quality records
+      description: Read measured or explicitly unmeasured quality records
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualityResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+        '304':
+          description: Not modified. Body omitted. Authentication still checked.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+      parameters:
+      - name: forecast_snapshot_id
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: If-None-Match
+        in: header
+        required: false
+        schema:
+          type: string
+  /api/v1/data-sources:
+    get:
+      operationId: getDataSources
+      tags:
+      - Quality
+      summary: Read data provenance and usage restrictions
+      description: Read data provenance and usage restrictions
+      responses:
+        '200':
+          description: Successful response.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SourceList'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+        '304':
+          description: Not modified. Body omitted. Authentication still checked.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            ETag:
+              schema:
+                type: string
+              description: Version/content validator.
+      parameters:
+      - name: forecast_snapshot_id
+        in: query
+        required: true
+        schema:
+          $ref: '#/components/schemas/Id'
+      - name: If-None-Match
+        in: header
+        required: false
+        schema:
+          type: string
+  /api/v1/exports:
+    post:
+      operationId: exportCalculation
+      tags:
+      - Export
+      summary: Export the exact confirmed calculation as CSV
+      description: Synchronous CSV, not a task. Complete validation and bounded buffering before 200. UTF-8 BOM,
+        semicolon delimiter, decimal point, CRLF, RFC4180 quoting, null as empty cell. Exact columns in docs/CSV.md.
+        Hash is returned in X-Calculation-ID; user export is NOT competition submission.
+      responses:
+        '200':
+          description: Complete CSV attachment. No polling or follow-up GET.
+          headers:
+            X-Request-ID:
+              description: Request correlation ID. Echo a valid incoming ID, or create one.
+              schema:
+                type: string
+            Cache-Control:
+              description: Per-operation caching policy.
+              schema:
+                type: string
+            Content-Disposition:
+              schema:
+                type: string
+              description: attachment; filename="tramflow-<safe-id>.csv"
+            X-Calculation-ID:
+              schema:
+                $ref: '#/components/schemas/CalculationId'
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '409':
+          $ref: '#/components/responses/Error409'
+        '410':
+          $ref: '#/components/responses/Error410'
+        '413':
+          $ref: '#/components/responses/Error413'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '429':
+          $ref: '#/components/responses/Error429'
+        '503':
+          $ref: '#/components/responses/Error503'
+        '504':
+          $ref: '#/components/responses/Error504'
+        '415':
+          $ref: '#/components/responses/Error415'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportRequest'
+            examples:
+              synthetic:
+                $ref: '#/components/examples/ExportRequest'
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: 'TLS gateway protection for real aggregate data. No bespoke login/JWT/refresh system. Local synthetic
+        mock: demo/demo, loopback only by default.'
+  responses:
+    Error400:
+      description: Invalid JSON, query syntax or schema.
+      headers:
+        X-Request-ID:
+          description: Request correlation ID. Echo a valid incoming ID, or create one.
+          schema:
+            type: string
+        Cache-Control:
+          description: Per-operation caching policy.
+          schema:
+            type: string
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Error401:
+      description: Authentication required by the deployment gateway.
+      headers:
+        X-Request-ID:
+          description: Request correlation ID. Echo a valid incoming ID, or create one.
+          schema:
+            type: string
+        Cache-Control:
+          description: Per-operation caching policy.
+          schema:
+            type: string
+        WWW-Authenticate:
+          schema:
+            type: string
+          description: Basic realm challenge.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Error404:
+      description: Unknown identifier.
+      headers:
+        X-Request-ID:
+          description: Request correlation ID. Echo a valid incoming ID, or create one.
+          schema:
+            type: string
+        Cache-Control:
+          description: Per-operation caching policy.
+          schema:
+            type: string
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Error409:
+      description: Calculation hash mismatch.
+      headers:
+        X-Request-ID:
+          description: Request correlation ID. Echo a valid incoming ID, or create one.
+          schema:
+            type: string
+        Cache-Control:
+          description: Per-operation caching policy.
+          schema:
+            type: string
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Error410:
+      description: Known snapshot was retired and removed.
+      headers:
+        X-Request-ID:
+          description: Request correlation ID. Echo a valid incoming ID, or create one.
+          schema:
+            type: string
+        Cache-Control:
+          description: Per-operation caching policy.
+          schema:
+            type: string
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Error413:
+      description: Body/export exceeds limits.
+      headers:
+        X-Request-ID:
+          description: Request correlation ID. Echo a valid incoming ID, or create one.
+          schema:
+            type: string
+        Cache-Control:
+          description: Per-operation caching policy.
+          schema:
+            type: string
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Error422:
+      description: Valid structure but unsupported semantic combination.
+      headers:
+        X-Request-ID:
+          description: Request correlation ID. Echo a valid incoming ID, or create one.
+          schema:
+            type: string
+        Cache-Control:
+          description: Per-operation caching policy.
+          schema:
+            type: string
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Error429:
+      description: Admission/rate limit exceeded; Retry-After seconds.
+      headers:
+        X-Request-ID:
+          description: Request correlation ID. Echo a valid incoming ID, or create one.
+          schema:
+            type: string
+        Cache-Control:
+          description: Per-operation caching policy.
+          schema:
+            type: string
+        Retry-After:
+          schema:
+            type: string
+          description: Positive integer delay in seconds.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Error503:
+      description: Not ready or bounded compute queue exhausted.
+      headers:
+        X-Request-ID:
+          description: Request correlation ID. Echo a valid incoming ID, or create one.
+          schema:
+            type: string
+        Cache-Control:
+          description: Per-operation caching policy.
+          schema:
+            type: string
+        Retry-After:
+          schema:
+            type: string
+          description: Positive integer delay in seconds.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Error504:
+      description: Calculation timeout; no partial result.
+      headers:
+        X-Request-ID:
+          description: Request correlation ID. Echo a valid incoming ID, or create one.
+          schema:
+            type: string
+        Cache-Control:
+          description: Per-operation caching policy.
+          schema:
+            type: string
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Error415:
+      description: Unsupported Content-Type; application/json required.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    Id:
+      type: string
+      description: Opaque stable identifier; route numbers are strings, not integers.
+      minLength: 1
+      maxLength: 96
+      pattern: ^[A-Za-z0-9][A-Za-z0-9_.:-]{0,95}$
+    CalculationId:
+      type: string
+      description: SHA-256 of the canonical computation descriptor; NOT a persisted resource ID. See docs/CALCULATIONS.md.
+      pattern: ^calc_[0-9a-f]{64}$
+    TimeWindow:
+      type: object
+      additionalProperties: false
+      required:
+      - from
+      - to
+      properties:
+        from:
+          type: string
+          format: date-time
+        to:
+          type: string
+          format: date-time
+      description: Half-open [from,to). RFC3339 with explicit timezone, aligned to whole hours. Responses normalize
+        to UTC. from < to is runtime validation.
+    ViewMode:
+      type: string
+      enum:
+      - day
+      - week
+      - month
+    Resolution:
+      type: string
+      enum:
+      - hour
+      - day
+    ForecastSelection:
+      type: object
+      additionalProperties: false
+      required:
+      - forecast_snapshot_id
+      - route_ids
+      - view_mode
+      - window
+      - resolution
+      properties:
+        forecast_snapshot_id:
+          $ref: '#/components/schemas/Id'
+        route_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Id'
+          minItems: 1
+          maxItems: 10
+          uniqueItems: true
+        view_mode:
+          $ref: '#/components/schemas/ViewMode'
+        window:
+          $ref: '#/components/schemas/TimeWindow'
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+      description: 'view_mode controls maximum window width, NOT lead time. day: <=24h/hour; week: <=168h; month:
+        <=744h. day resolution requires local-midnight bounds. Window must fit snapshot route coverage. Real lead
+        time is measured from snapshot.forecast_origin_at. No silent clipping. Output is limited to 960 (frame,route)
+        cells; use day aggregation or fewer routes for larger windows.'
+    ForecastQuery:
+      type: object
+      additionalProperties: false
+      required:
+      - selection
+      properties:
+        selection:
+          $ref: '#/components/schemas/ForecastSelection'
+    Factors:
+      type: object
+      additionalProperties: false
+      required: []
+      properties:
+        weather:
+          type: number
+          format: double
+          minimum: 0.5
+          maximum: 2
+          multipleOf: 0.001
+          default: 1
+        event:
+          type: number
+          format: double
+          minimum: 0.5
+          maximum: 2
+          multipleOf: 0.001
+          default: 1
+        season:
+          type: number
+          format: double
+          minimum: 0.5
+          maximum: 2
+          multipleOf: 0.001
+          default: 1
+      description: Additional manual multipliers on model boardings, NOT physical weather inputs and NOT causal
+        effects. Missing values default to 1. Precision <=3 decimals. Product must be between 0.25 and 4 inclusive
+        (runtime).
+    AbsoluteFleet:
+      type: object
+      additionalProperties: false
+      required:
+      - kind
+      - vehicle_count
+      properties:
+        kind:
+          type: string
+          enum:
+          - absolute
+        vehicle_count:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 200
+      description: Assumed effective fleet in every affected hourly bucket, not departures. 0 is a valid no-supply
+        scenario.
+    DeltaFleet:
+      type: object
+      additionalProperties: false
+      required:
+      - kind
+      - vehicle_count_delta
+      properties:
+        kind:
+          type: string
+          enum:
+          - delta
+        vehicle_count_delta:
+          type: integer
+          format: int32
+          minimum: -200
+          maximum: 200
+      description: Add to each hourly baseline fleet. Baseline must be known in every affected cell; result must
+        be 0..200. Values are not clamped.
+    FleetOverride:
+      oneOf:
+      - $ref: '#/components/schemas/AbsoluteFleet'
+      - $ref: '#/components/schemas/DeltaFleet'
+      discriminator:
+        propertyName: kind
+        mapping:
+          absolute: '#/components/schemas/AbsoluteFleet'
+          delta: '#/components/schemas/DeltaFleet'
+    ScenarioOverrides:
+      type: object
+      additionalProperties: false
+      required:
+      - effective_window
+      properties:
+        effective_window:
+          $ref: '#/components/schemas/TimeWindow'
+        fleet:
+          $ref: '#/components/schemas/FleetOverride'
+        factors:
+          $ref: '#/components/schemas/Factors'
+      description: Effective window must be contained in selection.window. Applies to all selection.route_ids, before
+        temporal aggregation. Outside this window use baseline. Scenario is relative to original snapshot, never
+        to a previous scenario.
+      anyOf:
+      - required:
+        - fleet
+      - required:
+        - factors
+    ScenarioQuery:
+      type: object
+      additionalProperties: false
+      required:
+      - selection
+      - overrides
+      properties:
+        selection:
+          $ref: '#/components/schemas/ForecastSelection'
+        overrides:
+          $ref: '#/components/schemas/ScenarioOverrides'
+    ForecastCalculation:
+      type: object
+      additionalProperties: false
+      required:
+      - kind
+      - selection
+      properties:
+        kind:
+          type: string
+          enum:
+          - forecast
+        selection:
+          $ref: '#/components/schemas/ForecastSelection'
+    ScenarioCalculation:
+      type: object
+      additionalProperties: false
+      required:
+      - kind
+      - selection
+      - overrides
+      properties:
+        kind:
+          type: string
+          enum:
+          - scenario
+        selection:
+          $ref: '#/components/schemas/ForecastSelection'
+        overrides:
+          $ref: '#/components/schemas/ScenarioOverrides'
+    CalculationDescriptor:
+      oneOf:
+      - $ref: '#/components/schemas/ForecastCalculation'
+      - $ref: '#/components/schemas/ScenarioCalculation'
+      discriminator:
+        propertyName: kind
+        mapping:
+          forecast: '#/components/schemas/ForecastCalculation'
+          scenario: '#/components/schemas/ScenarioCalculation'
+    UndefinedReason:
+      type: string
+      enum:
+      - SUPPLY_UNKNOWN
+      - NO_SUPPLY
+      - REFERENCE_MISSING
+      - REFERENCE_ZERO
+      - BASELINE_ZERO
+      - NO_TYPICAL_PROFILE
+      - NO_MEASUREMENT
+      - INCOMPLETE_COVERAGE
+    AvailableNumber:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - value
+      properties:
+        status:
+          type: string
+          enum:
+          - available
+        value:
+          type: number
+          format: double
+          minimum: 0
+    AvailableInteger:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - value
+      properties:
+        status:
+          type: string
+          enum:
+          - available
+        value:
+          type: integer
+          format: int32
+          minimum: 0
+    UnavailableNumber:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - value
+      - reason
+      properties:
+        status:
+          type: string
+          enum:
+          - unavailable
+        value:
+          type: number
+          nullable: true
+          enum:
+          - null
+        reason:
+          $ref: '#/components/schemas/UndefinedReason'
+    NumericReading:
+      oneOf:
+      - $ref: '#/components/schemas/AvailableNumber'
+      - $ref: '#/components/schemas/UnavailableNumber'
+      discriminator:
+        propertyName: status
+        mapping:
+          available: '#/components/schemas/AvailableNumber'
+          unavailable: '#/components/schemas/UnavailableNumber'
+    IntegerReading:
+      oneOf:
+      - $ref: '#/components/schemas/AvailableInteger'
+      - $ref: '#/components/schemas/UnavailableNumber'
+      discriminator:
+        propertyName: status
+        mapping:
+          available: '#/components/schemas/AvailableInteger'
+          unavailable: '#/components/schemas/UnavailableNumber'
+    LoadLevel:
+      type: string
+      enum:
+      - normal
+      - elevated
+      - high
+      - very_high
+      - unavailable
+    MetricSet:
+      type: object
+      additionalProperties: false
+      required:
+      - boardings
+      - vehicle_hours
+      - mean_vehicle_count
+      - boardings_per_vehicle_hour
+      - reference_boardings
+      - load_index
+      - load_level
+      - required_vehicle_count
+      - fleet_source
+      - fleet_is_proxy
+      properties:
+        boardings:
+          type: number
+          format: double
+          minimum: 0
+          description: Expected count, may be fractional. Sum hourly predictions; do not round before aggregation.
+        vehicle_hours:
+          $ref: '#/components/schemas/NumericReading'
+        mean_vehicle_count:
+          $ref: '#/components/schemas/NumericReading'
+        boardings_per_vehicle_hour:
+          $ref: '#/components/schemas/NumericReading'
+        reference_boardings:
+          $ref: '#/components/schemas/NumericReading'
+        load_index:
+          $ref: '#/components/schemas/NumericReading'
+        load_level:
+          $ref: '#/components/schemas/LoadLevel'
+        required_vehicle_count:
+          $ref: '#/components/schemas/IntegerReading'
+        fleet_source:
+          type: string
+          enum:
+          - observed_vehicle_profile
+          - manual_plan
+          - scenario_absolute
+          - scenario_delta
+          - mixed
+          - unavailable
+        fleet_is_proxy:
+          type: boolean
+      description: All formulas in docs/CALCULATIONS.md. Load index is relative to an empirical historical reference,
+        NOT cabin occupancy. Ratios are recomputed from aggregate numerators/denominators. required_vehicle_count
+        is max hourly hypothetical requirement at snapshot target_index, NOT a dispatch recommendation.
+    WeatherSummary:
+      type: object
+      additionalProperties: false
+      required:
+      - mode
+      - temperature_mean_c
+      - precipitation_sum_mm
+      - forecast_hours
+      - climatology_hours
+      - missing_hours
+      properties:
+        mode:
+          type: string
+          enum:
+          - forecast
+          - climatology
+          - mixed
+          - missing
+        temperature_mean_c:
+          type: number
+          format: double
+          nullable: true
+        precipitation_sum_mm:
+          type: number
+          format: double
+          minimum: 0
+          nullable: true
+        forecast_hours:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 744
+        climatology_hours:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 744
+        missing_hours:
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 744
+      description: Derived from the pinned weather snapshot. If any hour is missing, affected aggregate numeric
+        fields are null, not a partial sum.
+    MetricDelta:
+      type: object
+      additionalProperties: false
+      required:
+      - boardings
+      - load_index
+      - vehicle_hours
+      properties:
+        boardings:
+          type: number
+          format: double
+        load_index:
+          type: number
+          format: double
+          nullable: true
+        vehicle_hours:
+          type: number
+          format: double
+          nullable: true
+      description: evaluated - baseline. An undefined operand produces null. Load-index delta is an absolute ratio
+        difference, not a relative percent.
+    RouteReading:
+      type: object
+      additionalProperties: false
+      required:
+      - route_id
+      - typical_boardings
+      - relative_to_typical
+      - baseline
+      - evaluated
+      - delta
+      - weather
+      properties:
+        route_id:
+          $ref: '#/components/schemas/Id'
+        typical_boardings:
+          $ref: '#/components/schemas/NumericReading'
+        relative_to_typical:
+          type: number
+          format: double
+          minimum: -1
+          nullable: true
+        baseline:
+          $ref: '#/components/schemas/MetricSet'
+        evaluated:
+          $ref: '#/components/schemas/MetricSet'
+        delta:
+          $ref: '#/components/schemas/MetricDelta'
+        weather:
+          $ref: '#/components/schemas/WeatherSummary'
+      description: 'No scenario: evaluated equals baseline. relative_to_typical uses evaluated.boardings; denominator
+        0 or absent -> null. Typical profile is trained strictly before forecast_origin_at.'
+    Frame:
+      type: object
+      additionalProperties: false
+      required:
+      - window
+      - routes
+      properties:
+        window:
+          $ref: '#/components/schemas/TimeWindow'
+        routes:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteReading'
+          minItems: 1
+          maxItems: 10
+      description: Frames are contiguous, non-overlapping, sorted; routes sorted by route_id. No stop-level numbers
+        are included.
+    VisualizationPolicy:
+      type: object
+      additionalProperties: false
+      required:
+      - metric
+      - scale_min
+      - scale_max
+      - overflow
+      - thresholds
+      - reference_version
+      - label
+      properties:
+        metric:
+          type: string
+          enum:
+          - load_index
+        scale_min:
+          type: number
+          format: double
+          minimum: 0
+        scale_max:
+          type: number
+          format: double
+          minimum: 0
+        overflow:
+          type: string
+          enum:
+          - show_overflow
+        thresholds:
+          type: array
+          items:
+            type: number
+            minimum: 0
+          minItems: 3
+          maxItems: 3
+        reference_version:
+          $ref: '#/components/schemas/Id'
+        label:
+          type: string
+      description: Stable policy across all frames and scenarios. Index is never numerically clamped. Thresholds
+        are product policy, not safety/capacity standards.
+    Notice:
+      type: object
+      additionalProperties: false
+      required:
+      - code
+      - message
+      - severity
+      properties:
+        code:
+          type: string
+          pattern: ^[A-Z][A-Z0-9_]+$
+        message:
+          type: string
+        severity:
+          type: string
+          enum:
+          - info
+          - warning
+    Provenance:
+      type: object
+      additionalProperties: false
+      required:
+      - forecast_snapshot_id
+      - forecast_origin_at
+      - observations_complete_through
+      - model_version
+      - feature_schema_version
+      - history_version
+      - weather_snapshot_id
+      - supply_profile_version
+      - reference_version
+      - scenario_policy_version
+      - network_version
+      - runtime_mode
+      properties:
+        forecast_snapshot_id:
+          $ref: '#/components/schemas/Id'
+        forecast_origin_at:
+          type: string
+          format: date-time
+        observations_complete_through:
+          type: string
+          format: date-time
+        model_version:
+          $ref: '#/components/schemas/Id'
+        feature_schema_version:
+          $ref: '#/components/schemas/Id'
+        history_version:
+          $ref: '#/components/schemas/Id'
+        weather_snapshot_id:
+          $ref: '#/components/schemas/Id'
+        supply_profile_version:
+          $ref: '#/components/schemas/Id'
+        reference_version:
+          $ref: '#/components/schemas/Id'
+        scenario_policy_version:
+          $ref: '#/components/schemas/Id'
+        network_version:
+          $ref: '#/components/schemas/Id'
+        runtime_mode:
+          type: string
+          enum:
+          - replay
+          - operational
+          - synthetic_mock
+    CalculationResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - calculation_id
+      - descriptor
+      - provenance
+      - target_load_index
+      - frames
+      - totals
+      - visualization
+      - notices
+      properties:
+        calculation_id:
+          $ref: '#/components/schemas/CalculationId'
+        descriptor:
+          $ref: '#/components/schemas/CalculationDescriptor'
+        provenance:
+          $ref: '#/components/schemas/Provenance'
+        target_load_index:
+          type: number
+          format: double
+          minimum: 0.1
+          maximum: 3
+        frames:
+          type: array
+          items:
+            $ref: '#/components/schemas/Frame'
+          minItems: 1
+          maxItems: 744
+        totals:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteReading'
+          minItems: 1
+          maxItems: 10
+        visualization:
+          $ref: '#/components/schemas/VisualizationPolicy'
+        notices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notice'
+          minItems: 0
+          maxItems: 30
+      description: Stateless read result. totals cover the exact request window per route, with correctly recomputed
+        ratios. No cross-route occupancy sum. All numeric outputs finite. Context stays pinned until explicit refresh.
+    RouteCoverage:
+      type: object
+      additionalProperties: false
+      required:
+      - route_id
+      - window
+      - resolutions
+      - prediction_scope
+      - max_lead_hours
+      - status
+      properties:
+        route_id:
+          $ref: '#/components/schemas/Id'
+        window:
+          $ref: '#/components/schemas/TimeWindow'
+        resolutions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Resolution'
+          minItems: 1
+          maxItems: 2
+          uniqueItems: true
+        prediction_scope:
+          type: string
+          enum:
+          - route
+        max_lead_hours:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 744
+        status:
+          type: string
+          enum:
+          - validated
+          - experimental
+    Snapshot:
+      type: object
+      additionalProperties: false
+      required:
+      - provenance
+      - created_at
+      - coverage
+      - view_modes
+      - reference_quantile
+      - target_load_index
+      - retention_hours_after_deactivation
+      - limitations
+      properties:
+        provenance:
+          $ref: '#/components/schemas/Provenance'
+        created_at:
+          type: string
+          format: date-time
+        coverage:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteCoverage'
+          minItems: 1
+          maxItems: 10
+        view_modes:
+          type: array
+          items:
+            $ref: '#/components/schemas/ViewMode'
+          minItems: 1
+          maxItems: 3
+          uniqueItems: true
+        reference_quantile:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        target_load_index:
+          type: number
+          format: double
+          minimum: 0.1
+          maximum: 3
+        retention_hours_after_deactivation:
+          type: integer
+          format: int32
+          minimum: 24
+        limitations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notice'
+          minItems: 0
+      description: Immutable data/model/weather/supply tuple. An update creates a NEW ID; old requests never silently
+        switch to current. Coverage is a server declaration, not inferred from dataset filenames.
+    Position:
+      type: object
+      additionalProperties: false
+      required:
+      - longitude
+      - latitude
+      properties:
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+    RouteSummary:
+      type: object
+      additionalProperties: false
+      required:
+      - route_id
+      - name
+      - route_number
+      - geometry_status
+      properties:
+        route_id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+        route_number:
+          type: string
+        geometry_status:
+          type: string
+          enum:
+          - verified
+          - approximate
+          - unavailable
+        representative_position:
+          $ref: '#/components/schemas/Position'
+    RouteStop:
+      type: object
+      additionalProperties: false
+      required:
+      - route_stop_id
+      - stop_id
+      - sequence
+      - name
+      - position
+      - prediction_status
+      - prediction_reason
+      properties:
+        route_stop_id:
+          $ref: '#/components/schemas/Id'
+        stop_id:
+          $ref: '#/components/schemas/Id'
+        sequence:
+          type: integer
+          format: int32
+          minimum: 1
+        name:
+          type: string
+        position:
+          $ref: '#/components/schemas/Position'
+        prediction_status:
+          type: string
+          enum:
+          - unavailable
+        prediction_reason:
+          type: string
+          enum:
+          - STOP_LEVEL_DATA_UNAVAILABLE
+      description: Geographic catalog only. Stop-level boardings cannot be inferred from depot place_id or OSM geometry.
+    RoutePattern:
+      type: object
+      additionalProperties: false
+      required:
+      - route_pattern_id
+      - name
+      - stops
+      properties:
+        route_pattern_id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteStop'
+          minItems: 0
+          maxItems: 500
+      description: A route direction/variant. Repeated physical stops have distinct route_stop_id/sequence. Numeric
+        route forecasts are NOT split by pattern.
+    RouteDetail:
+      type: object
+      additionalProperties: false
+      required:
+      - route
+      - network_version
+      - patterns
+      - source_id
+      - geometry_observed_at
+      - historical_match_status
+      - notices
+      properties:
+        route:
+          $ref: '#/components/schemas/RouteSummary'
+        network_version:
+          $ref: '#/components/schemas/Id'
+        patterns:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoutePattern'
+          minItems: 0
+          maxItems: 10
+        source_id:
+          $ref: '#/components/schemas/Id'
+        geometry_observed_at:
+          type: string
+          format: date-time
+        historical_match_status:
+          type: string
+          enum:
+          - verified
+          - unverified
+        notices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notice'
+          minItems: 0
+    RouteList:
+      type: object
+      additionalProperties: false
+      required:
+      - network_version
+      - items
+      properties:
+        network_version:
+          $ref: '#/components/schemas/Id'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteSummary'
+          minItems: 1
+          maxItems: 10
+    LineString:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - coordinates
+      properties:
+        type:
+          type: string
+          enum:
+          - LineString
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: number
+            minItems: 2
+            maxItems: 2
+            description: '[longitude,latitude], WGS84; ranges checked by geometry importer.'
+          minItems: 2
+    MultiLineString:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - coordinates
+      properties:
+        type:
+          type: string
+          enum:
+          - MultiLineString
+        coordinates:
+          type: array
+          items:
+            type: array
+            items:
+              type: array
+              items:
+                type: number
+              minItems: 2
+              maxItems: 2
+              description: '[longitude,latitude], WGS84; ranges checked by geometry importer.'
+            minItems: 2
+          minItems: 1
+    Point:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - coordinates
+      properties:
+        type:
+          type: string
+          enum:
+          - Point
+        coordinates:
+          type: array
+          items:
+            type: number
+          minItems: 2
+          maxItems: 2
+          description: '[longitude,latitude], WGS84; ranges checked by geometry importer.'
+    LineGeometry:
+      oneOf:
+      - $ref: '#/components/schemas/LineString'
+      - $ref: '#/components/schemas/MultiLineString'
+    RouteLineFeature:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - id
+      - geometry
+      - properties
+      properties:
+        type:
+          type: string
+          enum:
+          - Feature
+        id:
+          $ref: '#/components/schemas/Id'
+        geometry:
+          $ref: '#/components/schemas/LineGeometry'
+        properties:
+          type: object
+          additionalProperties: false
+          required:
+          - kind
+          - route_id
+          - route_pattern_id
+          properties:
+            kind:
+              type: string
+              enum:
+              - route_line
+            route_id:
+              $ref: '#/components/schemas/Id'
+            route_pattern_id:
+              $ref: '#/components/schemas/Id'
+    StopPointFeature:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - id
+      - geometry
+      - properties
+      properties:
+        type:
+          type: string
+          enum:
+          - Feature
+        id:
+          $ref: '#/components/schemas/Id'
+        geometry:
+          $ref: '#/components/schemas/Point'
+        properties:
+          type: object
+          additionalProperties: false
+          required:
+          - kind
+          - route_id
+          - route_pattern_id
+          - route_stop_id
+          - stop_id
+          - name
+          - sequence
+          properties:
+            kind:
+              type: string
+              enum:
+              - stop
+            route_id:
+              $ref: '#/components/schemas/Id'
+            route_pattern_id:
+              $ref: '#/components/schemas/Id'
+            route_stop_id:
+              $ref: '#/components/schemas/Id'
+            stop_id:
+              $ref: '#/components/schemas/Id'
+            name:
+              type: string
+            sequence:
+              type: integer
+              format: int32
+              minimum: 1
+    GeometryFeature:
+      oneOf:
+      - $ref: '#/components/schemas/RouteLineFeature'
+      - $ref: '#/components/schemas/StopPointFeature'
+    RouteGeometry:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - network_version
+      - route_id
+      - source_id
+      - features
+      properties:
+        type:
+          type: string
+          enum:
+          - FeatureCollection
+        network_version:
+          $ref: '#/components/schemas/Id'
+        route_id:
+          $ref: '#/components/schemas/Id'
+        source_id:
+          $ref: '#/components/schemas/Id'
+        features:
+          type: array
+          items:
+            $ref: '#/components/schemas/GeometryFeature'
+          minItems: 0
+          maxItems: 1000
+      description: GeoJSON with documented foreign members. RouteStopFeature.id equals route_stop_id; route-line
+        id equals route_pattern_id. Catalog geography only; no forecast values.
+    Limits:
+      type: object
+      additionalProperties: false
+      required:
+      - max_routes
+      - max_window_hours
+      - max_hourly_cells
+      - max_body_bytes
+      - max_export_rows
+      - max_export_bytes
+      - forecast_timeout_ms
+      - max_concurrent_inference
+      - max_response_cells
+      properties:
+        max_routes:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 10
+        max_window_hours:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 744
+        max_hourly_cells:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 7440
+        max_body_bytes:
+          type: integer
+          format: int32
+          minimum: 1
+        max_export_rows:
+          type: integer
+          format: int32
+          minimum: 1
+        max_export_bytes:
+          type: integer
+          format: int32
+          minimum: 1
+        forecast_timeout_ms:
+          type: integer
+          format: int32
+          minimum: 1
+        max_concurrent_inference:
+          type: integer
+          format: int32
+          minimum: 1
+        max_response_cells:
+          type: integer
+          minimum: 1
+          maximum: 960
+    MapConfiguration:
+      type: object
+      additionalProperties: false
+      required:
+      - renderer
+      - style_url
+      - fallback_style_path
+      - attribution
+      - center
+      - zoom
+      properties:
+        renderer:
+          type: string
+          enum:
+          - maplibre
+        style_url:
+          type: string
+          format: uri
+        fallback_style_path:
+          type: string
+        attribution:
+          type: string
+        center:
+          $ref: '#/components/schemas/Position'
+        zoom:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 24
+      description: External basemap availability is not guaranteed. Local fallback shows route geography without
+        basemap. Attribution must stay visible.
+    Capabilities:
+      type: object
+      additionalProperties: false
+      required:
+      - forecast_scopes
+      - stop_forecasts
+      - segment_forecasts
+      - scenario_fleet
+      - scenario_factors
+      - physical_weather_overrides
+      - csv_export
+      - live_ingestion
+      properties:
+        forecast_scopes:
+          type: array
+          items:
+            type: string
+            enum:
+            - route
+          minItems: 1
+          maxItems: 1
+        stop_forecasts:
+          type: string
+          enum:
+          - unavailable
+        segment_forecasts:
+          type: string
+          enum:
+          - unavailable
+        scenario_fleet:
+          type: boolean
+        scenario_factors:
+          type: array
+          items:
+            type: string
+            enum:
+            - weather
+            - event
+            - season
+          minItems: 3
+          maxItems: 3
+          uniqueItems: true
+        physical_weather_overrides:
+          type: boolean
+          enum:
+          - false
+        csv_export:
+          type: boolean
+        live_ingestion:
+          type: boolean
+          enum:
+          - false
+    Bootstrap:
+      type: object
+      additionalProperties: false
+      required:
+      - api_version
+      - display_timezone
+      - locale
+      - active_snapshot
+      - routes
+      - default_selection
+      - map
+      - limits
+      - capabilities
+      properties:
+        api_version:
+          type: string
+        display_timezone:
+          type: string
+          enum:
+          - Europe/Moscow
+        locale:
+          type: string
+          enum:
+          - ru-RU
+        active_snapshot:
+          $ref: '#/components/schemas/Snapshot'
+        routes:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteSummary'
+          minItems: 1
+          maxItems: 10
+        default_selection:
+          $ref: '#/components/schemas/ForecastSelection'
+        map:
+          $ref: '#/components/schemas/MapConfiguration'
+        limits:
+          $ref: '#/components/schemas/Limits'
+        capabilities:
+          $ref: '#/components/schemas/Capabilities'
+    WeatherPoint:
+      type: object
+      additionalProperties: false
+      required:
+      - window
+      - mode
+      - temperature_c
+      - precipitation_mm
+      - weather_code
+      - provider_run_at
+      - available_at
+      - availability_verified
+      properties:
+        window:
+          $ref: '#/components/schemas/TimeWindow'
+        mode:
+          type: string
+          enum:
+          - forecast
+          - climatology
+          - missing
+        temperature_c:
+          type: number
+          format: double
+          nullable: true
+        precipitation_mm:
+          type: number
+          format: double
+          minimum: 0
+          nullable: true
+        weather_code:
+          type: integer
+          nullable: true
+          minimum: 0
+        provider_run_at:
+          type: string
+          format: date-time
+          nullable: true
+        available_at:
+          type: string
+          format: date-time
+          nullable: true
+        availability_verified:
+          type: boolean
+      description: For climatology weather_code and provider_run_at are null. Missing mode has null weather values.
+        available_at is information availability, not download time. Precipitation must be aligned to the interval;
+        provider backward-looking timestamps are normalized by the adapter.
+    WeatherResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - weather_snapshot_id
+      - forecast_snapshot_id
+      - route_id
+      - location_id
+      - provider
+      - retrieved_at
+      - source_id
+      - window
+      - points
+      - notices
+      properties:
+        weather_snapshot_id:
+          $ref: '#/components/schemas/Id'
+        forecast_snapshot_id:
+          $ref: '#/components/schemas/Id'
+        route_id:
+          $ref: '#/components/schemas/Id'
+        location_id:
+          $ref: '#/components/schemas/Id'
+        provider:
+          type: string
+          enum:
+          - open-meteo
+          - synthetic_mock
+        retrieved_at:
+          type: string
+          format: date-time
+        source_id:
+          $ref: '#/components/schemas/Id'
+        window:
+          $ref: '#/components/schemas/TimeWindow'
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/WeatherPoint'
+          minItems: 1
+          maxItems: 744
+        notices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notice'
+          minItems: 0
+      description: Pinned weather actually used by the computation. Does not call Open-Meteo synchronously, and
+        is not an arbitrary URL/coordinate proxy.
+    Source:
+      type: object
+      additionalProperties: false
+      required:
+      - source_id
+      - name
+      - category
+      - version
+      - license_note
+      - retrieved_at
+      - used_for_model
+      - limitations
+      properties:
+        source_id:
+          $ref: '#/components/schemas/Id'
+        name:
+          type: string
+        category:
+          type: string
+          enum:
+          - organizer
+          - weather
+          - calendar
+          - geometry
+        url:
+          type: string
+          format: uri
+        retrieval_method:
+          type: string
+          minLength: 1
+        version:
+          $ref: '#/components/schemas/Id'
+        license_note:
+          type: string
+        retrieved_at:
+          type: string
+          format: date-time
+        used_for_model:
+          type: boolean
+        limitations:
+          type: array
+          items:
+            type: string
+          minItems: 0
+      anyOf:
+      - required:
+        - url
+      - required:
+        - retrieval_method
+    SourceList:
+      type: object
+      additionalProperties: false
+      required:
+      - forecast_snapshot_id
+      - sources
+      properties:
+        forecast_snapshot_id:
+          $ref: '#/components/schemas/Id'
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/Source'
+          minItems: 1
+          maxItems: 30
+    ValidationRecord:
+      oneOf:
+      - $ref: '#/components/schemas/MeasuredValidationRecord'
+      - $ref: '#/components/schemas/UnmeasuredValidationRecord'
+      discriminator:
+        propertyName: status
+        mapping:
+          measured: '#/components/schemas/MeasuredValidationRecord'
+          not_measured: '#/components/schemas/UnmeasuredValidationRecord'
+    SourceEffect:
+      oneOf:
+      - $ref: '#/components/schemas/MeasuredSourceEffect'
+      - $ref: '#/components/schemas/UnmeasuredSourceEffect'
+      discriminator:
+        propertyName: status
+        mapping:
+          measured: '#/components/schemas/MeasuredSourceEffect'
+          not_measured: '#/components/schemas/UnmeasuredSourceEffect'
+    QualityResponse:
+      type: object
+      additionalProperties: false
+      required:
+      - forecast_snapshot_id
+      - target
+      - unit
+      - metrics
+      - source_effects
+      - limitations
+      properties:
+        forecast_snapshot_id:
+          $ref: '#/components/schemas/Id'
+        target:
+          type: string
+          enum:
+          - boardings
+        unit:
+          type: string
+          enum:
+          - boardings_per_route_hour
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationRecord'
+          minItems: 0
+        source_effects:
+          type: array
+          items:
+            $ref: '#/components/schemas/SourceEffect'
+          minItems: 0
+        limitations:
+          type: array
+          items:
+            type: string
+          minItems: 0
+    ExportRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - calculation
+      - expected_calculation_id
+      - format
+      properties:
+        calculation:
+          $ref: '#/components/schemas/CalculationDescriptor'
+        expected_calculation_id:
+          $ref: '#/components/schemas/CalculationId'
+        format:
+          type: string
+          enum:
+          - csv
+      description: Full descriptor is replayed. Expected hash mismatch ->409. Does not depend on a process-local
+        forecast_id or saved evaluation. Synchronous, bounded CSV; all validation happens before sending CSV headers.
+    ProblemField:
+      type: object
+      additionalProperties: false
+      required:
+      - pointer
+      - code
+      - message
+      properties:
+        pointer:
+          type: string
+        code:
+          type: string
+        message:
+          type: string
+    Problem:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - title
+      - status
+      - detail
+      - code
+      - request_id
+      properties:
+        type:
+          type: string
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        code:
+          type: string
+          pattern: ^[A-Z][A-Z0-9_]+$
+        request_id:
+          type: string
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemField'
+          minItems: 0
+          maxItems: 30
+      description: application/problem+json. Stable code for logic; human text in Russian. No raw records, card
+        hashes, internals or secrets.
+    Health:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - component
+      - checks
+      properties:
+        status:
+          type: string
+          enum:
+          - ok
+          - not_ready
+        component:
+          type: string
+          enum:
+          - api
+        checks:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+            - name
+            - ok
+            properties:
+              name:
+                type: string
+              ok:
+                type: boolean
+          minItems: 0
+    MeasuredValidationRecord:
+      type: object
+      additionalProperties: false
+      required:
+      - evaluation_id
+      - protocol_id
+      - model_version
+      - status
+      - route_ids
+      - window
+      - lead_hours_from
+      - lead_hours_to
+      - sample_count
+      - sum_actual
+      - sum_absolute_error
+      - wape_score
+      - baseline_wape_score
+      - notes
+      properties:
+        evaluation_id:
+          $ref: '#/components/schemas/Id'
+        protocol_id:
+          $ref: '#/components/schemas/Id'
+        model_version:
+          $ref: '#/components/schemas/Id'
+        status:
+          type: string
+          enum:
+          - measured
+        route_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Id'
+          minItems: 1
+          maxItems: 10
+          uniqueItems: true
+        window:
+          $ref: '#/components/schemas/TimeWindow'
+        lead_hours_from:
+          type: integer
+          format: int32
+          minimum: 0
+        lead_hours_to:
+          type: integer
+          format: int32
+          minimum: 1
+        sample_count:
+          type: integer
+          format: int32
+          minimum: 1
+        sum_actual:
+          type: number
+          format: double
+          minimum: 0
+        sum_absolute_error:
+          type: number
+          format: double
+          minimum: 0
+        wape_score:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          nullable: true
+        baseline_wape_score:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+          nullable: true
+        notes:
+          type: array
+          items:
+            type: string
+          minItems: 0
+      description: wape_score=max(0,1-sum_absolute_error/sum_actual). Zero actual sum -> null. not_measured -> scores
+        null, count/sums 0. Exact competition protocol still must be confirmed; supplied headers do not establish
+        it.
+    UnmeasuredValidationRecord:
+      type: object
+      additionalProperties: false
+      required:
+      - evaluation_id
+      - protocol_id
+      - model_version
+      - status
+      - route_ids
+      - window
+      - lead_hours_from
+      - lead_hours_to
+      - sample_count
+      - sum_actual
+      - sum_absolute_error
+      - wape_score
+      - baseline_wape_score
+      - notes
+      properties:
+        evaluation_id:
+          $ref: '#/components/schemas/Id'
+        protocol_id:
+          $ref: '#/components/schemas/Id'
+        model_version:
+          $ref: '#/components/schemas/Id'
+        status:
+          type: string
+          enum:
+          - not_measured
+        route_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/Id'
+          minItems: 1
+          maxItems: 10
+          uniqueItems: true
+        window:
+          $ref: '#/components/schemas/TimeWindow'
+        lead_hours_from:
+          type: integer
+          format: int32
+          minimum: 0
+        lead_hours_to:
+          type: integer
+          format: int32
+          minimum: 1
+        sample_count:
+          type: integer
+          format: int32
+          minimum: 0
+          enum:
+          - 0
+        sum_actual:
+          type: number
+          format: double
+          minimum: 0
+          enum:
+          - 0
+        sum_absolute_error:
+          type: number
+          format: double
+          minimum: 0
+          enum:
+          - 0
+        wape_score:
+          type: number
+          nullable: true
+          enum:
+          - null
+        baseline_wape_score:
+          type: number
+          nullable: true
+          enum:
+          - null
+        notes:
+          type: array
+          items:
+            type: string
+          minItems: 0
+      description: wape_score=max(0,1-sum_absolute_error/sum_actual). Zero actual sum -> null. not_measured -> scores
+        null, count/sums 0. Exact competition protocol still must be confirmed; supplied headers do not establish
+        it.
+    MeasuredSourceEffect:
+      type: object
+      additionalProperties: false
+      required:
+      - source_id
+      - protocol_id
+      - status
+      - score_without
+      - score_with
+      - delta
+      - notes
+      properties:
+        source_id:
+          $ref: '#/components/schemas/Id'
+        protocol_id:
+          $ref: '#/components/schemas/Id'
+        status:
+          type: string
+          enum:
+          - measured
+        score_without:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        score_with:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        delta:
+          type: number
+          format: double
+          minimum: -1
+          maximum: 1
+        notes:
+          type: string
+      description: Comparison must use same splits, horizon, target and other settings. No invented improvements;
+        not_measured -> numeric values null.
+    UnmeasuredSourceEffect:
+      type: object
+      additionalProperties: false
+      required:
+      - source_id
+      - protocol_id
+      - status
+      - score_without
+      - score_with
+      - delta
+      - notes
+      properties:
+        source_id:
+          $ref: '#/components/schemas/Id'
+        protocol_id:
+          $ref: '#/components/schemas/Id'
+        status:
+          type: string
+          enum:
+          - not_measured
+        score_without:
+          type: number
+          nullable: true
+          enum:
+          - null
+        score_with:
+          type: number
+          nullable: true
+          enum:
+          - null
+        delta:
+          type: number
+          nullable: true
+          enum:
+          - null
+        notes:
+          type: string
+      description: Comparison must use same splits, horizon, target and other settings. No invented improvements;
+        not_measured -> numeric values null.
+  examples:
+    ForecastRequest:
+      summary: SYNTHETIC integration example
+      value:
+        selection:
+          forecast_snapshot_id: demo-september-2026-v1
+          route_ids:
+          - demo-01
+          view_mode: day
+          window:
+            from: '2026-09-01T18:00:00+03:00'
+            to: '2026-09-01T19:00:00+03:00'
+          resolution: hour
+    ForecastResponse:
+      summary: SYNTHETIC integration example
+      value:
+        calculation_id: calc_e01ee32c523aebd3784f0e20865c87427675f392858511f983f642e0224ed14f
+        descriptor:
+          kind: forecast
+          selection:
+            forecast_snapshot_id: demo-september-2026-v1
+            route_ids:
+            - demo-01
+            view_mode: day
+            window:
+              from: '2026-09-01T15:00:00Z'
+              to: '2026-09-01T16:00:00Z'
+            resolution: hour
+        provenance:
+          forecast_snapshot_id: demo-september-2026-v1
+          forecast_origin_at: '2026-08-31T21:00:00Z'
+          observations_complete_through: '2026-08-31T19:00:00Z'
+          model_version: synthetic-no-onnx
+          feature_schema_version: features-v1
+          history_version: synthetic-history-v1
+          weather_snapshot_id: synthetic-weather-v1
+          supply_profile_version: synthetic-supply-v1
+          reference_version: synthetic-reference-v1
+          scenario_policy_version: scenario-formulas-v1
+          network_version: synthetic-network-v1
+          runtime_mode: synthetic_mock
+        target_load_index: 0.75
+        frames:
+        - window:
+            from: '2026-09-01T15:00:00Z'
+            to: '2026-09-01T16:00:00Z'
+          routes:
+          - route_id: demo-01
+            typical_boardings:
+              status: available
+              value: 549.0
+            relative_to_typical: 0.1111111111111111
+            baseline:
+              boardings: 610.0
+              vehicle_hours:
+                status: available
+                value: 10.0
+              mean_vehicle_count:
+                status: available
+                value: 10.0
+              boardings_per_vehicle_hour:
+                status: available
+                value: 61.0
+              reference_boardings:
+                status: available
+                value: 650.0
+              load_index:
+                status: available
+                value: 0.9384615384615385
+              load_level: elevated
+              required_vehicle_count:
+                status: available
+                value: 13
+              fleet_source: observed_vehicle_profile
+              fleet_is_proxy: true
+            evaluated:
+              boardings: 610.0
+              vehicle_hours:
+                status: available
+                value: 10.0
+              mean_vehicle_count:
+                status: available
+                value: 10.0
+              boardings_per_vehicle_hour:
+                status: available
+                value: 61.0
+              reference_boardings:
+                status: available
+                value: 650.0
+              load_index:
+                status: available
+                value: 0.9384615384615385
+              load_level: elevated
+              required_vehicle_count:
+                status: available
+                value: 13
+              fleet_source: observed_vehicle_profile
+              fleet_is_proxy: true
+            delta:
+              boardings: 0.0
+              load_index: 0.0
+              vehicle_hours: 0.0
+            weather:
+              mode: forecast
+              temperature_mean_c: 9.8
+              precipitation_sum_mm: 0.4
+              forecast_hours: 1
+              climatology_hours: 0
+              missing_hours: 0
+        totals:
+        - route_id: demo-01
+          typical_boardings:
+            status: available
+            value: 549.0
+          relative_to_typical: 0.1111111111111111
+          baseline:
+            boardings: 610.0
+            vehicle_hours:
+              status: available
+              value: 10.0
+            mean_vehicle_count:
+              status: available
+              value: 10.0
+            boardings_per_vehicle_hour:
+              status: available
+              value: 61.0
+            reference_boardings:
+              status: available
+              value: 650.0
+            load_index:
+              status: available
+              value: 0.9384615384615385
+            load_level: elevated
+            required_vehicle_count:
+              status: available
+              value: 13
+            fleet_source: observed_vehicle_profile
+            fleet_is_proxy: true
+          evaluated:
+            boardings: 610.0
+            vehicle_hours:
+              status: available
+              value: 10.0
+            mean_vehicle_count:
+              status: available
+              value: 10.0
+            boardings_per_vehicle_hour:
+              status: available
+              value: 61.0
+            reference_boardings:
+              status: available
+              value: 650.0
+            load_index:
+              status: available
+              value: 0.9384615384615385
+            load_level: elevated
+            required_vehicle_count:
+              status: available
+              value: 13
+            fleet_source: observed_vehicle_profile
+            fleet_is_proxy: true
+          delta:
+            boardings: 0.0
+            load_index: 0.0
+            vehicle_hours: 0.0
+          weather:
+            mode: forecast
+            temperature_mean_c: 9.8
+            precipitation_sum_mm: 0.4
+            forecast_hours: 1
+            climatology_hours: 0
+            missing_hours: 0
+        visualization:
+          metric: load_index
+          scale_min: 0
+          scale_max: 1.5
+          overflow: show_overflow
+          thresholds:
+          - 0.75
+          - 1
+          - 1.25
+          reference_version: synthetic-reference-v1
+          label: Intensity relative to historical reference; not cabin occupancy
+        notices:
+        - code: SYNTHETIC_MOCK
+          message: Synthetic fixtures, not model predictions or measured performance.
+          severity: warning
+        - code: ROUTE_LEVEL_ONLY
+          message: Stop and segment boardings are unavailable.
+          severity: info
+        - code: OBSERVED_FLEET_PROXY
+          message: Historical vehicle counts reflect successful validation events, not full actual service.
+          severity: warning
+    ScenarioRequest:
+      summary: SYNTHETIC integration example
+      value:
+        selection:
+          forecast_snapshot_id: demo-september-2026-v1
+          route_ids:
+          - demo-01
+          view_mode: day
+          window:
+            from: '2026-09-01T00:00:00+03:00'
+            to: '2026-09-02T00:00:00+03:00'
+          resolution: hour
+        overrides:
+          effective_window:
+            from: '2026-09-01T18:00:00+03:00'
+            to: '2026-09-01T19:00:00+03:00'
+          fleet:
+            kind: absolute
+            vehicle_count: 12
+          factors:
+            weather: 1
+            event: 1
+            season: 1
+    ExportRequest:
+      summary: SYNTHETIC integration example
+      value:
+        calculation:
+          kind: scenario
+          selection:
+            forecast_snapshot_id: demo-september-2026-v1
+            route_ids:
+            - demo-01
+            view_mode: day
+            window:
+              from: '2026-08-31T21:00:00Z'
+              to: '2026-09-01T21:00:00Z'
+            resolution: hour
+          overrides:
+            effective_window:
+              from: '2026-09-01T15:00:00Z'
+              to: '2026-09-01T16:00:00Z'
+            fleet:
+              kind: absolute
+              vehicle_count: 12
+            factors:
+              weather: 1.0
+              event: 1.0
+              season: 1.0
+        expected_calculation_id: calc_06f2263ffa8e91ffd695477d3d8d4f301fa2d287dff2cf07015ecd4d8fee6ff3
+        format: csv
+    Geometry:
+      summary: SYNTHETIC integration example
+      value:
+        type: FeatureCollection
+        network_version: synthetic-network-v1
+        route_id: demo-01
+        source_id: synthetic-geometry
+        features:
+        - type: Feature
+          id: demo-01-out
+          geometry:
+            type: LineString
+            coordinates:
+            - - 37.596000000000004
+              - 55.75
+            - - 37.606
+              - 55.753
+            - - 37.616
+              - 55.756
+          properties:
+            kind: route_line
+            route_id: demo-01
+            route_pattern_id: demo-01-out
+        - type: Feature
+          id: demo-01-out-1
+          geometry:
+            type: Point
+            coordinates:
+            - 37.596000000000004
+            - 55.75
+          properties:
+            kind: stop
+            route_id: demo-01
+            route_pattern_id: demo-01-out
+            route_stop_id: demo-01-out-1
+            stop_id: demo-01-stop-1
+            name: Synthetic stop 1
+            sequence: 1
+        - type: Feature
+          id: demo-01-out-2
+          geometry:
+            type: Point
+            coordinates:
+            - 37.606
+            - 55.753
+          properties:
+            kind: stop
+            route_id: demo-01
+            route_pattern_id: demo-01-out
+            route_stop_id: demo-01-out-2
+            stop_id: demo-01-stop-2
+            name: Synthetic stop 2
+            sequence: 2
+        - type: Feature
+          id: demo-01-out-3
+          geometry:
+            type: Point
+            coordinates:
+            - 37.616
+            - 55.756
+          properties:
+            kind: stop
+            route_id: demo-01
+            route_pattern_id: demo-01-out
+            route_stop_id: demo-01-out-3
+            stop_id: demo-01-stop-3
+            name: Synthetic stop 3
+            sequence: 3
+    Problem:
+      summary: SYNTHETIC integration example
+      value:
+        type: urn:tramflow:problem:factor-product-out-of-range
+        title: Unprocessable Content
+        status: 422
+        detail: Combined factor is outside 0.25..4.
+        code: FACTOR_PRODUCT_OUT_OF_RANGE
+        request_id: synthetic-request
+x-runtime-validation:
+- Window ordering, alignment, coverage, lead-time and view width.
+- No future observations or weather releases beyond forecast_origin_at.
+- Requested identifiers belong to pinned snapshot/network.
+- Product of weather/event/season factors in [0.25,4].
+- Fleet delta requires known hourly baseline and resulting fleet in [0,200].
+- Availability discriminators, missing data and divide-by-zero follow CALCULATIONS.md.
+- Scenario effective_window is contained in query; no overrides outside it.
+- CSV expected_calculation_id matches canonical calculation.
+- Raw data, card hashes, submission labels are never public.
+x-implementation-status:
+  implemented_in_this_package: Documentation-only subset with embedded synthetic OpenAPI examples. Mock,
+    reference implementations, generated code and test scripts from the original full handoff are not included.
+  not_implemented: PostgreSQL/PostGIS migrations and repositories, transactional Publisher, real Go HTTP service,
+    ONNX adapter/model, actual data preparation, basemap extraction, weather downloading, deployment,
+    database integration and load tests.
