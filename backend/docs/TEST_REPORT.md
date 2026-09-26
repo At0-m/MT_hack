@@ -29,3 +29,7 @@
 Docker Desktop на этой машине падает при инициализации dockerInference. Сборка image и Compose end-to-end не выполнены; контейнерные CPU/RSS/load checks остаются отдельной проверкой после восстановления Docker.
 
 Обученная модель, транспортные prepared inputs и остановочная ML-модель не переданы. Реальные WAPE/backtest, stop forecasts и качество источников не заявлены. Optional StopModelAdapter пока отсутствует; API и Publisher сообщают это явно. Локальный native MatMul проверяет интерфейс и память, не качество прогноза.
+
+## После BACKEND_REVIEW.md
+
+Проверки исправлений, новые регрессии, native LRU lifecycle и точные оставшиеся ограничения — в [REVIEW_FIXES.md](REVIEW_FIXES.md). Старый performance.json сохранён как исторический замер; после исправлений нагрузка повторно не измерялась.

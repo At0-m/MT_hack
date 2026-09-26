@@ -150,6 +150,44 @@ func TestPostgresPublicationAndReproducibility(t *testing.T) {
 		}
 		return b
 	}
+	beforeWeather, err := s.WeatherMetadata(ctx, a.Snapshot.Provenance.Weather)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, kind := range []string{"shifted", "no-day", "no-hour"} {
+		candidate := clone("bad-" + kind)
+		switch kind {
+		case "shifted":
+			for i := range candidate.Snapshot.Coverage {
+				candidate.Snapshot.Coverage[i].Window.From = origin.Add(12 * time.Hour)
+				candidate.Snapshot.Coverage[i].Window.To = origin.Add(36 * time.Hour)
+				candidate.Snapshot.Coverage[i].MaxLead = 36
+			}
+		case "no-day":
+			candidate.Snapshot.Views = []string{"week"}
+		case "no-hour":
+			for i := range candidate.Snapshot.Coverage {
+				candidate.Snapshot.Coverage[i].Resolutions = []string{"day"}
+			}
+		}
+		if err := s.Publish(ctx, candidate); err == nil {
+			t.Fatal("unusable candidate activated", kind)
+		}
+		active, _, err := s.Active(ctx)
+		if err != nil || active.Provenance.SnapshotID != a.Snapshot.Provenance.SnapshotID {
+			t.Fatal("active changed after rejected candidate")
+		}
+	}
+	// Enforce pattern ownership even for writes outside the normal bundle importer.
+	_, err = s.Pool.Exec(ctx, `INSERT INTO route_stops(network_version,route_id,pattern_id,route_stop_id,stop_id,sequence)
+ VALUES($1,'demo-02','demo-01-out','invalid-cross-route','demo-01-stop-1',99)`, a.Snapshot.Provenance.Network)
+	if err == nil {
+		t.Fatal("cross-route pattern accepted")
+	}
+	_, err = s.Pool.Exec(ctx, `SELECT 1`) // Confirm failed single statement did not break the connection.
+	if err != nil {
+		t.Fatal(err)
+	}
 	bad := clone("bad-candidate")
 	bad.Model.Path = "missing.onnx"
 	bad.Model.Release = "published"
@@ -167,7 +205,9 @@ func TestPostgresPublicationAndReproducibility(t *testing.T) {
 		wg.Add(1)
 		go func(id string) {
 			defer wg.Done()
-			results <- s.Publish(ctx, clone(id))
+			candidate := clone(id)
+			candidate.Snapshot.Created = candidate.Snapshot.Created.Add(2 * time.Hour)
+			results <- s.Publish(ctx, candidate)
 		}(id)
 	}
 	wg.Wait()
@@ -177,6 +217,10 @@ func TestPostgresPublicationAndReproducibility(t *testing.T) {
 		if err == nil {
 			success++
 		}
+	}
+	afterWeather, err := s.WeatherMetadata(ctx, a.Snapshot.Provenance.Weather)
+	if err != nil || string(encode(beforeWeather)) != string(encode(afterWeather)) {
+		t.Fatal("forecast publication changed weather metadata")
 	}
 	if success != 1 {
 		t.Fatal("CAS publication count", success)

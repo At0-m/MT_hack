@@ -25,6 +25,10 @@ import (
 
 type fixtureStore struct{ b d.Bundle }
 
+func (f fixtureStore) WeatherMetadata(context.Context, string) (d.WeatherSnapshot, error) {
+	return f.b.WeatherMetadata, nil
+}
+
 func (f fixtureStore) Snapshot(ctx context.Context, id string) (d.Snapshot, d.Model, error) {
 	if id != f.b.Snapshot.Provenance.SnapshotID {
 		return d.Snapshot{}, d.Model{}, d.Fail(404, "SNAPSHOT_NOT_FOUND", "РќРµ РЅР°Р№РґРµРЅ")

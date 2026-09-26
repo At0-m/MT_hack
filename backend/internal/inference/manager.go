@@ -31,12 +31,14 @@ type Manager struct {
 	closed   bool
 	Root     string
 	mu       sync.Mutex
-	sessions map[string]Predictor
+	sessions map[string]*modelSession
+	clock    uint64
+	changed  chan struct{}
 	slots    chan struct{}
 }
 
 func New(root string) *Manager {
-	return &Manager{Root: root, sessions: map[string]Predictor{}, slots: make(chan struct{}, 2)}
+	return &Manager{Root: root, sessions: map[string]*modelSession{}, changed: make(chan struct{}), slots: make(chan struct{}, 2)}
 }
 func (m *Manager) file(path, hash string) (string, error) {
 	root, err := filepath.Abs(m.Root)
@@ -80,16 +82,18 @@ func (m *Manager) prepare(ctx context.Context, model d.Model, synthetic bool) (P
 		}
 		return nil, nil
 	}
+	session, err := m.acquire(ctx, model)
+	if err != nil {
+		return nil, err
+	}
+	m.release(session)
+	// A handle pins the manifest, not the native pointer; it can reload after eviction.
+	return &modelHandle{manager: m, model: model}, nil
+}
+
+func (m *Manager) load(ctx context.Context, model d.Model) (Predictor, error) {
 	if model.Release != "published" || model.Input != "features" || model.Output != "boardings" || len(model.Columns) < 1 || len(model.Columns) > 256 {
 		return nil, fmt.Errorf("invalid model manifest")
-	}
-	m.mu.Lock()
-	defer m.mu.Unlock()
-	if p, ok := m.sessions[model.Version]; ok {
-		return p, nil
-	}
-	if len(m.sessions) >= 16 {
-		return nil, fmt.Errorf("model session limit reached")
 	}
 	path, err := m.file(model.Path, model.SHA256)
 	if err != nil {
@@ -150,7 +154,6 @@ func (m *Manager) prepare(ctx context.Context, model d.Model, synthetic bool) (P
 		}
 	}
 	good = true
-	m.sessions[model.Version] = p
 	return p, nil
 }
 func Postprocess(v float64, policy string) (float64, error) {
@@ -188,10 +191,6 @@ func (m *Manager) Predict(ctx context.Context, model d.Model, s d.Snapshot, hour
 		}
 		return out, nil
 	}
-	p, err := m.prepare(ctx, model, false)
-	if err != nil {
-		return nil, err
-	}
 	rows := make([][]float32, len(hours))
 	zone := time.FixedZone("Europe/Moscow", 10800)
 	for i, h := range hours {
@@ -222,14 +221,7 @@ func (m *Manager) Predict(ctx context.Context, model d.Model, s d.Snapshot, hour
 			rows[i][j] = float32(v)
 		}
 	}
-	select {
-	case m.slots <- struct{}{}:
-	case <-ctx.Done():
-		return nil, ctx.Err()
-	}
-	defer func() { <-m.slots }()
-	// Native execution is synchronous: slot and buffers survive caller cancellation.
-	raw, err := p.Predict(ctx, rows)
+	raw, err := m.run(ctx, model, rows)
 	if err != nil {
 		return nil, err
 	}
@@ -258,8 +250,8 @@ func (m *Manager) Close() {
 			<-m.slots
 		}
 	}()
-	for _, p := range m.sessions {
-		_ = p.Close()
+	for _, session := range m.sessions {
+		_ = session.predictor.Close()
 	}
-	m.sessions = map[string]Predictor{}
+	m.sessions = map[string]*modelSession{}
 }

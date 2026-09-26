@@ -29,7 +29,7 @@ $env:CORS_ORIGIN = 'http://localhost:5173'
 go run ./cmd/api
 ```
 
-`go run` без build tag поддерживает synthetic demo; real ONNX требует CGO и `go build -tags onnx`, `ONNX_LIBRARY_PATH` к native Runtime 1.24.1. Docker собирает именно native вариант. Compiler wrapper и native version зафиксированы в go.mod/Dockerfile. Для API используйте отдельную read роль с записью только в `user_sessions`; миграции/Publisher — другая роль. Пример выдачи прав в scripts/db-init.sh и migration 002.
+`go run` без build tag поддерживает synthetic demo; real ONNX требует CGO и `go build -tags onnx`, `ONNX_LIBRARY_PATH` к native Runtime 1.24.1. Docker собирает именно native вариант. Compiler wrapper и native version зафиксированы в go.mod/Dockerfile. Для API используйте отдельную read роль с записью только в `user_sessions`; миграции/Publisher — другая роль. Пример выдачи прав в scripts/db-init.sh и migrations 002/003.
 
 Production: TLS gateway, `COOKIE_SECURE=true` (default), точный `CORS_ORIGIN`, credentials только у Publisher при provisioning. Cookie HttpOnly/SameSite=Strict, token хранится в БД как SHA-256; пароль — bcrypt. Login ограничен 10 попытками/мин/IP на реплику и двумя конкурентными bcrypt; за gateway задайте общий лимит. POST с чужим Origin или Sec-Fetch-Site=cross-site отклоняется. Для same-origin frontend используйте reverse proxy; для localhost dev CORS явно разрешён.
 
@@ -70,7 +70,7 @@ go run ./cmd/loadtest -url http://localhost:8080 -n 3000 -c 16
 
 Integration suite требует `TEST_DATABASE_URL` администратора **тестового** PostgreSQL: создаёт отдельную случайную БД, проверяет и удаляет только её. Нет DB env — тест явно skipped. Native tests требуют build tag onnx и DLL/SO. Смотрите docs/TEST_REPORT.md и docs/performance.json для фактически выполненных проверок и замеров; container limits и требуемые RPS не выдаются за измеренный результат.
 
-Cache budget 64 MiB с консервативным 512-byte accounting на entry, максимум два native inference, 32 HTTP requests, DB pool 8. Model sessions максимум 16; native RSS не равен Go heap. Параметры конфигурации: DATABASE_URL, DB_MAX_CONNECTIONS (1..32), ARTIFACTS_ROOT, OPENAPI_PATH, HTTP_ADDR, CORS_ORIGIN, COOKIE_SECURE, ONNX_LIBRARY_PATH.
+Cache budget 64 MiB с консервативным 512-byte accounting на entry, максимум два native inference, 32 HTTP requests, DB pool 8. Model sessions максимум 16, с LRU-вытеснением свободных сессий и повторной загрузкой старых версий; native RSS не равен Go heap. Параметры конфигурации: DATABASE_URL, DB_MAX_CONNECTIONS (1..32), ARTIFACTS_ROOT, OPENAPI_PATH, HTTP_ADDR, CORS_ORIGIN, COOKIE_SECURE, ONNX_LIBRARY_PATH.
 
 ## ML-поставка и границы готовности
 
@@ -85,3 +85,5 @@ Retention сохраняет старые inputs/models; Publisher `--expire` с
 `internal/httpapi` содержит отдельные обработчики bootstrap/catalog/forecast/weather/export/session, middleware и проверку JSON. `internal/engine` — календарные ограничения, canonical hash, расчёт метрик, сценарии, индикаторы и summary. `internal/inference` управляет ONNX sessions; `internal/storage` — SQL, миграции, публикация и сессии; `internal/domain` — типизированный публичный JSON и prepared bundle.
 
 Документы ARCHITECTURE/BACKEND/CALCULATIONS/FRONTEND/ML_DATA и OpenAPI скопированы из последнего архива `MT_HACK_ALL_ROADS_LEAD_TO_FINALE.zip`. Инструкция запуска и отчёт проверок описывают фактическую реализацию.
+
+Исправления BACKEND_REVIEW.md, изменения формата bundle и оставшиеся интеграционные задачи описаны в [docs/REVIEW_FIXES.md](docs/REVIEW_FIXES.md). При обновлении обязательны миграция 003 и weather_metadata; порядок перехода — в [docs/ML_HANDOFF.md](docs/ML_HANDOFF.md).

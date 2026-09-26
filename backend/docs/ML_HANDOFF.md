@@ -40,3 +40,28 @@ docker compose run --rm -v "${PWD}/incoming/bundle.json:/data/bundle.json:ro" pu
 ```
 
 Максимум bundle 32 MiB, 7440 часов, 256 features. Повторное использование version IDs разрешено только при идентичном содержимом. Ошибка проверки или конкурентная смена active pointer отклоняет публикацию. Старый snapshot остаётся доступен до истечения retention.
+
+## Метаданные погоды после ревью
+
+Bundle теперь обязательно содержит `weather_metadata`:
+
+```json
+{
+  "weather_snapshot_id": "weather-v2",
+  "provider": "open-meteo",
+  "source_id": "open-meteo-forecast-source",
+  "retrieved_at": "2026-08-31T20:00:00Z",
+  "route_locations": {
+    "route-1": "moscow-center",
+    "route-2": "moscow-center"
+  }
+}
+```
+
+ID совпадает с provenance; provider — open-meteo или synthetic_mock в соответствующем режиме. Каждый маршрут coverage имеет location ID. SourceList содержит ровно одну запись с этим source_id, category=weather, version=weather_snapshot_id и тем же retrieved_at. Время получения не подменяется created_at прогнозного snapshot. Время выпуска и доступности каждого часа остаются в WeatherPoint. Повторное использование weather ID требует идентичных metadata и строк, даже если новый forecast snapshot создан позже.
+
+Миграция 003 создаёт weather_snapshots и составной FK принадлежности направления маршруту. Старые погодные provenance восстановить достоверно автоматически невозможно. Для поставки из schema 2 подготовьте новую погодную версию с настоящими metadata, новые SourceList/forecast ID и опубликуйте bundle после миграции. Старый закреплённый weather endpoint без metadata возвращает 503. Для локального demo перегенерируйте fixture: `go run ./cmd/fixtures --onnx`.
+
+Publisher также требует хотя бы один целый московский календарный день с day/hour, проверяет согласованность RouteDetail/Geometry и общих физических остановок до активации. При ошибке прежний active snapshot сохраняется.
+
+Наличие stop_model_version и stop_feature_schema_version в provenance теперь допускается только парой. Эти поля не включают inference: отдельные stop inputs, storage/adapter, summary/CSV и интеграция ещё нужны. Enrich больше не стирает уже подготовленные stop_readings; route-only ответы остаются пустыми.

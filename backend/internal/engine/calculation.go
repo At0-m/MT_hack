@@ -110,11 +110,14 @@ func Aggregate(hours []d.Hour, target float64) d.Metrics {
 	return x
 }
 func Weather(hours []d.Hour) d.WeatherSummary {
-	w := d.WeatherSummary{}
+	w := d.WeatherSummary{Category: weatherCategory(hours[0].Weather)}
 	temp, precip := 0.0, 0.0
 	tempOK, precipOK := true, true
 	for _, h := range hours {
 		p := h.Weather
+		if weatherCategory(p) != w.Category {
+			w.Category = "unknown"
+		}
 		switch p.Mode {
 		case "forecast":
 			w.Forecast++
@@ -161,11 +164,13 @@ func difference(a, b d.Reading) *float64 {
 func routeReading(id string, base, eval []d.Hour, target float64) d.RouteReading {
 	b, e := Aggregate(base, target), Aggregate(eval, target)
 	r := d.RouteReading{
-		RouteID:   id,
-		Baseline:  b,
-		Evaluated: e,
-		Typical:   d.Missing("NO_TYPICAL_PROFILE"),
-		Weather:   Weather(base),
+		CalendarCategory: calendarCategory(base),
+		RouteID:          id,
+		Baseline:         b,
+		Evaluated:        e,
+		Typical:          d.Missing("NO_TYPICAL_PROFILE"),
+		Weather:          Weather(base),
+		FleetAssessment:  AssessFleet(eval, target),
 		Delta: d.Delta{
 			Boardings:    e.Boardings - b.Boardings,
 			Index:        difference(e.Index, b.Index),

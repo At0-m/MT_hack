@@ -50,10 +50,10 @@ func (s *Store) Migrate(ctx context.Context) error {
 			return err
 		}
 	}
-	if v > 2 {
+	if v > 3 {
 		return fmt.Errorf("unsupported database schema %d", v)
 	}
-	for i, name := range []string{"001_initial.sql", "002_sessions_anchors.sql"} {
+	for i, name := range []string{"001_initial.sql", "002_sessions_anchors.sql", "003_weather_geography.sql"} {
 		if i+1 <= v {
 			continue
 		}
@@ -74,7 +74,7 @@ func (s *Store) CheckSchema(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if v != 2 || ext == "" {
+	if v != 3 || ext == "" {
 		return fmt.Errorf("schema not ready")
 	}
 	return nil

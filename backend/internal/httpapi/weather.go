@@ -48,18 +48,24 @@ func (s *Server) weather(w http.ResponseWriter, r *http.Request) {
 	for _, h := range hours {
 		points = append(points, h.Weather)
 	}
-	provider := "open-meteo"
-	if snap.Provenance.Mode == "synthetic_mock" {
-		provider = "synthetic_mock"
+	metadata, err := s.Store.WeatherMetadata(r.Context(), snap.Provenance.Weather)
+	if err != nil {
+		s.fail(w, err)
+		return
+	}
+	location, ok := metadata.Locations[route]
+	if !ok {
+		s.problem(w, 503, "WEATHER_METADATA_UNAVAILABLE", "Нет метаданных погодной локации.")
+		return
 	}
 	s.write(w, r, map[string]any{
 		"weather_snapshot_id":  snap.Provenance.Weather,
 		"forecast_snapshot_id": id,
 		"route_id":             route,
-		"location_id":          route,
-		"provider":             provider,
-		"retrieved_at":         snap.Created.UTC(),
-		"source_id":            snap.Provenance.Weather,
+		"location_id":          location,
+		"provider":             metadata.Provider,
+		"retrieved_at":         metadata.RetrievedAt.UTC(),
+		"source_id":            metadata.SourceID,
 		"window":               d.Window{From: from.UTC(), To: to.UTC()},
 		"points":               points,
 		"notices":              snap.Limitations,

@@ -16,6 +16,7 @@ import (
 )
 
 func ptr(v float64) *float64 { return &v }
+func weatherCode(v int) *int { return &v }
 func write(path string, v any) {
 	b, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
@@ -85,8 +86,9 @@ func main() {
 			Columns:     []string{"demand_base", "boost"},
 			TrainCutoff: p.CompleteThrough,
 		},
-		Routes: []d.RouteImport{},
-		Hours:  []d.Hour{},
+		WeatherMetadata: d.WeatherSnapshot{ID: p.Weather, Provider: "synthetic_mock", SourceID: "synthetic-weather-source", RetrievedAt: now, Locations: map[string]string{}},
+		Routes:          []d.RouteImport{},
+		Hours:           []d.Hour{},
 	}
 	example := c.Spec.Components.Examples["Geometry"].Value.Value
 	raw, _ := json.Marshal(example)
@@ -94,6 +96,7 @@ func main() {
 	_ = json.Unmarshal(raw, &geo)
 	for n := 1; n <= 10; n++ {
 		id := fmt.Sprintf("demo-%02d", n)
+		b.WeatherMetadata.Locations[id] = "synthetic-moscow"
 		coords := [][]float64{
 			{37.596 + float64(n-1)*0.006, 55.75},
 			{37.606 + float64(n-1)*0.006, 55.753},
@@ -185,7 +188,7 @@ func main() {
 					Mode:          "forecast",
 					Temperature:   ptr(9.8),
 					Precipitation: ptr(0.4),
-					Code:          new(int),
+					Code:          weatherCode(61),
 					RunAt:         &now,
 					AvailableAt:   &now,
 					Verified:      true,
@@ -203,6 +206,7 @@ func main() {
 	b.Sources, _ = json.Marshal(map[string]any{
 		"forecast_snapshot_id": p.SnapshotID,
 		"sources": []any{
+			map[string]any{"source_id": b.WeatherMetadata.SourceID, "name": "Synthetic hourly weather", "category": "weather", "retrieval_method": "go run ./cmd/fixtures", "version": p.Weather, "license_note": "Test data only", "retrieved_at": now, "used_for_model": true, "limitations": []string{"Not real weather"}},
 			map[string]any{
 				"source_id":        "synthetic-geometry",
 				"name":             "Generated synthetic fixtures",

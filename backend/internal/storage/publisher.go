@@ -31,6 +31,12 @@ func ValidateBundle(ctx context.Context, b *d.Bundle, c *contract.Contract, mode
 	if p.CompleteThrough.After(p.Origin) || b.Model.TrainCutoff.After(p.CompleteThrough) || b.Model.Version != p.Model || b.Model.Schema != p.Features {
 		return fmt.Errorf("version/cutoff mismatch")
 	}
+	if _, err := engine.DefaultSelection(s); err != nil {
+		return err
+	}
+	if (p.StopModel == "") != (p.StopFeatures == "") {
+		return fmt.Errorf("stop model and schema must be supplied together")
+	}
 	synthetic := p.Mode == "synthetic_mock"
 	if synthetic && !allowSynthetic {
 		return fmt.Errorf("synthetic publication requires explicit --allow-synthetic")
@@ -93,6 +99,12 @@ func ValidateBundle(ctx context.Context, b *d.Bundle, c *contract.Contract, mode
 		if report["forecast_snapshot_id"] != p.SnapshotID {
 			return fmt.Errorf("report snapshot mismatch")
 		}
+	}
+	if err := validateGeography(b.Routes); err != nil {
+		return err
+	}
+	if err := validateWeatherMetadata(*b); err != nil {
+		return err
 	}
 	sort.Slice(b.Hours, func(i, j int) bool {
 		if b.Hours[i].RouteID == b.Hours[j].RouteID {
@@ -216,6 +228,15 @@ func claim(ctx context.Context, tx pgx.Tx, kind, version string, payload any) er
 	return nil
 }
 func (s *Store) Publish(ctx context.Context, b d.Bundle) error {
+	if _, err := engine.DefaultSelection(b.Snapshot); err != nil {
+		return err
+	}
+	if err := validateGeography(b.Routes); err != nil {
+		return err
+	}
+	if err := validateWeatherMetadata(b); err != nil {
+		return err
+	}
 	tx, err := s.Pool.Begin(ctx)
 	if err != nil {
 		return err
@@ -255,7 +276,7 @@ func (s *Store) Publish(ctx context.Context, b d.Bundle) error {
 		{"history", p.History, history},
 		{"supply", p.Supply, supply},
 		{"reference", p.Reference, reference},
-		{"weather", p.Weather, weather},
+		{"weather", p.Weather, []any{b.WeatherMetadata, weather}},
 		{"features", p.Features, b.Model.Columns},
 		{"model", p.Model, b.Model},
 	} {
@@ -281,6 +302,9 @@ func (s *Store) Publish(ctx context.Context, b d.Bundle) error {
 				return err
 			}
 		}
+	}
+	if _, err = tx.Exec(ctx, "INSERT INTO weather_snapshots(version,metadata) VALUES($1,$2) ON CONFLICT DO NOTHING", p.Weather, encode(b.WeatherMetadata)); err != nil {
+		return err
 	}
 	for _, h := range b.Hours {
 		if _, err = tx.Exec(ctx, "INSERT INTO prepared_features VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING", p.History, p.Features, p.Origin, h.RouteID, h.Time, h.FeaturesAvailableAt, encode(h.Features), h.SyntheticBoardings); err != nil {
@@ -349,8 +373,14 @@ func importGeometry(ctx context.Context, tx pgx.Tx, network, route string, raw [
 			if f.ID != f.Props.RouteStop {
 				return fmt.Errorf("stop ID mismatch")
 			}
-			if _, err := tx.Exec(ctx, "INSERT INTO stops VALUES($1,$2,$3,ST_SetSRID(ST_GeomFromGeoJSON($4),4326)) ON CONFLICT(network_version,stop_id) DO NOTHING", network, f.Props.Stop, f.Props.Name, string(f.Geometry)); err != nil {
+			result, err := tx.Exec(ctx, `INSERT INTO stops VALUES($1,$2,$3,ST_SetSRID(ST_GeomFromGeoJSON($4),4326))
+ ON CONFLICT(network_version,stop_id) DO UPDATE SET name=EXCLUDED.name
+ WHERE stops.name=EXCLUDED.name AND ST_Equals(stops.location,EXCLUDED.location)`, network, f.Props.Stop, f.Props.Name, string(f.Geometry))
+			if err != nil {
 				return err
+			}
+			if result.RowsAffected() != 1 {
+				return fmt.Errorf("conflicting stored stop %s", f.Props.Stop)
 			}
 			if _, err := tx.Exec(ctx, "INSERT INTO route_stops(network_version,route_id,pattern_id,route_stop_id,stop_id,sequence) VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING", network, route, f.Props.Pattern, f.Props.RouteStop, f.Props.Stop, f.Props.Sequence); err != nil {
 				return err

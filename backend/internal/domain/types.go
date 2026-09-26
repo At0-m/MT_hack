@@ -48,6 +48,8 @@ type ExportRequest struct {
 	Format      string     `json:"format"`
 }
 type Provenance struct {
+	StopModel       string    `json:"stop_model_version,omitempty"`
+	StopFeatures    string    `json:"stop_feature_schema_version,omitempty"`
 	SnapshotID      string    `json:"forecast_snapshot_id"`
 	Origin          time.Time `json:"forecast_origin_at"`
 	CompleteThrough time.Time `json:"observations_complete_through"`
@@ -117,6 +119,7 @@ type WeatherPoint struct {
 	Verified      bool       `json:"availability_verified"`
 }
 type WeatherSummary struct {
+	Category      string   `json:"-"`
 	Mode          string   `json:"mode"`
 	Temperature   *float64 `json:"temperature_mean_c"`
 	Precipitation *float64 `json:"precipitation_sum_mm"`
@@ -129,16 +132,24 @@ type Delta struct {
 	Index        *float64 `json:"load_index"`
 	VehicleHours *float64 `json:"vehicle_hours"`
 }
+type FleetAssessment struct {
+	Variant      string
+	DeficitHours int
+	MaxDeficit   float64
+}
+
 type RouteReading struct {
-	StopReadings []StopReading  `json:"stop_readings"`
-	Indicators   []Indicator    `json:"indicators"`
-	RouteID      string         `json:"route_id"`
-	Typical      Reading        `json:"typical_boardings"`
-	Relative     *float64       `json:"relative_to_typical"`
-	Baseline     Metrics        `json:"baseline"`
-	Evaluated    Metrics        `json:"evaluated"`
-	Delta        Delta          `json:"delta"`
-	Weather      WeatherSummary `json:"weather"`
+	CalendarCategory string          `json:"-"`
+	FleetAssessment  FleetAssessment `json:"-"`
+	StopReadings     []StopReading   `json:"stop_readings"`
+	Indicators       []Indicator     `json:"indicators"`
+	RouteID          string          `json:"route_id"`
+	Typical          Reading         `json:"typical_boardings"`
+	Relative         *float64        `json:"relative_to_typical"`
+	Baseline         Metrics         `json:"baseline"`
+	Evaluated        Metrics         `json:"evaluated"`
+	Delta            Delta           `json:"delta"`
+	Weather          WeatherSummary  `json:"weather"`
 }
 type Frame struct {
 	Window Window         `json:"window"`
@@ -200,7 +211,16 @@ type RouteImport struct {
 	Detail   json.RawMessage `json:"detail"`
 	Geometry json.RawMessage `json:"geometry"`
 }
+type WeatherSnapshot struct {
+	ID          string            `json:"weather_snapshot_id"`
+	Provider    string            `json:"provider"`
+	SourceID    string            `json:"source_id"`
+	RetrievedAt time.Time         `json:"retrieved_at"`
+	Locations   map[string]string `json:"route_locations"`
+}
+
 type Bundle struct {
+	WeatherMetadata  WeatherSnapshot `json:"weather_metadata"`
 	ExpectedPrevious string          `json:"expected_previous_snapshot"`
 	Snapshot         Snapshot        `json:"snapshot"`
 	Model            Model           `json:"model"`

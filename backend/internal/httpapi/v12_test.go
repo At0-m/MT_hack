@@ -61,11 +61,12 @@ func TestSourceScenarioExportGolden(t *testing.T) {
 
 func TestIndicatorVariantsMatchKeys(t *testing.T) {
 	allowed := map[string]map[string]bool{
-		"weather":  {"none": true, "rain": true, "snow": true, "unknown": true},
+		"weather":  {"none": true, "heat": true, "cold": true, "clear": true, "cloudy": true, "other": true, "rain": true, "snow": true, "unknown": true},
 		"fleet":    {"none": true, "deficit": true, "balanced": true, "surplus": true, "unknown": true},
 		"peak":     {"none": true, "peak": true, "off_peak": true, "unknown": true},
-		"event":    {"none": true, "unknown": true},
-		"calendar": {"none": true, "unknown": true},
+		"trend":    {"none": true, "up": true, "down": true, "flat": true},
+		"event":    {"active": true, "none": true, "unknown": true},
+		"calendar": {"holiday": true, "weekday": true, "weekend": true, "none": true, "unknown": true},
 	}
 	handler, spec := handler(t)
 	for _, example := range []string{"ForecastRequest", "ScenarioRequest"} {

@@ -18,6 +18,7 @@ import (
 )
 
 type Store interface {
+	WeatherMetadata(context.Context, string) (d.WeatherSnapshot, error)
 	engine.Repository
 	Active(context.Context) (d.Snapshot, d.Model, error)
 	CheckSchema(context.Context) error
