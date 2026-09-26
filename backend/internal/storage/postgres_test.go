@@ -55,6 +55,7 @@ func TestPostgresPublicationAndReproducibility(t *testing.T) {
 	if err = s.CheckSchema(ctx); err != nil {
 		t.Fatal(err)
 	}
+	checkMigrationIntegrity(t, s, ctx)
 	if err = s.ProvisionUser(ctx, "dispatcher", "test-password-long"); err != nil {
 		t.Fatal(err)
 	}
@@ -91,6 +92,8 @@ func TestPostgresPublicationAndReproducibility(t *testing.T) {
 		}
 	}
 	a.Hours = hs
+	// This test intentionally keeps one day: it must advertise only that view.
+	a.Snapshot.Views = []string{"day"}
 	for i := range a.Snapshot.Coverage {
 		a.Snapshot.Coverage[i].Window.To = origin.Add(24 * time.Hour)
 		a.Snapshot.Coverage[i].MaxLead = 24
@@ -208,7 +211,7 @@ func TestPostgresPublicationAndReproducibility(t *testing.T) {
 		t.Fatal("feature batch aliases lightweight profiles", err)
 	}
 	// Account throttling is shared between database pools, independent of client IP.
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 120; i++ {
 		store := s
 		if i%2 == 1 {
 			store = replica
@@ -222,17 +225,38 @@ func TestPostgresPublicationAndReproducibility(t *testing.T) {
 		t.Fatal("replica bypasses account limiter", err)
 	}
 	userID := auth.Hash("dispatcher")[:32]
+	_, verifiedHash, err := s.User(ctx, "dispatcher")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if _, err := s.Pool.Exec(ctx, "INSERT INTO user_sessions(token_hash,user_id,expires_at) VALUES('expired-review',$1,now()-interval '1 hour')", userID); err != nil {
 		t.Fatal(err)
 	}
 	for i := 0; i < 22; i++ {
-		if err := s.CreateSession(ctx, fmt.Sprintf("review-session-%d", i), userID, time.Now().Add(time.Hour)); err != nil {
+		if err := s.CreateSession(ctx, fmt.Sprintf("review-session-%d", i), userID, time.Now().Add(time.Hour), verifiedHash); err != nil {
 			t.Fatal(err)
 		}
 	}
 	var sessionCount int
 	if err := s.Pool.QueryRow(ctx, "SELECT count(*) FROM user_sessions WHERE user_id=$1", userID).Scan(&sessionCount); err != nil || sessionCount != 20 {
 		t.Fatal("session cleanup/cap", sessionCount, err)
+	}
+	if err := s.ProvisionUser(ctx, "dispatcher", "new-password-long"); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Pool.QueryRow(ctx, "SELECT count(*) FROM user_sessions WHERE user_id=$1", userID).Scan(&sessionCount); err != nil || sessionCount != 0 {
+		t.Fatal("password rotation did not revoke sessions", sessionCount, err)
+	}
+	if err := s.CreateSession(ctx, "stale-password-session", userID, time.Now().Add(time.Hour), verifiedHash); err == nil {
+		t.Fatal("session created from password verified before rotation")
+	}
+	for range 11 {
+		if _, _, err := authA.Login(ctx, "dispatcher", "invalid-password"); err == nil {
+			t.Fatal("invalid password accepted")
+		}
+	}
+	if _, _, err := authB.Login(ctx, "dispatcher", "new-password-long"); err != nil {
+		t.Fatal("targeted account lockout persists across replicas", err)
 	}
 	bad := clone("bad-candidate")
 	bad.Model.Path = "missing.onnx"

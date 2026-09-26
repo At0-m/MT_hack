@@ -323,7 +323,7 @@ func (t *testAuth) User(ctx context.Context, username string) (auth.User, string
 	}
 	return auth.User{ID: "tester", Username: "tester", DisplayName: "Tester"}, t.hash, nil
 }
-func (t *testAuth) CreateSession(ctx context.Context, hash, id string, expires time.Time) error {
+func (t *testAuth) CreateSession(ctx context.Context, hash, id string, expires time.Time, verifiedHash string) error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.sessions[hash] = auth.Session{
@@ -342,7 +342,8 @@ func (t *testAuth) Session(ctx context.Context, hash string) (auth.Session, erro
 	}
 	return s, nil
 }
-func (t *testAuth) AllowLogin(context.Context, string) (bool, error) { return true, nil }
+func (t *testAuth) AllowLogin(context.Context, string) (bool, error)        { return true, nil }
+func (t *testAuth) RecordLogin(context.Context, string, bool) (bool, error) { return true, nil }
 func (t *testAuth) RevokeSession(ctx context.Context, hash string) error {
 	t.mu.Lock()
 	defer t.mu.Unlock()

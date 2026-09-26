@@ -1,9 +1,12 @@
 package httpapi
 
 import (
+	"errors"
+	"log/slog"
 	"net"
 	"net/http"
 	"time"
+	"tramflow/internal/auth"
 	d "tramflow/internal/domain"
 	"tramflow/internal/engine"
 )
@@ -15,7 +18,7 @@ type loginAttempt struct {
 
 func (s *Server) allowLogin(address string) bool {
 	if address == "" {
-		return true
+		return false
 	}
 	host, _, err := net.SplitHostPort(address)
 	if err != nil {
@@ -58,7 +61,12 @@ func (s *Server) cookie(w http.ResponseWriter, value string, expires time.Time, 
 	})
 }
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
+	outcome, subject := "invalid_request", ""
+	defer func() {
+		slog.Info("auth login", "request_id", w.Header().Get("X-Request-ID"), "outcome", outcome, "subject_hash", subject, "client_hash", auth.Hash(s.clientIP(r)))
+	}()
 	if !s.allowLogin(s.clientIP(r)) {
+		outcome = "ip_limited"
 		w.Header().Set("Retry-After", "60")
 		s.problem(w, 429, "LOGIN_RATE_LIMIT", "Слишком много попыток входа.")
 		return
@@ -67,6 +75,7 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	case s.loginSlots <- struct{}{}:
 		defer func() { <-s.loginSlots }()
 	default:
+		outcome = "busy"
 		s.problem(w, 429, "LOGIN_BUSY", "Повторите вход позже.")
 		return
 	}
@@ -77,11 +86,25 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	if !s.body(w, r, "LoginRequest", &q) {
 		return
 	}
+	subject = auth.Hash(q.Username)
 	session, token, err := s.Auth.Login(r.Context(), q.Username, q.Password)
 	if err != nil {
+		outcome = "error"
+		var problem *d.Error
+		if errors.As(err, &problem) {
+			switch problem.Code {
+			case "INVALID_CREDENTIALS":
+				outcome = "invalid"
+			case "INVALID_CREDENTIALS_LIMIT":
+				outcome = "account_limited"
+			case "LOGIN_RATE_LIMIT":
+				outcome = "global_limited"
+			}
+		}
 		s.fail(w, err)
 		return
 	}
+	outcome = "success"
 	s.cookie(w, token, session.Expires, 43200)
 	s.write(w, r, session, false)
 }

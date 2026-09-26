@@ -37,3 +37,7 @@ Docker Desktop на этой машине падает при инициализ
 ## После BACKEND_REVIEW_UPDATED.md
 
 Новые исправления и фактические проверки Go 1.26.8, Linux native ONNX + race с PostGIS и максимальной сетки под cgroup 2 GiB / 2 CPU: [UPDATED_REVIEW_FIXES.md](UPDATED_REVIEW_FIXES.md). Этот раздел дополняет исторические ограничения выше; Docker image/Compose остаются непроверенными.
+
+## После BigTech V3
+
+Актуальные auth/migration/model-cache правила и новые проверки: [BIGTECH_V3_FIXES.md](BIGTECH_V3_FIXES.md). Этот документ сохраняет исторические результаты предыдущей версии.

@@ -69,3 +69,7 @@ Publisher также требует хотя бы один целый моско
 ## Инварианты после обновлённого ревью
 
 Origin, observations_complete_through и train_cutoff обязательны и ненулевые; train_cutoff <= observations_complete_through <= origin. Fleet provenance: unavailable требует fleet=null/proxy=false; manual_plan — fleet!=null/proxy=false; observed_vehicle_profile — fleet!=null/proxy=true. Absolute scenario снимает proxy flag, delta сохраняет baseline provenance. Перед обновлением API примените миграции 004/005; подробности и оставшиеся stop/refresher границы — [UPDATED_REVIEW_FIXES.md](UPDATED_REVIEW_FIXES.md).
+
+## Требования V3
+
+Publisher требует route geometry и рабочее calendar coverage для каждого advertised view каждого маршрута, включая custom. Противоречивые weather modes и небезопасные числовые диапазоны отклоняются до activation; вся prediction grid проверяется chunk-ами по 128. Admission limits и schema 6 rollout: [BIGTECH_V3_FIXES.md](BIGTECH_V3_FIXES.md). ONNX artifact до 128 MiB, schema/golden до 1 MiB каждый; SHA streaming.

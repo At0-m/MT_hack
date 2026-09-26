@@ -44,7 +44,7 @@ func TestForwardedAddressRequiresTrustedPeer(t *testing.T) {
 		{"192.0.2.1:123", "203.0.113.2", "192.0.2.1"},
 		{"10.0.0.1:123", "203.0.113.2, 10.0.0.2", "203.0.113.2"},
 		{"10.0.0.1:123", "198.51.100.3, 203.0.113.2", "203.0.113.2"},
-		{"10.0.0.1:123", "", ""},
+		{"10.0.0.1:123", "", "10.0.0.1"},
 	} {
 		r := httptest.NewRequest("POST", "/api/v1/auth/login", nil)
 		r.RemoteAddr = test.peer

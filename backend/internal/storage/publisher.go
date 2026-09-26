@@ -60,6 +60,9 @@ func ValidateBundle(ctx context.Context, b *d.Bundle, c *contract.Contract, mode
 			return fmt.Errorf("route network mismatch or duplicate")
 		}
 		catalog[detail.Route.ID] = true
+		if len(r.Geometry) == 0 || string(r.Geometry) == "null" {
+			return fmt.Errorf("route geometry is required for map serving")
+		}
 		if len(r.Geometry) > 0 && string(r.Geometry) != "null" {
 			if err := c.Validate("RouteGeometry", r.Geometry); err != nil {
 				return fmt.Errorf("geometry: %w", err)
@@ -120,6 +123,9 @@ func ValidateBundle(ctx context.Context, b *d.Bundle, c *contract.Contract, mode
 			return fmt.Errorf("duplicate hourly input")
 		}
 		actual[key] = h
+		if err := engine.ValidateHourNumbers(h); err != nil {
+			return fmt.Errorf("hour %s: %w", key, err)
+		}
 		if !catalog[h.RouteID] || h.FeaturesAvailableAt.IsZero() || h.FeaturesAvailableAt.After(p.Origin) || h.Time.Unix()%3600 != 0 || h.Time.Nanosecond() != 0 {
 			return fmt.Errorf("invalid hourly input or future features")
 		}
@@ -133,7 +139,7 @@ func ValidateBundle(ctx context.Context, b *d.Bundle, c *contract.Contract, mode
 			return fmt.Errorf("contradictory fleet source/value/proxy")
 		}
 		if synthetic {
-			if h.SyntheticBoardings == nil || !finitePositive(h.SyntheticBoardings) {
+			if h.SyntheticBoardings == nil || !finitePositive(h.SyntheticBoardings) || *h.SyntheticBoardings > engine.MaxHourlyBoardings {
 				return fmt.Errorf("synthetic prediction missing")
 			}
 		} else if h.SyntheticBoardings != nil {
@@ -153,6 +159,9 @@ func ValidateBundle(ctx context.Context, b *d.Bundle, c *contract.Contract, mode
 			}
 		}
 		weather, _ := json.Marshal(h.Weather)
+		if err := validateWeatherMode(h.Weather); err != nil {
+			return err
+		}
 		if err := c.Validate("WeatherPoint", weather); err != nil {
 			return fmt.Errorf("weather: %w", err)
 		}
@@ -195,10 +204,21 @@ func ValidateBundle(ctx context.Context, b *d.Bundle, c *contract.Contract, mode
 		return err
 	}
 	// Verify the entire published grid before touching the active pointer.
-	if _, err := models.Predict(ctx, b.Model, s, b.Hours); err != nil {
-		return fmt.Errorf("candidate inference: %w", err)
+	hours := append([]d.Hour(nil), b.Hours...)
+	for start := 0; start < len(hours); start += 128 {
+		end := min(start+128, len(hours))
+		predictions, err := models.Predict(ctx, b.Model, s, hours[start:end])
+		if err != nil {
+			return fmt.Errorf("candidate inference: %w", err)
+		}
+		for offset, prediction := range predictions {
+			if prediction > engine.MaxHourlyBoardings || math.IsNaN(prediction) || math.IsInf(prediction, 0) || prediction < 0 {
+				return fmt.Errorf("prediction outside numeric admission bounds")
+			}
+			hours[start+offset].Boardings = prediction
+		}
 	}
-	return nil
+	return validateCapabilities(s, hours, c)
 }
 func validCoordinates(v any) bool {
 	a, ok := v.([]any)

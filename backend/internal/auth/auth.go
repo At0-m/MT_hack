@@ -23,8 +23,9 @@ type Session struct {
 }
 type Repository interface {
 	AllowLogin(context.Context, string) (bool, error)
+	RecordLogin(context.Context, string, bool) (bool, error)
 	User(context.Context, string) (User, string, error)
-	CreateSession(context.Context, string, string, time.Time) error
+	CreateSession(context.Context, string, string, time.Time, string) error
 	Session(context.Context, string) (Session, error)
 	RevokeSession(context.Context, string) error
 }
@@ -39,12 +40,14 @@ func New(repo Repository) *Service {
 }
 func Hash(token string) string { return fmt.Sprintf("%x", sha256.Sum256([]byte(token))) }
 func (s *Service) Login(ctx context.Context, username, password string) (Session, string, error) {
-	allowed, err := s.Repo.AllowLogin(ctx, Hash(username))
+	// A shared, bounded pre-auth budget stops rotating-IP/username spray. Account
+	// failure counters never prevent checking a legitimate user's password.
+	allowed, err := s.Repo.AllowLogin(ctx, Hash("tramflow:global-login-budget:v3"))
 	if err != nil {
 		return Session{}, "", err
 	}
 	if !allowed {
-		return Session{}, "", d.Fail(429, "LOGIN_RATE_LIMIT", "Слишком много попыток входа для этого аккаунта.")
+		return Session{}, "", d.Fail(429, "LOGIN_RATE_LIMIT", "Слишком много попыток входа; повторите позже.")
 	}
 	user, hash, err := s.Repo.User(ctx, username)
 	if err != nil {
@@ -55,7 +58,15 @@ func (s *Service) Login(ctx context.Context, username, password string) (Session
 		h = s.dummy
 	}
 	check := bcrypt.CompareHashAndPassword(h, []byte(password))
-	if check != nil || hash == "" {
+	success := check == nil && hash != ""
+	belowFailureLimit, err := s.Repo.RecordLogin(ctx, Hash("tramflow:account-failures:"+username), success)
+	if err != nil {
+		return Session{}, "", err
+	}
+	if !success {
+		if !belowFailureLimit {
+			return Session{}, "", d.Fail(429, "INVALID_CREDENTIALS_LIMIT", "Слишком много неверных попыток входа.")
+		}
 		return Session{}, "", d.Fail(401, "INVALID_CREDENTIALS", "Неверный логин или пароль.")
 	}
 	raw := make([]byte, 32)
@@ -64,7 +75,7 @@ func (s *Service) Login(ctx context.Context, username, password string) (Session
 	}
 	token := hex.EncodeToString(raw)
 	expires := time.Now().UTC().Add(12 * time.Hour)
-	if err = s.Repo.CreateSession(ctx, Hash(token), user.ID, expires); err != nil {
+	if err = s.Repo.CreateSession(ctx, Hash(token), user.ID, expires, hash); err != nil {
 		return Session{}, "", err
 	}
 	return Session{true, user, expires}, token, nil

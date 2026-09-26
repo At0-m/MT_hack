@@ -5,10 +5,19 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"log/slog"
+	"time"
 	d "tramflow/internal/domain"
 )
 
-const sessionLimit = 16
+// Conservative admission cap; native working memory still depends on the model.
+const sessionLimit = 4
+
+type modelLoad struct {
+	manifest [32]byte
+	done     chan struct{}
+	err      error
+}
 
 type modelSession struct {
 	predictor Predictor
@@ -56,6 +65,9 @@ func (m *Manager) acquire(ctx context.Context, model d.Model) (*modelSession, er
 	}
 	digest := sha256.Sum256(raw)
 	for {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		m.mu.Lock()
 		if session, ok := m.sessions[model.Version]; ok {
 			if session.manifest != digest {
@@ -67,9 +79,24 @@ func (m *Manager) acquire(ctx context.Context, model d.Model) (*modelSession, er
 			m.mu.Unlock()
 			return session, nil
 		}
-		if len(m.sessions) >= sessionLimit {
-			var victim string
-			var oldest *modelSession
+		if loading, ok := m.loading[model.Version]; ok {
+			m.mu.Unlock()
+			if loading.manifest != digest {
+				return nil, fmt.Errorf("loading model manifest changed")
+			}
+			select {
+			case <-loading.done:
+				if loading.err != nil {
+					return nil, loading.err
+				}
+				continue
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			}
+		}
+		var victim string
+		var oldest *modelSession
+		if len(m.sessions)+len(m.loading)+len(m.retired) >= sessionLimit {
 			for version, session := range m.sessions {
 				if session.refs == 0 && (oldest == nil || session.used < oldest.used) {
 					victim, oldest = version, session
@@ -85,24 +112,40 @@ func (m *Manager) acquire(ctx context.Context, model d.Model) (*modelSession, er
 					return nil, ctx.Err()
 				}
 			}
-			if err := oldest.predictor.Close(); err != nil {
-				m.mu.Unlock()
-				return nil, err
-			}
 			delete(m.sessions, victim)
 		}
-		// Serial loading prevents duplicate sessions. Runs release their slot before
-		// acquiring mu, so golden inference here cannot deadlock with a running model.
-		predictor, err := m.load(ctx, model)
-		if err != nil {
-			m.mu.Unlock()
-			return nil, err
-		}
-		m.clock++
-		session := &modelSession{predictor: predictor, manifest: digest, refs: 1, used: m.clock}
-		m.sessions[model.Version] = session
+		loading := &modelLoad{manifest: digest, done: make(chan struct{})}
+		m.loading[model.Version] = loading // Reserves one slot, including victim Close.
 		m.mu.Unlock()
-		return session, nil
+
+		started := time.Now()
+		var predictor Predictor
+		closeFailed := false
+		if oldest != nil {
+			err = oldest.predictor.Close()
+			closeFailed = err != nil
+		}
+		if err == nil {
+			predictor, err = m.open(ctx, model)
+		}
+		m.mu.Lock()
+		delete(m.loading, model.Version)
+		var session *modelSession
+		if err == nil {
+			m.clock++
+			session = &modelSession{predictor: predictor, manifest: digest, refs: 1, used: m.clock}
+			m.sessions[model.Version] = session
+		} else if closeFailed {
+			m.retired = append(m.retired, oldest)
+		}
+		loading.err = err
+		close(loading.done)
+		close(m.changed)
+		m.changed = make(chan struct{})
+		count := len(m.sessions)
+		m.mu.Unlock()
+		slog.Info("model load", "model_version", model.Version, "duration_ms", time.Since(started).Milliseconds(), "session_count", count, "evicted_version", victim, "success", err == nil)
+		return session, err
 	}
 }
 

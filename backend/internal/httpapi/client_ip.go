@@ -23,27 +23,27 @@ func (s *Server) clientIP(r *http.Request) string {
 	}
 	peer, err := netip.ParseAddr(host)
 	if err != nil {
-		return ""
+		return "invalid-peer"
 	}
 	peer = peer.Unmap()
 	if !s.trusted(peer) {
 		return peer.String()
 	}
 	// Only walk a chain supplied by a configured proxy, from the nearest hop back.
-	// A trusted peer without client metadata uses only shared account throttling.
+	// Malformed/missing metadata falls back to a coarse peer bucket, never unlimited.
 	chain := strings.Split(r.Header.Get("X-Forwarded-For"), ",")
 	if len(chain) > 16 {
-		return ""
+		return peer.String()
 	}
 	for i := len(chain) - 1; i >= 0; i-- {
 		address, err := netip.ParseAddr(strings.TrimSpace(chain[i]))
 		if err != nil {
-			return ""
+			return peer.String()
 		}
 		address = address.Unmap()
 		if !s.trusted(address) {
 			return address.String()
 		}
 	}
-	return ""
+	return peer.String()
 }

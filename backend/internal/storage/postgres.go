@@ -4,18 +4,24 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
 	d "tramflow/internal/domain"
 	"tramflow/internal/engine"
-	"tramflow/migrations"
 )
 
 type Store struct{ Pool *pgxpool.Pool }
 
 func Open(ctx context.Context, url string, max int32) (*Store, error) {
+	return openPool(ctx, url, max, "5000", "tramflow-api")
+}
+
+func OpenMaintenance(ctx context.Context, url string, max int32) (*Store, error) {
+	return openPool(ctx, url, max, "300000", "tramflow-publisher")
+}
+
+func openPool(ctx context.Context, url string, max int32, timeout, application string) (*Store, error) {
 	c, err := pgxpool.ParseConfig(url)
 	if err != nil {
 		return nil, err
@@ -23,61 +29,13 @@ func Open(ctx context.Context, url string, max int32) (*Store, error) {
 	c.MaxConns = max
 	c.MinConns = 0
 	c.ConnConfig.ConnectTimeout = 3 * time.Second
-	c.ConnConfig.RuntimeParams["statement_timeout"] = "5000"
-	c.ConnConfig.RuntimeParams["application_name"] = "tramflow"
+	c.ConnConfig.RuntimeParams["statement_timeout"] = timeout
+	c.ConnConfig.RuntimeParams["application_name"] = application
 	p, err := pgxpool.NewWithConfig(ctx, c)
 	if err != nil {
 		return nil, err
 	}
 	return &Store{p}, nil
-}
-func (s *Store) Migrate(ctx context.Context) error {
-	tx, err := s.Pool.Begin(ctx)
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback(ctx)
-	if _, err = tx.Exec(ctx, "SELECT pg_advisory_xact_lock(741852)"); err != nil {
-		return err
-	}
-	var exists bool
-	if err = tx.QueryRow(ctx, "SELECT to_regclass('public.schema_migrations') IS NOT NULL").Scan(&exists); err != nil {
-		return err
-	}
-	var v int
-	if exists {
-		if err = tx.QueryRow(ctx, "SELECT COALESCE(max(version),0) FROM schema_migrations").Scan(&v); err != nil {
-			return err
-		}
-	}
-	if v > 5 {
-		return fmt.Errorf("unsupported database schema %d", v)
-	}
-	for i, name := range []string{"001_initial.sql", "002_sessions_anchors.sql", "003_weather_geography.sql", "004_login_limits.sql", "005_calendar_flags.sql"} {
-		if i+1 <= v {
-			continue
-		}
-		sql, err := migrations.Files.ReadFile(name)
-		if err != nil {
-			return err
-		}
-		if _, err = tx.Exec(ctx, string(sql)); err != nil {
-			return err
-		}
-	}
-	return tx.Commit(ctx)
-}
-func (s *Store) CheckSchema(ctx context.Context) error {
-	var v int
-	var ext string
-	err := s.Pool.QueryRow(ctx, "SELECT (SELECT max(version) FROM schema_migrations),postgis_version()").Scan(&v, &ext)
-	if err != nil {
-		return err
-	}
-	if v != 5 || ext == "" {
-		return fmt.Errorf("schema not ready")
-	}
-	return nil
 }
 func dependency(err error) error {
 	if errors.Is(err, context.DeadlineExceeded) {

@@ -151,6 +151,8 @@ func Indicators(reading d.RouteReading, desc d.Descriptor, window d.Window) []d.
 			continue
 		}
 		if factor == 1 {
+			// Contract v1.2 has five slots. An active event has priority over peak;
+			// numeric peak metrics remain present in frames and summary.
 			indicators[position] = neutralIndicator("event", "События", "")
 			indicators[position].Variant = "active"
 		}

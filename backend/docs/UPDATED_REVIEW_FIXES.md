@@ -61,3 +61,7 @@ Maintenance выполняется отдельно с Publisher ролью: `go
 - Нет реальных WAPE/backtest и нагрузки обученной модели. Cooperative ONNX termination не заменяет process watchdog при зависшем native kernel. Docker image/Compose и новый CI должны быть проверены после восстановления Docker/пуша.
 
 Исправленный route backend проверен в описанных условиях; весь продукт production-ready пока не объявляется.
+
+## После BigTech V3
+
+Актуальные auth/migration/model-cache правила и новые проверки: [BIGTECH_V3_FIXES.md](BIGTECH_V3_FIXES.md). Этот документ сохраняет исторические результаты предыдущей версии.

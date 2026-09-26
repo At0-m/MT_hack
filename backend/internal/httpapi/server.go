@@ -75,6 +75,9 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/v1/exports", s.export)
 	mux.HandleFunc("POST /api/v1/summaries/query", s.summary)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		recorded := &statusWriter{ResponseWriter: w}
+		w = recorded
+		_, routePattern := mux.Handler(r)
 		start := time.Now()
 		id := r.Header.Get("X-Request-ID")
 		if !engine.IDPattern.MatchString(id) {
@@ -90,7 +93,11 @@ func (s *Server) Handler() http.Handler {
 				slog.Error("http panic", "request_id", id, "panic", panicValue, "stack", string(debug.Stack()))
 				s.problem(w, 500, "INTERNAL_ERROR", "Внутренняя ошибка сервиса.")
 			}
-			slog.Info("http", "request_id", id, "method", r.Method, "path", r.URL.Path, "duration_ms", time.Since(start).Milliseconds())
+			status := recorded.status
+			if status == 0 {
+				status = http.StatusOK
+			}
+			slog.Info("http", "request_id", id, "method", r.Method, "route", routePattern, "status", status, "user_id", d.UserID(r.Context()), "duration_ms", time.Since(start).Milliseconds())
 		}()
 		if origin := r.Header.Get("Origin"); origin != "" {
 			if origin != s.Origin {

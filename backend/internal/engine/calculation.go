@@ -204,6 +204,9 @@ func Calculate(desc d.Descriptor, s d.Snapshot, hours []d.Hour) (d.Response, err
 	byRoute := map[string][]d.Hour{}
 	evaluated := map[string][]d.Hour{}
 	for _, h := range hours {
+		if err := ValidateHourNumbers(h); err != nil {
+			return d.Response{}, d.Caused(503, "INVALID_INPUT_PROFILE", "Некорректные подготовленные данные.", "calculation", err)
+		}
 		if math.IsNaN(h.Boardings) || math.IsInf(h.Boardings, 0) || h.Boardings < 0 {
 			return d.Response{}, d.Fail(503, "INVALID_MODEL_OUTPUT", "Модель вернула недопустимый прогноз.")
 		}
@@ -271,6 +274,9 @@ func Calculate(desc d.Descriptor, s d.Snapshot, hours []d.Hour) (d.Response, err
 	}
 	for _, r := range q.RouteIDs {
 		result.Totals = append(result.Totals, routeReading(r, byRoute[r], evaluated[r], s.Target))
+	}
+	if err := ValidateResponseNumbers(result); err != nil {
+		return d.Response{}, d.Caused(503, "INVALID_DERIVED_METRICS", "Расчёт дал недопустимые значения.", "calculation", err)
 	}
 	return result, nil
 }

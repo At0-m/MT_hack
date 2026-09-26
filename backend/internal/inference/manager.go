@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"os"
 	"path/filepath"
@@ -26,21 +27,32 @@ type Schema struct {
 	Version string   `json:"version"`
 	Columns []string `json:"columns"`
 }
+
+const (
+	modelArtifactLimit    = 128 * 1024 * 1024
+	metadataArtifactLimit = 1024 * 1024
+)
+
 type Manager struct {
 	life     sync.RWMutex
 	closed   bool
 	Root     string
 	mu       sync.Mutex
 	sessions map[string]*modelSession
+	retired  []*modelSession // Failed Close keeps its admission slot until shutdown.
+	loading  map[string]*modelLoad
+	open     func(context.Context, d.Model) (Predictor, error)
 	clock    uint64
 	changed  chan struct{}
 	slots    chan struct{}
 }
 
 func New(root string) *Manager {
-	return &Manager{Root: root, sessions: map[string]*modelSession{}, changed: make(chan struct{}), slots: make(chan struct{}, 2)}
+	m := &Manager{Root: root, sessions: map[string]*modelSession{}, loading: map[string]*modelLoad{}, changed: make(chan struct{}), slots: make(chan struct{}, 2)}
+	m.open = m.load
+	return m
 }
-func (m *Manager) file(path, hash string) (string, error) {
+func (m *Manager) file(path, hash string, limit int64) (string, error) {
 	root, err := filepath.Abs(m.Root)
 	if err != nil {
 		return "", err
@@ -58,11 +70,24 @@ func (m *Manager) file(path, hash string) (string, error) {
 	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) || filepath.IsAbs(rel) {
 		return "", fmt.Errorf("artifact outside root")
 	}
-	b, err := os.ReadFile(p)
+	file, err := os.Open(p)
 	if err != nil {
 		return "", err
 	}
-	if fmt.Sprintf("%x", sha256.Sum256(b)) != hash {
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		return "", err
+	}
+	if !info.Mode().IsRegular() || info.Size() > limit {
+		return "", fmt.Errorf("artifact is not a regular file or exceeds admission limit")
+	}
+	digest := sha256.New()
+	count, err := io.Copy(digest, io.LimitReader(file, limit+1))
+	if err != nil || count > limit {
+		return "", fmt.Errorf("artifact checksum read failed or exceeds limit: %v", err)
+	}
+	if fmt.Sprintf("%x", digest.Sum(nil)) != hash {
 		return "", fmt.Errorf("artifact checksum mismatch")
 	}
 	return p, nil
@@ -96,15 +121,15 @@ func (m *Manager) load(ctx context.Context, model d.Model) (Predictor, error) {
 	if model.Release != "published" || model.Input != "features" || model.Output != "boardings" || len(model.Columns) < 1 || len(model.Columns) > 256 {
 		return nil, fmt.Errorf("invalid model manifest")
 	}
-	path, err := m.file(model.Path, model.SHA256)
+	path, err := m.file(model.Path, model.SHA256, modelArtifactLimit)
 	if err != nil {
 		return nil, err
 	}
-	schemaPath, err := m.file(model.SchemaPath, model.SchemaSHA256)
+	schemaPath, err := m.file(model.SchemaPath, model.SchemaSHA256, metadataArtifactLimit)
 	if err != nil {
 		return nil, err
 	}
-	goldenPath, err := m.file(model.GoldenPath, model.GoldenSHA256)
+	goldenPath, err := m.file(model.GoldenPath, model.GoldenSHA256, metadataArtifactLimit)
 	if err != nil {
 		return nil, err
 	}
@@ -242,17 +267,16 @@ func (m *Manager) Close() {
 	defer m.life.Unlock()
 	m.closed = true
 	m.mu.Lock()
-	defer m.mu.Unlock()
-	for i := 0; i < cap(m.slots); i++ {
-		m.slots <- struct{}{}
-	}
-	defer func() {
-		for i := 0; i < cap(m.slots); i++ {
-			<-m.slots
-		}
-	}()
-	for _, session := range m.sessions {
+	sessions := m.sessions
+	retired := m.retired
+	m.sessions = map[string]*modelSession{}
+	m.retired = nil
+	m.mu.Unlock()
+	// life.Lock has already waited for all Prepare/Predict operations to exit.
+	for _, session := range sessions {
 		_ = session.predictor.Close()
 	}
-	m.sessions = map[string]*modelSession{}
+	for _, session := range retired {
+		_ = session.predictor.Close()
+	}
 }
