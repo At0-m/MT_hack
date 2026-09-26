@@ -22,6 +22,9 @@ func write(path string, v any) {
 	if err != nil {
 		panic(err)
 	}
+	if err = os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		panic(err)
+	}
 	if err = os.WriteFile(path, b, 0644); err != nil {
 		panic(err)
 	}
@@ -247,7 +250,9 @@ func main() {
 			version = "synthetic-stress-256-v1"
 		}
 		root := filepath.Join("artifacts", version)
-		_ = os.MkdirAll(root, 0755)
+		if err := os.MkdirAll(root, 0755); err != nil {
+			panic(err)
+		}
 		model := tinyModelWidth(len(b.Model.Columns))
 		if err = os.WriteFile(filepath.Join(root, "boardings.onnx"), model, 0644); err != nil {
 			panic(err)
@@ -285,7 +290,9 @@ func main() {
 			b.Model = baseModel
 		}
 	}
-	_ = os.MkdirAll(filepath.Dir(*out), 0755)
+	if err := os.MkdirAll(filepath.Dir(*out), 0755); err != nil {
+		panic(err)
+	}
 	if *stress {
 		raw, err := json.Marshal(b)
 		if err != nil {
