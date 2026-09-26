@@ -1,210 +1,167 @@
-# Frontend: инструкция реализации
+# Frontend implementation guide v1.2
 
-## 1. Главная модель интерфейса
+## 1. Source of truth
 
-Рабочий экран остаётся вашим: карта, выбранный маршрут, рулетка времени, календарь, контроль выпуска, индикаторы факторов и drawer.
+Типы и endpoint'ы — только из `openapi/openapi.yaml`. Не добавлять поля/endpoint'ы локально без изменения контракта.
 
-```text
-AppState
-  pinnedSnapshot
-  networkVersion
-  routeIds
-  viewMode: day | week | month
-  window: [from,to)
-  resolution: hour | day
-  selectedFrameIndex
-  selectedGeographicStopId?
-  scenarioOverrides?
-  confirmedCalculation?
-  pendingRequestVersion
-```
-
-`selectedFrameIndex` и выбранная географическая остановка — локальное состояние. Они не создают серверную evaluation.
-
-Полученный `CalculationResponse` меняется атомарно целиком: карта, шапка, график, итог периода и экспорт используют одну версию. Нельзя независимо смешивать новый `evaluated` и старый `baseline`.
-
-**Редакция хранилища PostgreSQL/PostGIS не меняет frontend-контракт.** Клиент работает только с HTTP API; он не читает файловый `current.json`, не подключается к БД и не выбирает активную модель. `bootstrap.active_snapshot` и версии геометрии приходят из backend, для которого source of truth — PostgreSQL.
-
-## 2. Начальная загрузка
+## 2. App state
 
 ```text
-GET /api/v1/bootstrap
-  → сохранить active_snapshot и default_selection
-  → сохранить network_version и capabilities
-
-GET /api/v1/routes/{route_id}/geometry?network_version=...
-GET /api/v1/routes/{route_id}?network_version=...
-POST /api/v1/forecasts/query
-  {"selection": default_selection}
+forecastSnapshotId
+routeId
+routePatternId?
+viewMode: day | week | month | custom
+window
+spatialDetail: route | route_stop
+selectedFrameIndex
+scenarioOverrides
+selectedStopId?
 ```
 
-`bootstrap.routes` содержит десять реально поддержанных backend маршрутов. Не копировать номера из mock или макетов в константу production.
+## 3. Time UX
 
-Геометрию и базовые прогнозы можно загружать параллельно после bootstrap. Backend читает подготовленную географию из PostGIS и отдаёт **тот же GeoJSON** с прежними IDs и `network_version`; локальная геометрия frontend — это уже загруженная копия, не отдельный источник истины. Если подложка не работает, данные всё равно отображаются на локальном фоне.
+| Mode | Backend resolution | Frontend interaction |
+|---|---|---|
+| Day | hour | получает все hourly frames; wheel меняет локальный index |
+| Week | day | 7 daily frames |
+| Month | day | 28/29/30/31 daily frames |
+| Custom | day only | произвольный диапазон дат |
 
-Для первой интеграции:
+`custom` никогда не запрашивается с `resolution=hour`. Для почасового просмотра выбранного дня переключиться в `day`.
 
-```ts
-const api = new ApiClient("http://localhost:8080", "demo:demo");
-const boot = await api.bootstrap();
-const result = await api.forecast({ selection: boot.default_selection });
-```
+Custom:
 
-В production пароль не встраивается во frontend. Защита приложения и API — на same-origin gateway.
+- границы выбираются календарными датами;
+- может пересекать месяц/год и 29 февраля;
+- максимум читается из `bootstrap.limits.max_custom_days`;
+- frontend не обрезает range сам и не принимает partial response как полный;
+- `422` показывает пользователю доступный coverage/limit из problem details, если backend их вернул.
 
-## 3. Режимы времени
+## 4. Карта
 
-| UI | Интервал по умолчанию | resolution | Кадры |
-|---|---|---|---|
-| День | Выбранный день, местная полночь → следующая | `hour` | 24 |
-| Неделя | Понедельник → следующий понедельник | `day` | 7 |
-| Месяц | Первое число → первое число следующего месяца | `day` | 28–31 |
-
-Для произвольного отрезка задаём явные `from` / `to`. День допускает до 24 часов, неделя — до 168, месяц — до 744. При дневной агрегации границы должны быть московскими полуночами. Недельный/месячный запрос может иметь часовую детализацию, если не превышает лимит 960 возвращаемых ячеек `(кадр,маршрут)`.
-
-**Длина выбранного периода и дальность прогноза — разные понятия.** Допустимые целевые даты берём из `snapshot.coverage`, не вычисляем самостоятельно по имени режима.
-
-Календарные операции выполняются в `Europe/Moscow`; не в часовом поясе браузера. Ответы нормализованы в UTC. Для отображения используется `Intl.DateTimeFormat` с явным `timeZone`.
-
-Если календарная неделя/месяц частично вне покрытия, запрещено молча показывать сокращённый период как полный. UI либо блокирует выбор, либо предлагает **явно подписанный доступный отрезок** и отправляет именно его. Backend интервал самостоятельно не обрезает.
-
-В API v1 нет смеси факта и прогноза внутри одного графика. Все числовые кадры — прогноз выбранного snapshot. Даты вне покрытия недоступны.
-
-## 4. Рулетка и график
-
-После загрузки 24/7/28–31 кадров:
+Geometry загружается отдельно от forecast values:
 
 ```text
-selectedFrameIndex = новое положение
-  → чтение frames[index]
-  → локальное обновление карты и шапки
+RouteGeometry
+  route_pattern line
+  route_stop points
+
+CalculationResponse
+  frames[].routes[].stop_readings[]
 ```
 
-Никаких HTTP-запросов на `wheel`, `mousemove`, `pointermove`.
+Join только по `route_stop_id`.
 
-Полный график использует `frames`, итог периода — `totals`. Не пересчитывать агрегатные `load_index` средним по кадрам. При часовом drill-down нужен новый forecast query с тем же snapshot и границами нужного дня.
+### Реальная остановочная метрика
 
-Показываем ожидаемые посадки с разумным округлением только в UI. Не заменяем исходные числа округлёнными перед экспортом.
+При `spatial_detail=route_stop` `stop_readings[]` — реальные stop-level predictions. Не подменять их route-level значениями.
 
-## 5. Привязка полей к вашим макетам
+Если `capabilities.stop_forecasts=false`, UI скрывает/disable stop analytics и не делает `route_stop` запрос.
 
-| Макет | Реализация |
-|---|---|
-| `default.png` | `frames[index].routes[...].evaluated` + локальная геометрия |
-| `time_roll.png` | Только смена индекса кадра |
-| `calendar_day_split.png` | Новый `window`, режим day, часовые кадры |
-| `calendar_week_split.png` | Неделя, дневные кадры |
-| `calendar_month_split.png` | Месяц, дневные кадры |
-| `route.png` | Локальный каталог + один пакетный запрос метрик всех маршрутов |
-| `number_of_trams.png` | ScenarioOverrides.fleet + явно показанное окно действия |
-| `modle1.png` | Закреплённая погода и дополнительный ручной weather multiplier |
-| `modle2.png` | Предложение транспорта: источник оценки, baseline/scenario |
-| `modle3.png` | Календарный контекст; ручные event/season поправки |
-| `overall_metrics.png` | Честная детализация маршрута; для остановки — только география и контекст всего маршрута |
+### Декоративные столбики перед остановкой
 
-## 6. Что меняем в визуальном смысле
-
-### Число «50%»
-
-Заменить подпись «заполненность салона» на **«индекс интенсивности»** или «нагрузка относительно исторического эталона». Предпочтительно: `0,94× эталона`; допустимо `94% эталонной интенсивности` с пояснением.
-
-Поле `load_index` не ограничено единицей. При 1.72 показываем 172% эталона, не 100%.
-
-### Количество вагонов
-
-При baseline из `observed_vehicle_profile`: «Оценка выпуска по истории валидаций». Не «На линии прямо сейчас».
-
-В дневном агрегате `mean_vehicle_count` может быть дробным: «В среднем 9,4». Это не число уникальных трамваев за сутки.
-
-В сценарии: «Предполагаемый выпуск». Указываем `absolute` или `delta` и интервал действия. Ноль допустим; индекс станет недоступным, не нулевым.
-
-### Остановки и столбики
-
-Реальные числовые прогнозы существуют **только на маршруте**. Нельзя распределять прогноз равномерно или случайно между остановками и выдавать это за результат модели.
-
-P0: цвет/толщина линии маршрута и один маршрутный индикатор в `representative_position`. Остановки — обычные географические маркеры.
-
-При клике на остановку: название, маршрут/направление и сообщение «Посадки на этой остановке не определены по текущим данным». Ниже можно показать график с заголовком **«Прогноз по всему маршруту»**, но не подписывать его именем остановки.
-
-Deck.gl не является обязательной зависимостью. Его можно добавить для одного маршрутного столбика; множественные количественные столбики по остановкам пока не имеют основания.
-
-## 7. Route picker без N+1
-
-Каталог уже есть в bootstrap. Чтобы сравнить текущую нагрузку десяти маршрутов, выполнить **один** `forecasts/query`:
-
-- все `route_ids`;
-- `window` текущего кадра;
-- соответствующая детализация.
-
-Сортировку выполнить локально. Не сравнивать прогноз выбранного маршрута за час с прогнозами остальных за сутки. Недоступный индекс — в отдельной группе, не как 0. По изменению выпуска одного маршрута не переносить этот сценарий на остальные автоматически.
-
-## 8. Сценарии
-
-В UI выбираем область действия: «выбранный час/день» или «весь показанный период». Отправляем конкретный `effective_window`.
-
-```json
-{
-  "selection": {
-    "forecast_snapshot_id": "demo-september-2026-v1",
-    "route_ids": ["demo-01"],
-    "view_mode": "day",
-    "window": {
-      "from": "2026-09-01T00:00:00+03:00",
-      "to": "2026-09-02T00:00:00+03:00"
-    },
-    "resolution": "hour"
-  },
-  "overrides": {
-    "effective_window": {
-      "from": "2026-09-01T18:00:00+03:00",
-      "to": "2026-09-01T19:00:00+03:00"
-    },
-    "fleet": {"kind":"delta","vehicle_count_delta":2},
-    "factors": {"weather":1.0,"event":1.1,"season":1.0}
-  }
-}
-```
-
-Делаем debounce ввода около 150–250 мс; это UX-настройка, не гарантия сервера. Показываем «Пересчитываем» и блокируем экспорт до подтверждённого ответа.
-
-`baseline` показывается рядом с `evaluated`. При смене маршрута/периода P0 сбрасывает сценарий с уведомлением: не сохраняет скрыто поправки с другим временным смыслом. Кнопка «Сбросить» возвращает исходный forecast.
-
-Не менять физическую температуру через multiplier: API v1 такого сценария не предоставляет.
-
-## 9. Гонки запросов
-
-На каждый содержательный запрос увеличиваем локальный номер версии и отменяем предыдущий через `AbortController`. Ответ принимается только для актуальной версии запроса.
-
-Отмена не гарантирует немедленного прерывания уже начатого ONNX inference на сервере; frontend просто не применяет устаревший ответ.
-
-При новой публикации не менять `pinnedSnapshot` посередине работы. Показать «Доступен новый прогноз». После подтверждения пользователя загрузить новый согласованный набор и переключить экран целиком.
-
-Любой запрос может попасть на другую API-реплику: sticky sessions и зависимость от её локального кэша не нужны. Передавать полный selection/descriptor и закреплённый snapshot по существующему контракту. Ошибка БД/готовности backend — `503`, а не повод выбирать другой snapshot или искать локальный registry.
-
-## 10. Экспорт
-
-Отправляем:
+На одну остановку приходит одно значение. Frontend может отрисовать декоративный ramp/chain перед stop согласно:
 
 ```text
-calculation              = confirmedCalculation.descriptor
-expected_calculation_id  = confirmedCalculation.calculation_id
-format                   = csv
+visualization.stop_columns.approach_effect = decorative
+profile = ramp_to_stop
+approach_length_m ≈ 20
 ```
 
-Не собирать экспортный запрос заново из частично отредактированного состояния. Ответ — сразу файл, не job ID. Пример получения Blob и проверки заголовка `X-Calculation-ID` есть в fetch-клиенте.
+Несколько визуальных сегментов не являются несколькими измерениями. Tooltip показывает один `StopReading`.
 
-`409` означает, что экспорт не соответствует подтверждённому расчёту. `410` — старый снимок удалён. Автоматически экспортировать новую версию вместо прежней запрещено.
+Высота строится по `stop_reading.evaluated.load_index` и общей `VisualizationPolicy`; цвет — по `load_level`/design token. Исходное число не clamp'ится.
 
-## 11. Погода, качество и ошибки
+## 5. Indicators / moods
 
-`GET /weather` получает данные snapshot, не «самую свежую погоду вообще». Для `climatology` — «Сезонная оценка», для `missing` — «Погодные данные недоступны». Не рисовать точный дождь в дальнем месячном прогнозе по сезонной средней.
+Backend возвращает:
 
-В `/model-quality` значение `not_measured` отображается «Не измерено», не «0%». Источники и ограничения доступны в drawer «О модели».
+```text
+key
+variant
+tone
+icon
+title
+text
+```
 
-Для неизвестных метрик используем «Нет данных», а не 0. Ошибки обрабатываем по `Problem.code`; текст `detail` не парсим. Сохраняем `request_id` для сообщения разработчикам.
+Иконка выбирается по структурированным полям, не по тексту.
 
-На карте сохраняем атрибуцию. При сбое внешней подложки переключаемся на локальный стиль и повторно добавляем пользовательские слои после `style.load`.
+Примеры:
 
-## 12. Готовность frontend
+```text
+weather + rain
+weather + clear
+trend + up
+trend + down
+fleet + deficit
+fleet + balanced
+```
 
-Готовность — не только сходство с макетом. Проверить: рулетка без сети; сценарий с явным окном; неизвестный выпуск; нулевой выпуск; индекс >1; смена snapshot; потеря подложки; CSV того же расчёта; остановочный drawer без ложных чисел; календарь вне покрытия.
+`variant=none` + `icon=none` означает нейтральное состояние без иконки.
+
+Frontend не делает выводы вроде «дождь повысил спрос на 7%», если backend не вернул такое отдельное измеренное утверждение.
+
+## 6. Summary
+
+`POST /api/v1/summaries/query` получает полный calculation descriptor + `expected_calculation_id`.
+
+UI states:
+
+```text
+idle
+loading
+ready(text)
+unavailable(reason)
+error(problem)
+```
+
+Summary для stop focus использует настоящий `StopReading`, когда stop forecast доступен.
+
+## 7. Scenario
+
+Fleet change:
+
+```text
+boardings baseline stays unchanged
+load metrics recompute
+```
+
+Manual demand factors могут изменить boardings. После scenario response frontend полностью заменяет отображаемые evaluated metrics этим response, не смешивает old/new frame data.
+
+## 8. Auth
+
+Startup:
+
+```text
+GET /auth/session
+  200 -> app
+  401 -> login form
+```
+
+Login через `POST /auth/login`. Browser должен отправлять same-origin cookies (`credentials: include`, если требуется fetch-конфигурацией). Session token не читать и не хранить в JS.
+
+Logout -> `POST /auth/logout` -> clear local app state -> login screen.
+
+## 9. Export
+
+Экспорт передаёт тот же `CalculationDescriptor` и `expected_calculation_id`. Frontend не собирает CSV сам из видимых карточек.
+
+## 10. Ошибки, которые нельзя скрывать
+
+- stop forecast unavailable;
+- window outside snapshot coverage;
+- custom range too long;
+- custom hourly request invalid;
+- snapshot expired/deactivated beyond retention;
+- calculation mismatch;
+- unavailable metric reason (`NO_SUPPLY`, `REFERENCE_MISSING` и т.п.).
+
+## 11. Что нельзя делать
+
+- HTTP request на каждый шаг day wheel;
+- парсить indicator text для иконки;
+- генерировать fictitious stop/segment values ради анимации;
+- называть `load_index` физической заполненностью салона;
+- silently clip custom range;
+- считать, что сумма stop predictions обязана равняться route prediction, если backend явно не сообщил reconciliation policy.
