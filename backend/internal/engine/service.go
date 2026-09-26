@@ -3,6 +3,7 @@ package engine
 import (
 	"container/list"
 	"context"
+	"errors"
 	"sync"
 	"time"
 	d "tramflow/internal/domain"
@@ -11,7 +12,9 @@ import (
 
 type Repository interface {
 	Snapshot(context.Context, string) (d.Snapshot, d.Model, error)
+	// Hours returns small profiles and calendar flags, never the full model features.
 	Hours(context.Context, d.Snapshot, SelectionInput) ([]d.Hour, error)
+	Features(context.Context, d.Snapshot, []d.Hour) ([]d.Hour, error)
 }
 type SelectionInput struct {
 	Routes []string
@@ -58,6 +61,7 @@ func (c *Cache) Set(k string, v float64) {
 }
 
 type Service struct {
+	budget requestBudget
 	Repo   Repository
 	Models *inference.Manager
 	Cache  *Cache
@@ -72,6 +76,11 @@ func (s *Service) Calculate(ctx context.Context, desc d.Descriptor) (d.Response,
 		return d.Response{}, err
 	}
 	desc = Normalize(desc)
+	release, err := s.budget.acquire(ctx, desc.Selection)
+	if err != nil {
+		return d.Response{}, err
+	}
+	defer release()
 	hours, err := s.Repo.Hours(ctx, snap, SelectionInput{desc.Selection.RouteIDs, desc.Selection.Window})
 	if err != nil {
 		return d.Response{}, err
@@ -89,15 +98,29 @@ func (s *Service) Calculate(ctx context.Context, desc d.Descriptor) (d.Response,
 			indices = append(indices, i)
 		}
 	}
-	if len(missing) > 0 {
-		out, err := s.Models.Predict(ctx, model, snap, missing)
-		if err != nil {
-			return d.Response{}, d.Fail(503, "MODEL_UNAVAILABLE", "Модель или её входы недоступны.")
+	const chunkSize = 128
+	for start := 0; start < len(missing); start += chunkSize {
+		end := min(start+chunkSize, len(missing))
+		chunk := missing[start:end]
+		if model.Release == "published" {
+			chunk, err = s.Repo.Features(ctx, snap, chunk)
+			if err != nil {
+				return d.Response{}, err
+			}
 		}
-		for j, i := range indices {
+		out, err := s.Models.Predict(ctx, model, snap, chunk)
+		if err != nil {
+			if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+				return d.Response{}, d.Caused(504, "INFERENCE_TIMEOUT", "Время инференса истекло.", "inference", err)
+			}
+			return d.Response{}, d.Caused(503, "MODEL_UNAVAILABLE", "Модель или её входы недоступны.", "inference", err)
+		}
+		for j, i := range indices[start:end] {
 			hours[i].Boardings = out[j]
 			s.Cache.Set(keys[i], out[j])
 		}
+		// Do not retain large feature maps across chunks or in the returned frames.
+		chunk = nil
 	}
 	result, err := Calculate(desc, snap, hours)
 	if err != nil {

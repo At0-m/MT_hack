@@ -38,13 +38,14 @@ func run() error {
 	defer models.Close()
 	svc := &engine.Service{Repo: store, Models: models, Cache: engine.NewCache(64 * 1024 * 1024)}
 	api := &httpapi.Server{
-		Store:        store,
-		Models:       models,
-		Service:      svc,
-		Contract:     spec,
-		Auth:         auth.New(store),
-		CookieSecure: os.Getenv("COOKIE_SECURE") != "false",
-		Origin:       c.Origin,
+		TrustedProxies: c.TrustedProxies,
+		Store:          store,
+		Models:         models,
+		Service:        svc,
+		Contract:       spec,
+		Auth:           auth.New(store),
+		CookieSecure:   os.Getenv("COOKIE_SECURE") != "false",
+		Origin:         c.Origin,
 	}
 	server := &http.Server{
 		Addr:              c.Addr,

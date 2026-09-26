@@ -39,7 +39,7 @@ Golden vectors: `{"rows":[[18,1,9,18,0,610]],"expected":[610]}`. Expected — к
 docker compose run --rm -v "${PWD}/incoming/bundle.json:/data/bundle.json:ro" publisher --bundle /data/bundle.json
 ```
 
-Максимум bundle 32 MiB, 7440 часов, 256 features. Повторное использование version IDs разрешено только при идентичном содержимом. Ошибка проверки или конкурентная смена active pointer отклоняет публикацию. Старый snapshot остаётся доступен до истечения retention.
+Максимум bundle 32 MiB, 7440 часов, 256 model features и два raw calendar flags в каждом часе. Feature JSON — не более 64 KiB на час, ключ — не более 128 bytes. Повторное использование version IDs разрешено только при идентичном содержимом; feature_schema_version закрепляет checksum всего schema artifact, включая preprocessing metadata. Изменение его семантики требует нового ID, даже при прежнем списке columns. Ошибка проверки или конкурентная смена active pointer отклоняет публикацию. Старый snapshot остаётся доступен до истечения retention.
 
 ## Метаданные погоды после ревью
 
@@ -65,3 +65,7 @@ ID совпадает с provenance; provider — open-meteo или synthetic_mo
 Publisher также требует хотя бы один целый московский календарный день с day/hour, проверяет согласованность RouteDetail/Geometry и общих физических остановок до активации. При ошибке прежний active snapshot сохраняется.
 
 Наличие stop_model_version и stop_feature_schema_version в provenance теперь допускается только парой. Эти поля не включают inference: отдельные stop inputs, storage/adapter, summary/CSV и интеграция ещё нужны. Enrich больше не стирает уже подготовленные stop_readings; route-only ответы остаются пустыми.
+
+## Инварианты после обновлённого ревью
+
+Origin, observations_complete_through и train_cutoff обязательны и ненулевые; train_cutoff <= observations_complete_through <= origin. Fleet provenance: unavailable требует fleet=null/proxy=false; manual_plan — fleet!=null/proxy=false; observed_vehicle_profile — fleet!=null/proxy=true. Absolute scenario снимает proxy flag, delta сохраняет baseline provenance. Перед обновлением API примените миграции 004/005; подробности и оставшиеся stop/refresher границы — [UPDATED_REVIEW_FIXES.md](UPDATED_REVIEW_FIXES.md).

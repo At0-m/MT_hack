@@ -41,6 +41,7 @@ services:
       DATABASE_URL: postgres://tramflow_api:${API_DB_PASSWORD}@db:5432/tramflow?sslmode=disable
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
       COOKIE_SECURE: "false"
+      TRUSTED_PROXY_CIDRS: ${TRUSTED_PROXY_CIDRS:-}
     volumes:
       - ./artifacts:/data/artifacts:ro
     ports:

@@ -3,7 +3,9 @@ package storage
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"time"
 	d "tramflow/internal/domain"
 	"tramflow/internal/engine"
@@ -58,8 +60,12 @@ func validateWeatherMetadata(b d.Bundle) error {
 func (s *Store) WeatherMetadata(ctx context.Context, version string) (d.WeatherSnapshot, error) {
 	var raw []byte
 	var metadata d.WeatherSnapshot
-	if err := s.Pool.QueryRow(ctx, "SELECT metadata FROM weather_snapshots WHERE version=$1", version).Scan(&raw); err != nil {
+	err := s.Pool.QueryRow(ctx, "SELECT metadata FROM weather_snapshots WHERE version=$1", version).Scan(&raw)
+	if errors.Is(err, pgx.ErrNoRows) {
 		return metadata, d.Fail(503, "WEATHER_METADATA_UNAVAILABLE", "Метаданные погодного снимка недоступны.")
+	}
+	if err != nil {
+		return metadata, dependency(err)
 	}
 	if err := json.Unmarshal(raw, &metadata); err != nil {
 		return metadata, dependency(err)

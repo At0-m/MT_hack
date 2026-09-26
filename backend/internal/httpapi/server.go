@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"net/netip"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -28,22 +30,25 @@ type Store interface {
 	Report(context.Context, string, string) (json.RawMessage, error)
 }
 type Server struct {
-	Store         Store
-	Service       *engine.Service
-	Contract      *contract.Contract
-	Models        *inference.Manager
-	Auth          *auth.Service
-	Origin        string
-	CookieSecure  bool
-	loginMu       sync.Mutex
-	loginAttempts map[string]loginAttempt
-	loginSlots    chan struct{}
-	slots         chan struct{}
-	Timeout       time.Duration
+	TrustedProxies []netip.Prefix
+	Store          Store
+	Service        *engine.Service
+	Contract       *contract.Contract
+	Models         *inference.Manager
+	Auth           *auth.Service
+	Origin         string
+	CookieSecure   bool
+	loginMu        sync.Mutex
+	loginAttempts  map[string]loginAttempt
+	loginSlots     chan struct{}
+	slots          chan struct{}
+	readySlots     chan struct{}
+	Timeout        time.Duration
 }
 
 func (s *Server) Handler() http.Handler {
 	s.slots = make(chan struct{}, 32)
+	s.readySlots = make(chan struct{}, 2)
 	s.loginSlots = make(chan struct{}, 2)
 	s.loginAttempts = map[string]loginAttempt{}
 	if s.Timeout == 0 {
@@ -81,7 +86,8 @@ func (s *Server) Handler() http.Handler {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		defer func() {
-			if recover() != nil {
+			if panicValue := recover(); panicValue != nil {
+				slog.Error("http panic", "request_id", id, "panic", panicValue, "stack", string(debug.Stack()))
 				s.problem(w, 500, "INTERNAL_ERROR", "Внутренняя ошибка сервиса.")
 			}
 			slog.Info("http", "request_id", id, "method", r.Method, "path", r.URL.Path, "duration_ms", time.Since(start).Milliseconds())
@@ -106,6 +112,21 @@ func (s *Server) Handler() http.Handler {
 			s.problem(w, 403, "CSRF_REJECTED", "Запрос с другого сайта не разрешён.")
 			return
 		}
+		if r.Method == http.MethodGet && (r.URL.Path == "/health/live" || r.URL.Path == "/health/ready") {
+			if r.URL.Path == "/health/ready" {
+				select {
+				case s.readySlots <- struct{}{}:
+					defer func() { <-s.readySlots }()
+				default:
+					s.problem(w, 503, "READINESS_BUSY", "Проверка готовности занята.")
+					return
+				}
+			}
+			probeCtx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+			defer cancel()
+			mux.ServeHTTP(w, r.WithContext(probeCtx))
+			return
+		}
 		select {
 		case s.slots <- struct{}{}:
 			defer func() { <-s.slots }()
@@ -123,10 +144,12 @@ func (s *Server) Handler() http.Handler {
 				s.problem(w, 401, "UNAUTHORIZED", "Требуется вход.")
 				return
 			}
-			if _, err = s.Auth.Resolve(ctx, cookie.Value); err != nil {
+			session, err := s.Auth.Resolve(ctx, cookie.Value)
+			if err != nil {
 				s.fail(w, err)
 				return
 			}
+			r = r.WithContext(d.WithUser(ctx, session.User.ID))
 		}
 		if _, pattern := mux.Handler(r); pattern == "" {
 			s.problem(w, 404, "NOT_FOUND", "API endpoint не найден.")

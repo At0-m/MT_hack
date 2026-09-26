@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"testing"
+	"time"
 	"tramflow/internal/contract"
 	d "tramflow/internal/domain"
 	"tramflow/internal/inference"
@@ -21,7 +22,7 @@ func TestCandidateGeographyAndWeatherIntegrity(t *testing.T) {
 	}
 	m := inference.New("../../artifacts")
 	defer m.Close()
-	for _, kind := range []string{"position", "physical conflict", "occurrence", "pattern", "weather source", "weather retrieved", "weather location", "stop schema pair"} {
+	for _, kind := range []string{"position", "physical conflict", "occurrence", "pattern", "weather source", "weather retrieved", "weather location", "stop schema pair", "unavailable with fleet", "manual without fleet", "manual proxy", "observed nonproxy", "zero observation cutoff", "zero train cutoff"} {
 		t.Run(kind, func(t *testing.T) {
 			var b d.Bundle
 			if err := json.Unmarshal(raw, &b); err != nil {
@@ -56,6 +57,21 @@ func TestCandidateGeographyAndWeatherIntegrity(t *testing.T) {
 				delete(b.WeatherMetadata.Locations, "demo-01")
 			case "stop schema pair":
 				b.Snapshot.Provenance.StopModel = "stop-v1"
+			case "unavailable with fleet":
+				b.Hours[0].Source = "unavailable"
+			case "manual without fleet":
+				b.Hours[0].Source = "manual_plan"
+				b.Hours[0].Fleet = nil
+				b.Hours[0].Proxy = false
+			case "manual proxy":
+				b.Hours[0].Source = "manual_plan"
+			case "observed nonproxy":
+				b.Hours[0].Proxy = false
+			case "zero observation cutoff":
+				b.Snapshot.Provenance.CompleteThrough = time.Time{}
+			case "zero train cutoff":
+				b.Model.TrainCutoff = time.Time{}
+
 			}
 			if err := ValidateBundle(context.Background(), &b, c, m, true); err == nil {
 				t.Fatal("invalid candidate accepted")

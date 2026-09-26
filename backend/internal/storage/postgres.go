@@ -50,10 +50,10 @@ func (s *Store) Migrate(ctx context.Context) error {
 			return err
 		}
 	}
-	if v > 3 {
+	if v > 5 {
 		return fmt.Errorf("unsupported database schema %d", v)
 	}
-	for i, name := range []string{"001_initial.sql", "002_sessions_anchors.sql", "003_weather_geography.sql"} {
+	for i, name := range []string{"001_initial.sql", "002_sessions_anchors.sql", "003_weather_geography.sql", "004_login_limits.sql", "005_calendar_flags.sql"} {
 		if i+1 <= v {
 			continue
 		}
@@ -74,16 +74,16 @@ func (s *Store) CheckSchema(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if v != 3 || ext == "" {
+	if v != 5 || ext == "" {
 		return fmt.Errorf("schema not ready")
 	}
 	return nil
 }
 func dependency(err error) error {
 	if errors.Is(err, context.DeadlineExceeded) {
-		return d.Fail(504, "DEPENDENCY_TIMEOUT", "Превышено время ожидания данных.")
+		return d.Caused(504, "DEPENDENCY_TIMEOUT", "Превышено время ожидания данных.", "postgres", err)
 	}
-	return d.Fail(503, "DATABASE_UNAVAILABLE", "Хранилище временно недоступно.")
+	return d.Caused(503, "DATABASE_UNAVAILABLE", "Хранилище временно недоступно.", "postgres", err)
 }
 func decodeSnapshot(meta, model []byte) (d.Snapshot, d.Model, error) {
 	var s d.Snapshot
@@ -114,14 +114,17 @@ func (s *Store) Snapshot(ctx context.Context, id string) (d.Snapshot, d.Model, e
 func (s *Store) Active(ctx context.Context) (d.Snapshot, d.Model, error) {
 	var meta, model []byte
 	err := s.Pool.QueryRow(ctx, "SELECT s.metadata,m.metadata FROM active_forecast_snapshot a JOIN forecast_snapshots s ON s.id=a.snapshot_id JOIN models m ON m.version=s.model_version WHERE a.slot=1 AND s.deleted_at IS NULL").Scan(&meta, &model)
-	if err != nil {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return d.Snapshot{}, d.Model{}, d.Fail(503, "NO_ACTIVE_SNAPSHOT", "Опубликованный прогноз недоступен.")
+	}
+	if err != nil {
+		return d.Snapshot{}, d.Model{}, dependency(err)
 	}
 	return decodeSnapshot(meta, model)
 }
 func (s *Store) Hours(ctx context.Context, snap d.Snapshot, q engine.SelectionInput) ([]d.Hour, error) {
 	p := snap.Provenance
-	rows, err := s.Pool.Query(ctx, `SELECT f.route_id,f.target_hour,f.features,f.available_at,f.synthetic_boardings,
+	rows, err := s.Pool.Query(ctx, `SELECT f.route_id,f.target_hour,f.calendar_flags,f.available_at,f.synthetic_boardings,
  sp.fleet,sp.source,sp.is_proxy,r.reference,r.typical,w.point
  FROM prepared_features f
  JOIN supply_profiles sp ON sp.version=$5 AND sp.route_id=f.route_id AND sp.target_hour=f.target_hour

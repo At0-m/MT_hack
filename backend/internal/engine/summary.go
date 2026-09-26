@@ -33,8 +33,15 @@ func Summarize(response d.Response, focus d.Focus) d.Summary {
 	maxIndex := -1.0
 	for _, r := range selected {
 		total += r.Evaluated.Boardings
-		if r.Evaluated.Index.Value != nil && *r.Evaluated.Index.Value > maxIndex {
-			maxIndex = *r.Evaluated.Index.Value
+	}
+	for _, frame := range response.Frames {
+		for _, reading := range frame.Routes {
+			if focus.Kind != "overall" && reading.RouteID != focus.Route {
+				continue
+			}
+			if reading.Evaluated.Index.Value != nil && *reading.Evaluated.Index.Value > maxIndex {
+				maxIndex = *reading.Evaluated.Index.Value
+			}
 		}
 	}
 	s.Facts = append(s.Facts, d.Fact{
@@ -44,7 +51,7 @@ func Summarize(response d.Response, focus d.Focus) d.Summary {
 	if maxIndex >= 0 {
 		s.Facts = append(s.Facts, d.Fact{
 			Key:  "load",
-			Text: fmt.Sprintf("Максимальный маршрутный индекс периода: %.2f; это не заполненность салона.", maxIndex),
+			Text: fmt.Sprintf("Максимальный маршрутный индекс среди кадров периода: %.2f; это не заполненность салона.", maxIndex),
 		})
 	}
 	delta := 0.0

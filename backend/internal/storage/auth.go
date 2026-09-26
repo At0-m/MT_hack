@@ -35,12 +35,31 @@ func (s *Store) ProvisionUser(ctx context.Context, username, password string) er
 	return err
 }
 func (s *Store) CreateSession(ctx context.Context, hash, id string, expires time.Time) error {
-	_, err := s.Pool.Exec(ctx, "INSERT INTO user_sessions(token_hash,user_id,expires_at) VALUES($1,$2,$3)", hash, id, expires)
+	tx, err := s.Pool.Begin(ctx)
 	if err != nil {
+		return dependency(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err = tx.Exec(ctx, "SELECT pg_advisory_xact_lock(hashtextextended($1,741854))", id); err != nil {
+		return dependency(err)
+	}
+	if _, err = tx.Exec(ctx, `DELETE FROM user_sessions WHERE token_hash IN
+ (SELECT token_hash FROM user_sessions WHERE expires_at<=now() ORDER BY expires_at LIMIT 512)`); err != nil {
+		return dependency(err)
+	}
+	if _, err = tx.Exec(ctx, `DELETE FROM user_sessions WHERE token_hash IN
+ (SELECT token_hash FROM user_sessions WHERE user_id=$1 ORDER BY created_at DESC,token_hash OFFSET 19)`, id); err != nil {
+		return dependency(err)
+	}
+	if _, err = tx.Exec(ctx, "INSERT INTO user_sessions(token_hash,user_id,expires_at) VALUES($1,$2,$3)", hash, id, expires); err != nil {
+		return dependency(err)
+	}
+	if err = tx.Commit(ctx); err != nil {
 		return dependency(err)
 	}
 	return nil
 }
+
 func (s *Store) Session(ctx context.Context, hash string) (auth.Session, error) {
 	var result auth.Session
 	err := s.Pool.QueryRow(ctx, "SELECT u.user_id,u.username,u.display_name,s.expires_at FROM user_sessions s JOIN app_users u USING(user_id) WHERE token_hash=$1 AND expires_at>now() AND NOT u.disabled", hash).Scan(&result.User.ID, &result.User.Username, &result.User.DisplayName, &result.Expires)

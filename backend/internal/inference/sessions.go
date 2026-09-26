@@ -45,7 +45,7 @@ func (m *Manager) run(ctx context.Context, model d.Model, rows [][]float32) ([]f
 		return nil, ctx.Err()
 	}
 	defer func() { <-m.slots }()
-	// Run is synchronous: cancellation cannot free its buffers or native session.
+	// Cooperative termination requests do not release buffers/session before Run exits.
 	return session.predictor.Predict(ctx, rows)
 }
 

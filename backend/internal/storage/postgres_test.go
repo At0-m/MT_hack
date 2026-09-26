@@ -188,6 +188,52 @@ func TestPostgresPublicationAndReproducibility(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	schemaMutation := clone("bad-schema-mutation")
+	schemaMutation.Model.Version = "different-model"
+	schemaMutation.Snapshot.Provenance.Model = schemaMutation.Model.Version
+	schemaMutation.Model.SchemaSHA256 = "different-schema-checksum"
+	if err := s.Publish(ctx, schemaMutation); err == nil {
+		t.Fatal("same feature schema ID accepted another artifact")
+	}
+	// The metadata path must never expand full feature blobs, even on a cold miss.
+	profiles, err := s.Hours(ctx, a.Snapshot, engine.SelectionInput{Routes: []string{"demo-01"}, Window: desc.Selection.Window})
+	if err != nil || len(profiles) != 24 {
+		t.Fatal(err)
+	}
+	if len(profiles[0].Features) != 0 {
+		t.Fatal("full feature map fetched on metadata path")
+	}
+	loaded, err := s.Features(ctx, a.Snapshot, profiles[:2])
+	if err != nil || len(loaded[0].Features) != 2 || len(profiles[0].Features) != 0 {
+		t.Fatal("feature batch aliases lightweight profiles", err)
+	}
+	// Account throttling is shared between database pools, independent of client IP.
+	for i := 0; i < 10; i++ {
+		store := s
+		if i%2 == 1 {
+			store = replica
+		}
+		allowed, err := store.AllowLogin(ctx, auth.Hash("shared-account"))
+		if err != nil || !allowed {
+			t.Fatal(i, err)
+		}
+	}
+	if allowed, err := replica.AllowLogin(ctx, auth.Hash("shared-account")); err != nil || allowed {
+		t.Fatal("replica bypasses account limiter", err)
+	}
+	userID := auth.Hash("dispatcher")[:32]
+	if _, err := s.Pool.Exec(ctx, "INSERT INTO user_sessions(token_hash,user_id,expires_at) VALUES('expired-review',$1,now()-interval '1 hour')", userID); err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 22; i++ {
+		if err := s.CreateSession(ctx, fmt.Sprintf("review-session-%d", i), userID, time.Now().Add(time.Hour)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	var sessionCount int
+	if err := s.Pool.QueryRow(ctx, "SELECT count(*) FROM user_sessions WHERE user_id=$1", userID).Scan(&sessionCount); err != nil || sessionCount != 20 {
+		t.Fatal("session cleanup/cap", sessionCount, err)
+	}
 	bad := clone("bad-candidate")
 	bad.Model.Path = "missing.onnx"
 	bad.Model.Release = "published"
@@ -242,6 +288,20 @@ func TestPostgresPublicationAndReproducibility(t *testing.T) {
 	_, _, err = s.Snapshot(ctx, "unknown")
 	if !errors.As(err, &e) || e.Status != 404 {
 		t.Fatal(err)
+	}
+	if _, err := s.Pool.Exec(ctx, `INSERT INTO supply_profiles(version,route_id,target_hour,fleet,source,is_proxy)
+ VALUES('orphan-review','demo-01',$1,1,'manual_plan',false)`, origin); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.CollectData(ctx); err != nil {
+		t.Fatal(err)
+	}
+	var orphanCount int
+	if err := s.Pool.QueryRow(ctx, "SELECT count(*) FROM supply_profiles WHERE version='orphan-review'").Scan(&orphanCount); err != nil || orphanCount != 0 {
+		t.Fatal("orphan profiles not collected", err)
+	}
+	if profiles, err := s.Hours(ctx, a.Snapshot, engine.SelectionInput{Routes: []string{"demo-01"}, Window: desc.Selection.Window}); err != nil || len(profiles) != 24 {
+		t.Fatal("GC removed versions shared by live snapshot", err)
 	}
 	s.Pool.Close()
 	_, _, err = s.Snapshot(ctx, "unknown")

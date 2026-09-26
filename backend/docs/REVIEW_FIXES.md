@@ -43,3 +43,7 @@ Stop pipeline требует собственного model manifest, inputs/ref
 ## Обновление
 
 Миграцию 003 применяет Publisher `--migrate`. Новая публикация требует weather_metadata; старый weather endpoint без metadata отдаёт 503 вместо выдуманного provenance. Для старой поставки schema 2 нужен новый weather ID и честные source metadata; подробности в ML_HANDOFF.md. Перегенерируйте локальный synthetic bundle командой `go run ./cmd/fixtures --onnx`. Миграция не меняет active pointer; несовместимые старые связи route/pattern нужно исправить в источнике до миграции.
+
+## После BACKEND_REVIEW_UPDATED.md
+
+Новые исправления и фактические проверки Go 1.26.8, Linux native ONNX + race с PostGIS и максимальной сетки под cgroup 2 GiB / 2 CPU: [UPDATED_REVIEW_FIXES.md](UPDATED_REVIEW_FIXES.md). Этот раздел дополняет исторические ограничения выше; Docker image/Compose остаются непроверенными.

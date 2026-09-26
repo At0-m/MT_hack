@@ -29,6 +29,15 @@ func (s *Server) problem(w http.ResponseWriter, status int, code, detail string)
 func (s *Server) fail(w http.ResponseWriter, err error) {
 	var e *d.Error
 	if errors.As(err, &e) {
+		if e.Status == 429 {
+			w.Header().Set("Retry-After", "1")
+			if e.Code == "LOGIN_RATE_LIMIT" {
+				w.Header().Set("Retry-After", "60")
+			}
+		}
+		if e.Cause != nil {
+			slog.Error("request dependency failed", "request_id", w.Header().Get("X-Request-ID"), "operation", e.Operation, "code", e.Code, "error", e.Cause)
+		}
 		s.problem(w, e.Status, e.Code, e.Detail)
 		return
 	}

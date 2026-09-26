@@ -28,7 +28,7 @@ func ValidateBundle(ctx context.Context, b *d.Bundle, c *contract.Contract, mode
 	if p.Policy != "scenario-formulas-v1" || s.Target != 0.75 || s.Quantile != 0.9 {
 		return fmt.Errorf("unsupported scenario policy")
 	}
-	if p.CompleteThrough.After(p.Origin) || b.Model.TrainCutoff.After(p.CompleteThrough) || b.Model.Version != p.Model || b.Model.Schema != p.Features {
+	if p.Origin.IsZero() || p.CompleteThrough.IsZero() || b.Model.TrainCutoff.IsZero() || p.CompleteThrough.After(p.Origin) || b.Model.TrainCutoff.After(p.CompleteThrough) || b.Model.Version != p.Model || b.Model.Schema != p.Features {
 		return fmt.Errorf("version/cutoff mismatch")
 	}
 	if _, err := engine.DefaultSelection(s); err != nil {
@@ -129,6 +129,9 @@ func ValidateBundle(ctx context.Context, b *d.Bundle, c *contract.Contract, mode
 		if h.Source != "observed_vehicle_profile" && h.Source != "manual_plan" && h.Source != "unavailable" {
 			return fmt.Errorf("invalid fleet source")
 		}
+		if (h.Source == "unavailable") != (h.Fleet == nil) || (h.Source == "unavailable" && h.Proxy) || (h.Source == "manual_plan" && h.Proxy) || (h.Source == "observed_vehicle_profile" && !h.Proxy) {
+			return fmt.Errorf("contradictory fleet source/value/proxy")
+		}
 		if synthetic {
 			if h.SyntheticBoardings == nil || !finitePositive(h.SyntheticBoardings) {
 				return fmt.Errorf("synthetic prediction missing")
@@ -139,6 +142,14 @@ func ValidateBundle(ctx context.Context, b *d.Bundle, c *contract.Contract, mode
 		for _, v := range h.Features {
 			if math.IsNaN(v) || math.IsInf(v, 0) || math.Abs(v) > math.MaxFloat32 {
 				return fmt.Errorf("nonfinite feature")
+			}
+		}
+		if len(h.Features) > 258 || len(encode(h.Features)) > 65536 {
+			return fmt.Errorf("feature blob limit exceeded")
+		}
+		for name := range h.Features {
+			if len(name) > 128 {
+				return fmt.Errorf("feature name limit exceeded")
 			}
 		}
 		weather, _ := json.Marshal(h.Weather)
@@ -268,6 +279,14 @@ func (s *Store) Publish(ctx context.Context, b d.Bundle) error {
 		reference = append(reference, []any{h.RouteID, h.Time.UTC(), h.Reference, h.Typical})
 		weather = append(weather, []any{h.RouteID, h.Time.UTC(), h.Weather})
 	}
+	var conflicts int
+	if err = tx.QueryRow(ctx, `SELECT count(*) FROM models WHERE metadata->>'feature_schema_version'=$1
+ AND COALESCE(metadata->>'schema_sha256','')<>$2`, p.Features, b.Model.SchemaSHA256).Scan(&conflicts); err != nil {
+		return err
+	}
+	if conflicts > 0 {
+		return fmt.Errorf("feature schema artifact changed under existing version")
+	}
 	for _, v := range []struct {
 		kind, version string
 		payload       any
@@ -278,6 +297,7 @@ func (s *Store) Publish(ctx context.Context, b d.Bundle) error {
 		{"reference", p.Reference, reference},
 		{"weather", p.Weather, []any{b.WeatherMetadata, weather}},
 		{"features", p.Features, b.Model.Columns},
+		{"feature_schema_artifact", p.Features, featureSchemaClaim(b.Model)},
 		{"model", p.Model, b.Model},
 	} {
 		if err = claim(ctx, tx, v.kind, v.version, v.payload); err != nil {
@@ -306,19 +326,8 @@ func (s *Store) Publish(ctx context.Context, b d.Bundle) error {
 	if _, err = tx.Exec(ctx, "INSERT INTO weather_snapshots(version,metadata) VALUES($1,$2) ON CONFLICT DO NOTHING", p.Weather, encode(b.WeatherMetadata)); err != nil {
 		return err
 	}
-	for _, h := range b.Hours {
-		if _, err = tx.Exec(ctx, "INSERT INTO prepared_features VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING", p.History, p.Features, p.Origin, h.RouteID, h.Time, h.FeaturesAvailableAt, encode(h.Features), h.SyntheticBoardings); err != nil {
-			return err
-		}
-		if _, err = tx.Exec(ctx, "INSERT INTO supply_profiles VALUES($1,$2,$3,$4,$5,$6) ON CONFLICT DO NOTHING", p.Supply, h.RouteID, h.Time, h.Fleet, h.Source, h.Proxy); err != nil {
-			return err
-		}
-		if _, err = tx.Exec(ctx, "INSERT INTO reference_profiles VALUES($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING", p.Reference, h.RouteID, h.Time, h.Reference, h.Typical); err != nil {
-			return err
-		}
-		if _, err = tx.Exec(ctx, "INSERT INTO weather_points VALUES($1,$2,$3,$4) ON CONFLICT DO NOTHING", p.Weather, h.RouteID, h.Time, encode(h.Weather)); err != nil {
-			return err
-		}
+	if err = insertHours(ctx, tx, p, b.Hours); err != nil {
+		return err
 	}
 	if _, err = tx.Exec(ctx, "INSERT INTO forecast_snapshots(id,metadata,model_version) VALUES($1,$2,$3)", p.SnapshotID, encode(b.Snapshot), p.Model); err != nil {
 		return err

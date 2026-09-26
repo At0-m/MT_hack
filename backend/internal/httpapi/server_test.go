@@ -50,6 +50,17 @@ func (f fixtureStore) Hours(ctx context.Context, s d.Snapshot, q engine.Selectio
 	}
 	return out, nil
 }
+func (f fixtureStore) Features(ctx context.Context, snap d.Snapshot, hours []d.Hour) ([]d.Hour, error) {
+	out := append([]d.Hour(nil), hours...)
+	for i, h := range out {
+		for _, stored := range f.b.Hours {
+			if h.RouteID == stored.RouteID && h.Time.Equal(stored.Time) {
+				out[i].Features = stored.Features
+			}
+		}
+	}
+	return out, nil
+}
 func (f fixtureStore) Routes(context.Context, string) ([]json.RawMessage, error) {
 	out := []json.RawMessage{}
 	for _, r := range f.b.Routes {
@@ -331,6 +342,7 @@ func (t *testAuth) Session(ctx context.Context, hash string) (auth.Session, erro
 	}
 	return s, nil
 }
+func (t *testAuth) AllowLogin(context.Context, string) (bool, error) { return true, nil }
 func (t *testAuth) RevokeSession(ctx context.Context, hash string) error {
 	t.mu.Lock()
 	defer t.mu.Unlock()

@@ -6,7 +6,7 @@ REST API на Go для маршрутного прогноза посадок: 
 
 ## Запуск через Docker
 
-Требуются Docker Compose и Go 1.26.2 для генерации fixture (или приложенный generated demo bundle).
+Требуются Docker Compose и Go 1.26.8 для генерации fixture (или приложенный generated demo bundle).
 
 ```powershell
 ./scripts/dev.ps1
@@ -29,9 +29,9 @@ $env:CORS_ORIGIN = 'http://localhost:5173'
 go run ./cmd/api
 ```
 
-`go run` без build tag поддерживает synthetic demo; real ONNX требует CGO и `go build -tags onnx`, `ONNX_LIBRARY_PATH` к native Runtime 1.24.1. Docker собирает именно native вариант. Compiler wrapper и native version зафиксированы в go.mod/Dockerfile. Для API используйте отдельную read роль с записью только в `user_sessions`; миграции/Publisher — другая роль. Пример выдачи прав в scripts/db-init.sh и migrations 002/003.
+`go run` без build tag поддерживает synthetic demo; real ONNX требует CGO и `go build -tags onnx`, `ONNX_LIBRARY_PATH` к native Runtime 1.24.1. Docker собирает именно native вариант. Compiler wrapper и native version зафиксированы в go.mod/Dockerfile. Для API используйте отдельную роль: SELECT runtime таблиц, SELECT/INSERT/DELETE в `user_sessions`, SELECT/INSERT/UPDATE/DELETE в `login_limits`; миграции/Publisher — другая роль. Пример выдачи прав в scripts/db-init.sh и migrations 002–005. После обновления сначала примените `go run ./cmd/publisher --migrate` с write-role.
 
-Production: TLS gateway, `COOKIE_SECURE=true` (default), точный `CORS_ORIGIN`, credentials только у Publisher при provisioning. Cookie HttpOnly/SameSite=Strict, token хранится в БД как SHA-256; пароль — bcrypt. Login ограничен 10 попытками/мин/IP на реплику и двумя конкурентными bcrypt; за gateway задайте общий лимит. POST с чужим Origin или Sec-Fetch-Site=cross-site отклоняется. Для same-origin frontend используйте reverse proxy; для localhost dev CORS явно разрешён.
+Production: TLS gateway, `COOKIE_SECURE=true` (default), точный `CORS_ORIGIN`, credentials только у Publisher при provisioning. Cookie HttpOnly/SameSite=Strict, token хранится в БД как SHA-256; пароль — bcrypt. Login ограничен 60 попытками/мин/IP на реплику, 10/мин/account в общей БД и двумя конкурентными bcrypt. За gateway задайте его точные CIDRs в `TRUSTED_PROXY_CIDRS` и общий gateway limiter. Только доверенный peer разрешает разбор X-Forwarded-For; при отсутствующей корректной цепочке используется account limiter. POST с чужим Origin или Sec-Fetch-Site=cross-site отклоняется. Для same-origin frontend используйте reverse proxy; для localhost dev CORS явно разрешён.
 
 ## Фронтенду
 
@@ -68,15 +68,15 @@ docker compose --profile test run --rm tests
 go run ./cmd/loadtest -url http://localhost:8080 -n 3000 -c 16
 ```
 
-Integration suite требует `TEST_DATABASE_URL` администратора **тестового** PostgreSQL: создаёт отдельную случайную БД, проверяет и удаляет только её. Нет DB env — тест явно skipped. Native tests требуют build tag onnx и DLL/SO. Смотрите docs/TEST_REPORT.md и docs/performance.json для фактически выполненных проверок и замеров; container limits и требуемые RPS не выдаются за измеренный результат.
+Integration suite требует `TEST_DATABASE_URL` администратора **тестового** PostgreSQL: создаёт отдельную случайную БД, проверяет и удаляет только её. Нет DB env — тест явно skipped. Native tests требуют build tag onnx и DLL/SO. Смотрите [обновлённый отчёт](docs/UPDATED_REVIEW_FIXES.md) и [предельный замер](docs/boundary-performance.json): native/race с PostGIS пройдены; max-size HTTP проверен под cgroup 2 GiB / 2 CPU на синтетической модели. Старые docs/TEST_REPORT.md и docs/performance.json сохраняют исторические результаты. Реальную ML-нагрузку и Docker end-to-end ещё нужно проверить.
 
-Cache budget 64 MiB с консервативным 512-byte accounting на entry, максимум два native inference, 32 HTTP requests, DB pool 8. Model sessions максимум 16, с LRU-вытеснением свободных сессий и повторной загрузкой старых версий; native RSS не равен Go heap. Параметры конфигурации: DATABASE_URL, DB_MAX_CONNECTIONS (1..32), ARTIFACTS_ROOT, OPENAPI_PATH, HTTP_ADDR, CORS_ORIGIN, COOKIE_SECURE, ONNX_LIBRARY_PATH.
+Cache budget 64 MiB с консервативным 512-byte accounting на entry, максимум два native inference, 32 пользовательских HTTP requests, DB pool 8. Полные признаки загружаются только для cache misses, по 128 строк. Бюджет параллельных расчётов — 32 единицы на процесс и 30 на пользователя, до 256 часовых ячеек на единицу; превышение даёт 429. GET health/live обходит этот лимит, ready имеет два собственных слота и timeout 2 с. Model sessions максимум 16, с LRU-вытеснением свободных сессий; native RSS не равен Go heap. Context cancellation запрашивает ONNX RunOptions.Terminate; освобождение буферов ждёт завершения Run. Параметры конфигурации: DATABASE_URL, DB_MAX_CONNECTIONS (1..32), ARTIFACTS_ROOT, OPENAPI_PATH, HTTP_ADDR, CORS_ORIGIN, COOKIE_SECURE, TRUSTED_PROXY_CIDRS, ONNX_LIBRARY_PATH.
 
 ## ML-поставка и границы готовности
 
 Настоящей обученной модели и prepared transport data пока нет. Demo синтетический, WAPE и эффекты внешних источников не измерены. Подключение ML описано в docs/ML_HANDOFF.md. Backend готовит runtime boundaries, но не заменяет работу ML/ETL-команды: импортирует versioned prepared inputs, проверяет hashes/golden vectors и запускает ONNX. Raw ingestion, weather downloading, обучение и backtest — offline-поставка.
 
-Retention сохраняет старые inputs/models; Publisher `--expire` создаёт tombstones для 410 после declared retention. Физическая уборка inputs/artifacts пока не реализована. Отказ PostgreSQL даёт 503 без файлового fallback. На новую модель требуется повторить реальные WAPE/parity и container load/RSS/CPU checks.
+Retention сохраняет старые inputs/models; Publisher `--expire` создаёт tombstones для 410 после declared retention. `--expire --gc-data` явно удаляет большие DB profiles, не используемые retained snapshots, с минутным grace period. Tombstones/manifests/version claims и artifact files сохраняются; файловый GC ещё нужен. Отказ PostgreSQL даёт 503 без файлового fallback и логирует private cause. На новую модель требуется повторить реальные WAPE/parity и container load/RSS/CPU checks. Stop pipeline и автоматический Open-Meteo refresher остаются открытыми компонентами.
 
 ## Структура кода
 

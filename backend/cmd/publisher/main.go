@@ -20,6 +20,7 @@ func run() error {
 	bundle := flag.String("bundle", "", "Prepared ML/ETL bundle JSON")
 	migrate := flag.Bool("migrate", false, "Apply database migrations")
 	synthetic := flag.Bool("allow-synthetic", false, "Allow explicitly synthetic fixture publication")
+	gc := flag.Bool("gc-data", false, "Collect unreferenced database profiles; keeps manifests/artifacts and tombstones")
 	expire := flag.Bool("expire", false, "Expire retained inactive snapshots")
 	createUser := flag.String("create-user", "", "Provision user using API_PASSWORD environment")
 	flag.Parse()
@@ -45,7 +46,15 @@ func run() error {
 		}
 	}
 	if *expire {
-		return s.Expire(ctx)
+		if err = s.Expire(ctx); err != nil {
+			return err
+		}
+		if !*gc {
+			return nil
+		}
+	}
+	if *gc {
+		return s.CollectData(ctx)
 	}
 	if *bundle == "" {
 		if *migrate || *createUser != "" {

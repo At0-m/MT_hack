@@ -230,10 +230,19 @@ type Bundle struct {
 	Sources          json.RawMessage `json:"sources"`
 }
 type Error struct {
-	Status int
-	Code   string
-	Detail string
+	Cause     error
+	Operation string
+	Status    int
+	Code      string
+	Detail    string
 }
 
-func (e *Error) Error() string                   { return fmt.Sprintf("%s: %s", e.Code, e.Detail) }
-func Fail(status int, code, detail string) error { return &Error{status, code, detail} }
+func (e *Error) Error() string { return fmt.Sprintf("%s: %s", e.Code, e.Detail) }
+func Fail(status int, code, detail string) error {
+	return &Error{Status: status, Code: code, Detail: detail}
+}
+
+func (e *Error) Unwrap() error { return e.Cause }
+func Caused(status int, code, detail, operation string, cause error) error {
+	return &Error{Status: status, Code: code, Detail: detail, Operation: operation, Cause: cause}
+}

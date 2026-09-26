@@ -27,6 +27,7 @@ func write(path string, v any) {
 	}
 }
 func main() {
+	stress := flag.Bool("stress", false, "Generate 7440-hour/256-feature synthetic native boundary fixture")
 	native := flag.Bool("onnx", false, "Generate a tiny synthetic ONNX MatMul model for native integration tests")
 	out := flag.String("output", "testdata/demo-bundle.json", "Bundle path")
 	flag.Parse()
@@ -35,7 +36,17 @@ func main() {
 		panic(err)
 	}
 	origin := time.Date(2026, 8, 31, 21, 0, 0, 0, time.UTC)
-	end := origin.Add(720 * time.Hour)
+	if *stress {
+		origin = time.Date(2026, 9, 30, 21, 0, 0, 0, time.UTC)
+	}
+	width := 720
+	if *stress {
+		width = 744
+		if *out == "testdata/demo-bundle.json" {
+			*out = "testdata/stress-bundle.json"
+		}
+	}
+	end := origin.Add(time.Duration(width) * time.Hour)
 	now := origin
 	p := d.Provenance{
 		SnapshotID:      "demo-september-2026-v1",
@@ -50,6 +61,15 @@ func main() {
 		Policy:          "scenario-formulas-v1",
 		Network:         "synthetic-network-v1",
 		Mode:            "synthetic_mock",
+	}
+	if *stress {
+		p.SnapshotID = "stress-october-2026-v1"
+		p.Features = "stress-features-v1"
+		p.History = "stress-history-v1"
+		p.Weather = "stress-weather-v1"
+		p.Supply = "stress-supply-v1"
+		p.Reference = "stress-reference-v1"
+		p.Network = "stress-network-v1"
 	}
 	notices := []d.Notice{
 		{
@@ -83,7 +103,7 @@ func main() {
 			Version:     p.Model,
 			Schema:      p.Features,
 			Release:     "synthetic",
-			Columns:     []string{"demand_base", "boost"},
+			Columns:     fixtureColumns(*stress),
 			TrainCutoff: p.CompleteThrough,
 		},
 		WeatherMetadata: d.WeatherSnapshot{ID: p.Weather, Provider: "synthetic_mock", SourceID: "synthetic-weather-source", RetrievedAt: now, Locations: map[string]string{}},
@@ -168,14 +188,14 @@ func main() {
 			Resolutions: []string{"hour", "day"},
 			Scopes:      []string{"route"},
 			StopStatus:  "unavailable",
-			MaxLead:     720,
+			MaxLead:     width,
 			Status:      "experimental",
 		})
 		for t := origin; t.Before(end); t = t.Add(time.Hour) {
 			b.Hours = append(b.Hours, d.Hour{
 				RouteID:             id,
 				Time:                t,
-				Features:            map[string]float64{"demand_base": 600, "boost": 10},
+				Features:            fixtureFeatures(*stress),
 				FeaturesAvailableAt: p.CompleteThrough,
 				Fleet:               ptr(10),
 				Reference:           ptr(65),
@@ -222,15 +242,19 @@ func main() {
 	})
 	if *native {
 		baseModel := b.Model
-		root := "artifacts/synthetic-matmul-v1"
+		version := "synthetic-matmul-v1"
+		if *stress {
+			version = "synthetic-stress-256-v1"
+		}
+		root := filepath.Join("artifacts", version)
 		_ = os.MkdirAll(root, 0755)
-		model := tinyModel()
+		model := tinyModelWidth(len(b.Model.Columns))
 		if err = os.WriteFile(filepath.Join(root, "boardings.onnx"), model, 0644); err != nil {
 			panic(err)
 		}
 		write(filepath.Join(root, "feature_schema.json"), map[string]any{"version": p.Features, "columns": b.Model.Columns})
-		write(filepath.Join(root, "golden_vectors.json"), map[string]any{"rows": [][]float32{{600, 10}, {0, 0}, {-1, 2}}, "expected": []float32{610, 0, 1}})
-		b.Model.Version = "synthetic-matmul-v1"
+		write(filepath.Join(root, "golden_vectors.json"), map[string]any{"rows": fixtureGolden(len(b.Model.Columns)), "expected": []float32{610, 0, 1}})
+		b.Model.Version = version
 		b.Model.Release = "published"
 		b.Model.Input = "features"
 		b.Model.Output = "boardings"
@@ -239,7 +263,7 @@ func main() {
 			path := filepath.Join(root, file)
 			content, _ := os.ReadFile(path)
 			hash := fmt.Sprintf("%x", sha256.Sum256(content))
-			rel := filepath.ToSlash(filepath.Join("synthetic-matmul-v1", file))
+			rel := filepath.ToSlash(filepath.Join(version, file))
 			switch file {
 			case "boardings.onnx":
 				b.Model.Path = rel
@@ -253,11 +277,26 @@ func main() {
 			}
 		}
 		// Synthetic mode remains explicit, but the native test calls the adapter directly.
-		write("testdata/native-model.json", b.Model)
-		b.Model = baseModel
+		if *stress {
+			write("testdata/stress-model.json", b.Model)
+			b.Snapshot.Provenance.Model = b.Model.Version
+		} else {
+			write("testdata/native-model.json", b.Model)
+			b.Model = baseModel
+		}
 	}
 	_ = os.MkdirAll(filepath.Dir(*out), 0755)
-	write(*out, b)
+	if *stress {
+		raw, err := json.Marshal(b)
+		if err != nil {
+			panic(err)
+		}
+		if err = os.WriteFile(*out, raw, 0644); err != nil {
+			panic(err)
+		}
+	} else {
+		write(*out, b)
+	}
 	fmt.Println(*out)
 }
 func varint(v uint64) []byte {
@@ -284,12 +323,13 @@ func valueInfo(name string, width uint64) []byte {
 	tensor := join(vint(1, 1), message(2, shape))
 	return join(str(1, name), message(2, message(1, tensor)))
 }
-func tinyModel() []byte {
-	weights := make([]byte, 8)
-	binary.LittleEndian.PutUint32(weights, math.Float32bits(1))
-	binary.LittleEndian.PutUint32(weights[4:], math.Float32bits(1))
-	tensor := join(vint(1, 2), vint(1, 1), vint(2, 1), message(4, weights), str(8, "weights"))
+func tinyModelWidth(width int) []byte {
+	weights := make([]byte, 4*width)
+	for i := 0; i < width; i++ {
+		binary.LittleEndian.PutUint32(weights[4*i:], math.Float32bits(1))
+	}
+	tensor := join(vint(1, uint64(width)), vint(1, 1), vint(2, 1), message(4, weights), str(8, "weights"))
 	node := join(str(1, "features"), str(1, "weights"), str(2, "boardings"), str(4, "MatMul"))
-	graph := join(message(1, node), str(2, "synthetic-matmul"), message(5, tensor), message(11, valueInfo("features", 2)), message(12, valueInfo("boardings", 1)))
+	graph := join(message(1, node), str(2, "synthetic-matmul"), message(5, tensor), message(11, valueInfo("features", uint64(width))), message(12, valueInfo("boardings", 1)))
 	return join(vint(1, 8), str(2, "tramflow-synthetic"), message(7, graph), message(8, vint(2, 13)))
 }

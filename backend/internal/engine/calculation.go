@@ -18,6 +18,7 @@ func Scenario(h d.Hour, o *d.Overrides) (d.Hour, error) {
 		if f.Kind == "absolute" {
 			n = float64(*f.Absolute)
 			h.Source = "scenario_absolute"
+			h.Proxy = false
 		} else {
 			if h.Fleet == nil {
 				return h, d.Fail(422, "SUPPLY_UNKNOWN", "Delta требует известного базового выпуска.")

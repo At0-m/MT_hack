@@ -1,4 +1,4 @@
-FROM golang:1.26.2-bookworm AS build
+FROM golang:1.26.8-bookworm AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
@@ -9,8 +9,10 @@ RUN CGO_ENABLED=1 go build -tags onnx -trimpath -o /out/api ./cmd/api && \
 
 FROM debian:bookworm-slim AS runtime
 ARG ORT_VERSION=1.24.1
+ARG ORT_SHA256=9142552248b735920f9390027e4512a2cacf8946a1ffcbe9071a5c210531026f
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl libgomp1 && \
     curl --fail --location --retry 3 "https://github.com/microsoft/onnxruntime/releases/download/v${ORT_VERSION}/onnxruntime-linux-x64-${ORT_VERSION}.tgz" -o /tmp/ort.tgz && \
+    echo "${ORT_SHA256}  /tmp/ort.tgz" | sha256sum --check --strict && \
     tar -xzf /tmp/ort.tgz -C /opt && rm /tmp/ort.tgz && \
     apt-get purge -y curl && apt-get autoremove -y && rm -rf /var/lib/apt/lists/* && \
     useradd --system --uid 10001 --create-home tramflow

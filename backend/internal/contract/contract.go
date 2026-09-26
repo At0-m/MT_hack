@@ -17,7 +17,9 @@ func Load(path string) (*Contract, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err = s.Validate(context.Background()); err != nil {
+	// The supplied v1.2 spec attaches descriptions to $ref. Permit only this
+	// documentation sibling; validation of request bodies remains strict.
+	if err = s.Validate(context.Background(), openapi3.AllowExtraSiblingFields("description")); err != nil {
 		return nil, err
 	}
 	return &Contract{s}, nil

@@ -2,11 +2,14 @@ package config
 
 import (
 	"fmt"
+	"net/netip"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Config struct {
+	TrustedProxies                                              []netip.Prefix
 	Database, Artifacts, Contract, Addr, User, Password, Origin string
 	Pool                                                        int32
 }
@@ -28,6 +31,16 @@ func Load() (Config, error) {
 	n, err := strconv.Atoi(env("DB_MAX_CONNECTIONS", "8"))
 	if err != nil || n < 1 || n > 32 {
 		return c, fmt.Errorf("DB_MAX_CONNECTIONS must be 1..32")
+	}
+	for _, value := range strings.Split(os.Getenv("TRUSTED_PROXY_CIDRS"), ",") {
+		if strings.TrimSpace(value) == "" {
+			continue
+		}
+		prefix, err := netip.ParsePrefix(strings.TrimSpace(value))
+		if err != nil {
+			return c, fmt.Errorf("invalid TRUSTED_PROXY_CIDRS")
+		}
+		c.TrustedProxies = append(c.TrustedProxies, prefix)
 	}
 	c.Pool = int32(n)
 	return c, nil

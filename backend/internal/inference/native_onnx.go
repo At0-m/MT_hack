@@ -68,7 +68,16 @@ func (n *native) Predict(ctx context.Context, rows [][]float32) ([]float32, erro
 		return nil, err
 	}
 	defer output.Destroy()
-	if err = n.session.Run([]ort.Value{input}, []ort.Value{output}); err != nil {
+	runOptions, err := ort.NewRunOptions()
+	if err != nil {
+		return nil, err
+	}
+	defer runOptions.Destroy()
+	// RunOptions belongs to this call. Keep buffers/session owned until Run exits.
+	err = runCancelable(ctx, func() error {
+		return n.session.RunWithOptions([]ort.Value{input}, []ort.Value{output}, runOptions)
+	}, runOptions.Terminate)
+	if err != nil {
 		return nil, err
 	}
 	return append([]float32(nil), output.GetData()...), nil

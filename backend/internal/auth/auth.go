@@ -22,6 +22,7 @@ type Session struct {
 	Expires       time.Time `json:"expires_at"`
 }
 type Repository interface {
+	AllowLogin(context.Context, string) (bool, error)
 	User(context.Context, string) (User, string, error)
 	CreateSession(context.Context, string, string, time.Time) error
 	Session(context.Context, string) (Session, error)
@@ -38,6 +39,13 @@ func New(repo Repository) *Service {
 }
 func Hash(token string) string { return fmt.Sprintf("%x", sha256.Sum256([]byte(token))) }
 func (s *Service) Login(ctx context.Context, username, password string) (Session, string, error) {
+	allowed, err := s.Repo.AllowLogin(ctx, Hash(username))
+	if err != nil {
+		return Session{}, "", err
+	}
+	if !allowed {
+		return Session{}, "", d.Fail(429, "LOGIN_RATE_LIMIT", "Слишком много попыток входа для этого аккаунта.")
+	}
 	user, hash, err := s.Repo.User(ctx, username)
 	if err != nil {
 		return Session{}, "", err

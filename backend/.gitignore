@@ -8,4 +8,6 @@ artifacts/*
 !artifacts/.gitkeep
 testdata/demo-bundle.json
 testdata/native-model.json
+testdata/stress-bundle.json
+testdata/stress-model.json
 tmp/

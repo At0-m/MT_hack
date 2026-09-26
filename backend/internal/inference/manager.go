@@ -77,10 +77,11 @@ func (m *Manager) Prepare(ctx context.Context, model d.Model, synthetic bool) (P
 }
 func (m *Manager) prepare(ctx context.Context, model d.Model, synthetic bool) (Predictor, error) {
 	if synthetic {
-		if model.Release != "synthetic" {
-			return nil, fmt.Errorf("synthetic model required")
+		if model.Release == "synthetic" {
+			return nil, nil
 		}
-		return nil, nil
+		// Published native test models can still run on explicitly synthetic data.
+		// Runtime mode/quality remain synthetic; this does not claim trained quality.
 	}
 	session, err := m.acquire(ctx, model)
 	if err != nil {
@@ -182,7 +183,7 @@ func (m *Manager) Predict(ctx context.Context, model d.Model, s d.Snapshot, hour
 	}
 	out := make([]float64, len(hours))
 	synthetic := s.Provenance.Mode == "synthetic_mock"
-	if synthetic {
+	if synthetic && model.Release == "synthetic" {
 		for i, h := range hours {
 			if h.SyntheticBoardings == nil {
 				return nil, fmt.Errorf("missing synthetic prediction")

@@ -14,6 +14,9 @@ type loginAttempt struct {
 }
 
 func (s *Server) allowLogin(address string) bool {
+	if address == "" {
+		return true
+	}
 	host, _, err := net.SplitHostPort(address)
 	if err != nil {
 		host = address
@@ -25,7 +28,7 @@ func (s *Server) allowLogin(address string) bool {
 	if now.Sub(a.Start) >= time.Minute {
 		a = loginAttempt{Start: now}
 	}
-	if a.Count >= 10 {
+	if a.Count >= 60 {
 		return false
 	}
 	if len(s.loginAttempts) >= 4096 {
@@ -55,7 +58,7 @@ func (s *Server) cookie(w http.ResponseWriter, value string, expires time.Time, 
 	})
 }
 func (s *Server) login(w http.ResponseWriter, r *http.Request) {
-	if !s.allowLogin(r.RemoteAddr) {
+	if !s.allowLogin(s.clientIP(r)) {
 		w.Header().Set("Retry-After", "60")
 		s.problem(w, 429, "LOGIN_RATE_LIMIT", "Слишком много попыток входа.")
 		return

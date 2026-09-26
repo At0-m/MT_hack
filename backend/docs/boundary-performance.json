@@ -1,0 +1,44 @@
+{
+  "fixture": "synthetic native MatMul; 10 routes, 744 hours, 256 columns",
+  "database": "PostgreSQL 16/PostGIS; separate API role",
+  "scope": "WSL2 systemd cgroup; actual HTTP handlers, no Docker image build",
+  "tests": [
+    {
+      "phase": "cold",
+      "status": 200,
+      "seconds": 4.5296
+    },
+    {
+      "phase": "hot",
+      "status": 200,
+      "seconds": 0.0648
+    },
+    {
+      "phase": "partial scenario",
+      "status": 200,
+      "seconds": 0.0579
+    }
+  ],
+  "publication_seconds": 4.099,
+  "memory_max_bytes": 2147483648,
+  "cpu_max": "200000 100000",
+  "overload": {
+    "requests": 32,
+    "accepted": 1,
+    "rejected_429": 31,
+    "liveness_probes": 189,
+    "liveness_errors": 0,
+    "readiness_probes": 189,
+    "readiness_errors": 0,
+    "cache": "cold after API restart"
+  },
+  "api_cgroup_memory_peak_bytes": 64393216,
+  "memory_events": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0
+  }
+}
