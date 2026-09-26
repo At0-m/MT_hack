@@ -1,0 +1,7 @@
+.git
+.env
+.cache
+requirements
+artifacts
+*.exe
+tmp

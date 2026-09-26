@@ -1,0 +1,11 @@
+.env
+.cache/
+*.exe
+*.test
+coverage.out
+requirements/
+artifacts/*
+!artifacts/.gitkeep
+testdata/demo-bundle.json
+testdata/native-model.json
+tmp/
