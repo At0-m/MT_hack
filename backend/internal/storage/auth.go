@@ -1,0 +1,121 @@
+package storage
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"github.com/jackc/pgx/v5"
+	"golang.org/x/crypto/bcrypt"
+	"time"
+	"tramflow/internal/auth"
+	d "tramflow/internal/domain"
+)
+
+func (s *Store) User(ctx context.Context, username string) (auth.User, string, error) {
+	var u auth.User
+	var hash string
+	err := s.Pool.QueryRow(ctx, "SELECT user_id,username,display_name,password_hash FROM app_users WHERE username=$1 AND NOT disabled", username).Scan(&u.ID, &u.Username, &u.DisplayName, &hash)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return u, "", nil
+	}
+	if err != nil {
+		return u, "", dependency(err)
+	}
+	return u, hash, nil
+}
+func (s *Store) ProvisionUser(ctx context.Context, username, password string) error {
+	if len(username) < 1 || len(username) > 128 || len(password) < 12 || len(password) > 72 {
+		return fmt.Errorf("username must be 1..128 bytes; password 12..72 bytes")
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	tx, err := s.Pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+	id := auth.Hash(username)[:32]
+	var existingID string
+	err = tx.QueryRow(ctx, "SELECT user_id FROM app_users WHERE username=$1", username).Scan(&existingID)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return err
+	}
+	if err == nil {
+		id = existingID
+	}
+	// Use the same lock order as session creation: advisory lock before row writes.
+	if _, err = tx.Exec(ctx, "SELECT pg_advisory_xact_lock(hashtextextended($1,741854))", id); err != nil {
+		return err
+	}
+	var updatedID string
+	if err = tx.QueryRow(ctx, `INSERT INTO app_users(user_id,username,display_name,password_hash)
+ VALUES($1,$2,$3,$4) ON CONFLICT(username) DO UPDATE SET password_hash=EXCLUDED.password_hash
+ RETURNING user_id`, id, username, username, string(hash)).Scan(&updatedID); err != nil {
+		return err
+	}
+	if updatedID != id {
+		return fmt.Errorf("user identity changed during provisioning")
+	}
+	if _, err = tx.Exec(ctx, "DELETE FROM user_sessions WHERE user_id=$1", id); err != nil {
+		return err
+	}
+	return tx.Commit(ctx)
+}
+func (s *Store) CreateSession(ctx context.Context, hash, id string, expires time.Time, verifiedHash string) error {
+	tx, err := s.Pool.Begin(ctx)
+	if err != nil {
+		return dependency(err)
+	}
+	defer tx.Rollback(ctx)
+	if _, err = tx.Exec(ctx, "SELECT pg_advisory_xact_lock(hashtextextended($1,741854))", id); err != nil {
+		return dependency(err)
+	}
+	var currentHash string
+	if err = tx.QueryRow(ctx, "SELECT password_hash FROM app_users WHERE user_id=$1 AND NOT disabled", id).Scan(&currentHash); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return d.Fail(401, "INVALID_CREDENTIALS", "Неверный логин или пароль.")
+		}
+		return dependency(err)
+	}
+	if currentHash != verifiedHash {
+		return d.Fail(401, "INVALID_CREDENTIALS", "Неверный логин или пароль.")
+	}
+	if _, err = tx.Exec(ctx, `DELETE FROM user_sessions WHERE token_hash IN
+ (SELECT token_hash FROM user_sessions WHERE expires_at<=now() ORDER BY expires_at LIMIT 512)`); err != nil {
+		return dependency(err)
+	}
+	if _, err = tx.Exec(ctx, `DELETE FROM user_sessions WHERE token_hash IN
+ (SELECT token_hash FROM user_sessions WHERE user_id=$1 ORDER BY created_at DESC,token_hash OFFSET 19)`, id); err != nil {
+		return dependency(err)
+	}
+	if _, err = tx.Exec(ctx, "INSERT INTO user_sessions(token_hash,user_id,expires_at) VALUES($1,$2,$3)", hash, id, expires); err != nil {
+		return dependency(err)
+	}
+	if err = tx.Commit(ctx); err != nil {
+		return dependency(err)
+	}
+	return nil
+}
+
+func (s *Store) Session(ctx context.Context, hash string) (auth.Session, error) {
+	var result auth.Session
+	err := s.Pool.QueryRow(ctx, "SELECT u.user_id,u.username,u.display_name,s.expires_at FROM user_sessions s JOIN app_users u USING(user_id) WHERE token_hash=$1 AND expires_at>now() AND NOT u.disabled", hash).Scan(&result.User.ID, &result.User.Username, &result.User.DisplayName, &result.Expires)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return result, d.Fail(401, "UNAUTHORIZED", "Сессия истекла; войдите снова.")
+	}
+	if err != nil {
+		return result, dependency(err)
+	}
+	result.Authenticated = true
+	result.Expires = result.Expires.UTC()
+	return result, nil
+}
+func (s *Store) RevokeSession(ctx context.Context, hash string) error {
+	_, err := s.Pool.Exec(ctx, "DELETE FROM user_sessions WHERE token_hash=$1", hash)
+	if err != nil {
+		return dependency(err)
+	}
+	return nil
+}

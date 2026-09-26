@@ -1,0 +1,56 @@
+name: Go backend checks
+
+on:
+  push:
+    paths: ['backend/**', '.github/workflows/backend.yml']
+  pull_request:
+    paths: ['backend/**', '.github/workflows/backend.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-test-only
+          POSTGRES_DB: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      CGO_ENABLED: '1'
+      TEST_DATABASE_URL: postgres://postgres:ci-test-only@localhost:5432/postgres?sslmode=disable
+      ONNX_LIBRARY_PATH: ${{ github.workspace }}/backend/tmp/ort/onnxruntime-linux-x64-1.24.1/lib/libonnxruntime.so.1.24.1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - name: Verified ONNX Runtime
+        run: |
+          mkdir -p tmp/ort
+          curl --fail --location --retry 3 https://github.com/microsoft/onnxruntime/releases/download/v1.24.1/onnxruntime-linux-x64-1.24.1.tgz -o tmp/ort/runtime.tgz
+          echo '9142552248b735920f9390027e4512a2cacf8946a1ffcbe9071a5c210531026f  tmp/ort/runtime.tgz' | sha256sum --check --strict
+          tar -xzf tmp/ort/runtime.tgz -C tmp/ort
+      - name: Fixtures and native database tests
+        run: |
+          go run ./cmd/fixtures --onnx
+          go test -tags onnx -race -count=1 -timeout 180s ./cmd/... ./internal/... ./migrations
+          go vet -tags onnx ./cmd/... ./internal/... ./migrations
+      - name: Vulnerability scan
+        run: go run golang.org/x/vuln/cmd/govulncheck@v1.8.0 ./cmd/... ./internal/... ./migrations
+      - name: Production image build
+        run: docker build --target runtime --tag tramflow:ci .
