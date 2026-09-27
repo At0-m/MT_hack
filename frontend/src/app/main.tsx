@@ -1,7 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
 import '../styles/main.css';
-import '../styles/integration.css';
 
 const FIGMA_W = 1920;
 const FIGMA_H = 1080;

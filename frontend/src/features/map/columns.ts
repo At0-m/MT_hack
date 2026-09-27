@@ -1,10 +1,9 @@
 import type { FeatureCollection, Polygon } from 'geojson';
 import type { Calculation, Geometry, StopFeature } from '../../api/types';
 export const loadColors = {normal:'#00ff00',elevated:'#f6ff00',high:'#ffb44a',very_high:'#ff0000',unavailable:'#bbc5d2'};
-export function loadColor(value:number|undefined, thresholds: readonly number[] = [0.75, 1, 1.25]):string {
+export function loadColor(value:number|undefined):string {
  if(value===undefined||!Number.isFinite(value))return loadColors.unavailable;
- const [low, medium, high] = thresholds;
- return value<low?loadColors.normal:value<medium?loadColors.elevated:value<high?loadColors.high:loadColors.very_high;
+ return value<.25?loadColors.normal:value<.5?loadColors.elevated:value<.75?loadColors.high:loadColors.very_high;
 }
 type Point = number[];
 const meters = (a:Point,b:Point) => Math.hypot((a[0]-b[0])*111320*Math.cos(a[1]*Math.PI/180),(a[1]-b[1])*111320);
@@ -79,9 +78,9 @@ export function buildColumns(geometry:Geometry, calculation:Calculation|undefine
   if(!points)simplified++;
   const anchors=points??[stop.geometry.coordinates],value=reading.evaluated.load_index.value;
   const baseline=Math.max(MIN_ROOF_HEIGHT,roofHeight(stop.geometry.coordinates))+5;
-  const height=0.4*(baseline+Math.max(3,Math.min(1,(value-policy.scale_min)/(policy.scale_max-policy.scale_min||1))*300));
+  const height=0.4*(baseline+Math.max(3,Math.min(1,(Math.min(1,value)-policy.scale_min)/(policy.scale_max-policy.scale_min||1))*300));
   const center=anchors.reduce((best,p,i)=>meters(p,stop.geometry.coordinates)<meters(anchors[best],stop.geometry.coordinates)?i:best,0);
-   const color=loadColor(value,policy.thresholds);
+   const color=loadColor(value);
   anchors.forEach((p,i)=>{
    const h=i===center?height:height*Math.pow(0.65,Math.abs(i-center));
    features.push({type:'Feature',geometry:{type:'Polygon',coordinates:[square(p,i===center?2.4:2)]},properties:{...stop.properties,height:h,value,central:i===center,overflow:value>policy.scale_max,color}});

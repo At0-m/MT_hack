@@ -1,7 +1,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import type { Schema } from '../api/types';
 export const number = (n: number) => new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1}).format(n);
-export function metric(value:Schema['NumericReading']|undefined,percent=false):string {return !value?'Нет данных':value.status==='available'?(percent?String(Math.round(value.value*100)):number(value.value))+(percent?'%':''):`Недоступно (${value.reason})`;}
+export function metric(value:Schema['NumericReading']|undefined,percent=false):string {return !value?'Нет данных':value.status==='available'?(percent?String(Math.round(Math.min(1,Math.max(0,value.value))*100)):number(value.value))+(percent?'%':''):`Недоступно (${value.reason})`;}
 export function Popup({children,label,onClose,className=''}:{children:ReactNode;label:string;onClose:()=>void;className?:string}) {
  const shell=className.includes('popup-time')?'50000.svg':className.includes('popup-calendar')?'calendar-wide.svg':className.includes('popup-routes')?'fe310.svg':className.includes('popup-fleet')?'aec07.svg':undefined;
  const ref=useRef<HTMLDivElement>(null);const close=useRef(onClose);close.current=onClose;

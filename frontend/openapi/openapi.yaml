@@ -1552,7 +1552,7 @@ components:
           items:
             $ref: '#/components/schemas/UiIndicator'
           minItems: 0
-          maxItems: 6
+          maxItems: 5
         stop_readings:
           type: array
           items:
@@ -1821,7 +1821,7 @@ components:
           items:
             $ref: '#/components/schemas/ViewMode'
           minItems: 1
-          maxItems: 4
+          maxItems: 3
           uniqueItems: true
         reference_quantile:
           type: number

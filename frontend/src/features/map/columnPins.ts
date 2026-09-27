@@ -18,5 +18,5 @@ export function columnPins(map: TransportMap, host: HTMLElement) {
    element.style.left=`${(px+1)*canvas.clientWidth/2}px`;element.style.top=`${(1-py)*canvas.clientHeight/2}px`;
   }
  }};
- return {layer,update(values:ColumnPin[]){overlay.replaceChildren();pins=values.map(pin=>{const element=document.createElement('span');element.className='column-pin';element.textContent=`${Math.round(pin.value*100)}%`;element.style.setProperty('--pin-color',pin.color);overlay.append(element);return {pin,element};});},remove(){overlay.remove();}};
+ return {layer,update(values:ColumnPin[]){overlay.replaceChildren();pins=values.map(pin=>{const element=document.createElement('span');element.className='column-pin';element.textContent=`${Math.round(Math.min(1,Math.max(0,pin.value))*100)}%`;element.style.setProperty('--pin-color',pin.color);overlay.append(element);return {pin,element};});},remove(){overlay.remove();}};
 }

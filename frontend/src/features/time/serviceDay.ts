@@ -14,7 +14,7 @@ export function overridesForDay(selection: Selection, overrides?: Overrides): Ov
 /** Keep the original response and its identity for every frame, including after midnight. */
 export function serviceFrames(calculation: Calculation, nextDay?: Calculation): DisplayFrame[] {
  const frames = calculation.frames.map((_, index) => ({ calculation, index }));
- if (calculation.descriptor.selection.view_mode !== 'day' || !nextDay) return frames;
+ if (calculation.descriptor.selection.view_mode !== 'day') return frames;
  return [...frames.filter(f => moscow(f.calculation.frames[f.index].window.from).hour >= 6),
   ...(nextDay?.frames.map((_, index) => ({ calculation: nextDay, index })) ?? [])
    .filter(f => moscow(f.calculation.frames[f.index].window.from).hour < 2)];

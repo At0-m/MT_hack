@@ -15,19 +15,19 @@ export function Fleet({ calculation, index, onChange, onDirty, pending }: {
  useEffect(() => {
   if (draft === undefined) return;
   const v = Number(draft);
-  if (!draft.trim() || !Number.isInteger(v) || v < 0 || v > 200) {
-   setError('Количество трамваев: целое число от 0 до 200.'); return;
+  if (!draft.trim() || !Number.isInteger(v) || v < 0 || v > 99) {
+   setError('Количество трамваев: целое число от 0 до 99.'); return;
   }
   setError('');
-  const timer = setTimeout(() => callback.current({ effective_window: JSON.parse(effectiveKey), fleet: { kind: 'absolute', vehicle_count: v }, ...(calculation.descriptor.kind === 'scenario' ? {factors: calculation.descriptor.overrides.factors} : {}) }), 450);
+  const timer = setTimeout(() => callback.current({ effective_window: JSON.parse(effectiveKey), fleet: { kind: 'absolute', vehicle_count: v } }), 450);
   return () => clearTimeout(timer);
  }, [draft, effectiveKey]);
- const change = (next: string) => { setDraft(next===''?'':String(Math.min(200,Math.max(0,Math.floor(Number(next)))))); onDirty(); };
+ const change = (next: string) => { setDraft(next===''?'':String(Math.min(99,Math.max(0,Math.floor(Number(next)))))); onDirty(); };
  return <div className="fleet-editor" aria-busy={pending}>
   <div className="fleet-step">
    <button aria-label="Уменьшить выпуск" disabled={Number(value) <= 0} onClick={() => change(String(Math.max(0, Math.floor(Number(value)) - 1)))}>-</button>
-   <input type="number" aria-label="Количество трамваев" placeholder="Н/Д" value={value} min={0} max={200} step={1} onChange={e => change(e.target.value)} />
-   <button aria-label="Увеличить выпуск" disabled={Number(value) >= 200} onClick={() => change(String(Math.min(200, Math.floor(Number(value)) + 1)))}>+</button>
+   <input type="number" aria-label="Количество трамваев" placeholder="Н/Д" value={value} min={0} max={99} step={1} onChange={e => change(e.target.value)} />
+   <button aria-label="Увеличить выпуск" disabled={Number(value) >= 99} onClick={() => change(String(Math.min(99, Math.floor(Number(value)) + 1)))}>+</button>
   </div>
   {error && <p className="fleet-error" role="alert">{error}</p>}
  </div>;

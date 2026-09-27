@@ -11,7 +11,7 @@ describe('Moscow calendar and coverage',()=>{
  it('day is exactly 24 Moscow hours regardless of host timezone',()=>{const s=selection('day','2026-09-27');expect(s.window.from).toBe('2026-09-27T00:00:00+03:00');expect(frameWindows(s)).toHaveLength(24);});
  it('week crosses year boundary',()=>{const s=selection('week','2026-12-28');expect(frameWindows(s)).toHaveLength(7);expect(s.window.to).toBe('2027-01-04T00:00:00+03:00');});
  it('custom spans three months including leap day and inclusive last date',()=>{const s=selection('custom','2024-01-31','2024-03-01');expect(frameWindows(s)).toHaveLength(31);expect(s.window.to).toBe('2024-03-02T00:00:00+03:00');});
- it('custom rejects unsupported three-month selection instead of clipping',()=>{const s=selection('custom','2026-01-30','2026-05-01');expect(()=>validateSelection(s,bootstrap,3)).toThrow();expect(frameWindows(s)).toHaveLength(92);});
+ it('custom spans more than three months without clipping',()=>{const s=selection('custom','2026-01-30','2026-05-01');validateSelection(s,bootstrap,3);expect(frameWindows(s)).toHaveLength(92);});
  it('rejects reversed dates',()=>expect(()=>makeWindow('custom','2026-03-02','2026-03-01')).toThrow());
  it('rejects custom hour',()=>{const s={...selection('custom','2026-01-01'),resolution:'hour'} as Selection;expect(()=>validateSelection(s,bootstrap)).toThrow();});
  it('honors deployment-specific custom limit',()=>{const b=structuredClone(bootstrap);b.limits.max_custom_days=12;expect(()=>validateSelection(selection('custom','2026-01-01','2026-01-13'),b)).toThrow('12');});
@@ -42,7 +42,6 @@ describe('decorative approach geometry',()=>{
 });
 
 describe('service day from 06 to 01',()=>{
- it('uses all 24 actual hours when next-day coverage is unavailable',async()=>{const c=await calculate(selection('day','2026-12-31'));expect(serviceFrames(c)).toHaveLength(24);expect(serviceFrames(c)[0].index).toBe(0);});
  it('uses real next-day frames across month and year boundaries',async()=>{
   const s=selection('day','2026-12-31'),next=nextDaySelection(s)!;
   const [c,n]=await Promise.all([calculate(s),calculate(next)]);

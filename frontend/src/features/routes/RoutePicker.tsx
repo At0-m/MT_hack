@@ -26,29 +26,17 @@ export function RoutePicker({
   const [error, setError] = useState('');
   const [retry, setRetry] = useState(0);
   const [sort, setSort] = useState(true);
-  const [details, setDetails] = useState<Record<string, Schema['RouteDetail']>>({ [routeDetail.route.route_id]: routeDetail });
-  useEffect(() => {
-    const controller = new AbortController();
-    setDetails({ [routeDetail.route.route_id]: routeDetail });
-    // Ten small immutable route descriptions, not ten forecast computations.
-    void Promise.allSettled(bootstrap.routes.filter(r => r.route_id !== routeDetail.route.route_id).map(async r => {
-      const detail = await api.route(r.route_id, bootstrap.active_snapshot.provenance.network_version, controller.signal);
-      if (!controller.signal.aborted && detail.network_version === bootstrap.active_snapshot.provenance.network_version)
-        setDetails(previous => ({ ...previous, [r.route_id]: detail }));
-    }));
-    return () => controller.abort();
-  }, [bootstrap, routeDetail]);
 
   useEffect(() => {
     const ctrl = new AbortController();
     setComparison(undefined);
     setError('');
-    const s = { ...selection, route_ids: bootstrap.routes.filter(r=>{try{validateSelection({...selection,route_ids:[r.route_id],spatial_detail:'route'},bootstrap);return true;}catch{return false;}}).map(r=>r.route_id), spatial_detail: 'route' as const };
+    const s = { ...selection, route_ids: bootstrap.routes.map((r) => r.route_id), spatial_detail: 'route' as const };
     try {
       validateSelection(s, bootstrap);
       void api.calculate(s, undefined, ctrl.signal).then((c) => {
         assertCalculation(c, { kind: 'forecast', selection: s });
-        if (!ctrl.signal.aborted) setComparison(c);
+        setComparison(c);
       }).catch((e) => {
         if (!ctrl.signal.aborted) setError(errorText(e));
       });
@@ -106,7 +94,7 @@ export function RoutePicker({
         {!routes.length && <p className="no-routes">Ничего не найдено</p>}
         {routes.map((r, i) => {
           const reading = readings?.find((v) => v.route_id === r.route_id);
-          const stops = details[r.route_id]?.patterns[0]?.stops;
+          const stops = r.route_id === routeDetail.route.route_id ? routeDetail.patterns[0]?.stops : undefined;
           const isSelected = selectedRouteId === r.route_id;
           const isActive = i === active;
 
@@ -118,7 +106,7 @@ export function RoutePicker({
               onClick={() => onChoose(r.route_id)}
               onMouseEnter={() => setActive(i)}
             >
-              <span className="route-heading"><strong>Трамвай №{r.route_number}</strong>{reading?.indicators.some(item=>item.key==='trend'&&(item.variant==='up'||item.variant==='down'))&&<IncomingIcon name={reading.indicators.find(item=>item.key==='trend')?.variant==='up'?'up.png':'down.png'} className="route-trend-icon"/>}</span>
+              <span className="route-heading"><strong>Трамвай №{r.route_number}</strong><IncomingIcon name={["down down.png","down.png","up.png","up up.png","up up.png"][i%5]} className={`route-trend-icon route-trend-icon--${['double-down','down','up','double-up','triple-up'][i%5]}`}/></span>
               <span className={isSelected ? 'route-chosen' : 'route-choose'}>
                 {isSelected ? 'ВЫБРАН' : 'ВЫБРАТЬ'}
               </span>

@@ -11,7 +11,6 @@ import { serviceFrames } from '../features/time/serviceDay';
 import { dateLabel } from '../features/time/dates';
 import { Popup, metric } from '../ui/common';
 import { Fleet } from '../features/scenario/Fleet';
-import { Factors } from '../features/scenario/Factors';
 import { RoutePicker } from '../features/routes/RoutePicker';
 import { Analytics } from '../features/analytics/Analytics';
 import { FloatingChart } from '../features/charts/FloatingChart';
@@ -21,7 +20,6 @@ import { loadColor } from '../features/map/columns';
 function Dispatcher({onLogout}:{onLogout:()=>Promise<void>}){
   const d=useDispatcher();
   const [index,setIndex]=useState(0);
-  const [calendarDay,setCalendarDay]=useState(false);
   const [popup,commitPopup]=useState<string>();
   const [popupClosing,setPopupClosing]=useState(false);
   const nextPopup=useRef<string|undefined>(undefined);
@@ -48,7 +46,7 @@ function Dispatcher({onLogout}:{onLogout:()=>Promise<void>}){
   const selection=c?.descriptor.selection;
   const b=d.bootstrap;
   const dateSelection=d.pendingSelection??selection;
-  const frames=c?serviceFrames(c,calendarDay?undefined:d.confirmed?.nextDay):[];
+  const frames=c?serviceFrames(c,d.confirmed?.nextDay):[];
   const displayIndex=Math.min(index,Math.max(0,frames.length-1));
   const activeCalculation=frames[displayIndex]?.calculation??c;
   const frameIndex=frames[displayIndex]?.index??0;
@@ -70,7 +68,7 @@ function Dispatcher({onLogout}:{onLogout:()=>Promise<void>}){
       const url=URL.createObjectURL(blob);
       const a=document.createElement('a');
       a.href=url;
-      a.download=`transport-${dateLabel(activeCalculation.descriptor.selection.window.from,'yyyy-MM-dd')}-${activeCalculation.calculation_id.slice(5,13)}.csv`;
+      a.download=`transport-${activeCalculation.calculation_id.slice(5,13)}.csv`;
       a.click();
       setTimeout(()=>URL.revokeObjectURL(url),1000);
     }catch(e){
@@ -99,19 +97,18 @@ function Dispatcher({onLogout}:{onLogout:()=>Promise<void>}){
               <IncomingIcon name="train.png" className="fleet-icon-placeholder"/><span className="digits">{reading?.evaluated.mean_vehicle_count.status==='available'?metric(reading.evaluated.mean_vehicle_count):'Н/Д'}</span>
             </button>
             <button className="top-control index-control" aria-label="Общая аналитика" onClick={()=>{setStationClosing(false);setPanel('overall');setPopup(undefined);}}>
-               <span className="index-symbol" aria-hidden="true" style={{'--index-color':reading?.evaluated.load_index.status==='available'?loadColor(reading.evaluated.load_index.value,activeCalculation?.visualization.thresholds):undefined} as React.CSSProperties}><span/><span/><span/></span>
-               <span className="digits" style={{color:reading?.evaluated.load_index.status==='available'?loadColor(reading.evaluated.load_index.value,activeCalculation?.visualization.thresholds):undefined}}>{reading?.evaluated.load_index.status==='available'?metric(reading.evaluated.load_index,true):'Н/Д'}</span>
+               <span className="index-symbol" aria-hidden="true" style={{'--index-color':reading?.evaluated.load_index.status==='available'?loadColor(reading.evaluated.load_index.value):undefined} as React.CSSProperties}><span/><span/><span/></span>
+               <span className="digits" style={{color:reading?.evaluated.load_index.status==='available'?loadColor(reading.evaluated.load_index.value):undefined}}>{reading?.evaluated.load_index.status==='available'?metric(reading.evaluated.load_index,true):'Н/Д'}</span>
             </button>
           </nav>
-          {popup&&<Popup key={popup} label={{time:'Временные кадры',calendar:'Выбор периода',routes:'Маршруты',fleet:'Сценарий выпуска',factors:'Поправки к прогнозу'}[popup]!} className={`popup-${popup}${popupClosing?' popup-leaving':''}`} onClose={()=>setPopup(undefined)}>
+          {popup&&<Popup key={popup} label={{time:'Временные кадры',calendar:'Выбор периода',routes:'Маршруты',fleet:'Сценарий выпуска'}[popup]!} className={`popup-${popup}${popupClosing?' popup-leaving':''}`} onClose={()=>setPopup(undefined)}>
             {popup==='time'&&<Timeline calculation={c} frames={frames} index={displayIndex} onChange={setIndex} wheel/>}
             {popup==='calendar'&&<Calendar selection={selection} bootstrap={b} onApply={(s,close=true)=>{setIndex(0);setPanel(undefined);if(close)setPopup(undefined);void d.calculate(s);}}/>}
-            {popup==='routes'&&<RoutePicker routeDetail={d.confirmed!.route} bootstrap={b} selection={activeCalculation!.descriptor.selection} index={frameIndex} onChoose={routeId=>{setPanel(undefined);setPattern(undefined);setPopup(undefined);setIndex(0);void d.calculate({...selection,route_ids:[routeId]});}}/>}
+            {popup==='routes'&&<RoutePicker routeDetail={d.confirmed!.route} bootstrap={b} selection={selection} index={frameIndex} onChoose={routeId=>{setPanel(undefined);setPattern(undefined);setPopup(undefined);setIndex(0);void d.calculate({...selection,route_ids:[routeId]});}}/>}
             {popup==='fleet'&&<Fleet key={activeCalculation!.frames[frameIndex].window.from} calculation={activeCalculation!} index={frameIndex} pending={d.pending} onDirty={d.markDirty} onChange={o=>void d.calculate(selection,o)}/>}
-            {popup==='factors'&&<Factors calculation={activeCalculation!} allowed={b.capabilities.scenario_factors} pending={d.pending} onDirty={d.markDirty} onChange={o=>void d.calculate(selection,o)} onReset={()=>{setPopup(undefined);void d.calculate(selection);}}/>}
           </Popup>}
           <Indicators items={reading?.indicators??[]}/>
-          {panel&&<Analytics key={typeof panel==='string'?panel:panel.route_stop_id} calculation={activeCalculation!} index={frameIndex} frames={frames} displayIndex={displayIndex} onFrame={setIndex} focus={stop} title={title} blocked={blocked} stopSupported={activeCalculation!.descriptor.selection.spatial_detail==='route_stop'} onCloseStart={()=>setStationClosing(true)} onClose={()=>{setPanel(undefined);setStationClosing(false);}}/>}
+          {panel&&<Analytics key={typeof panel==='string'?panel:panel.route_stop_id} calculation={activeCalculation!} index={frameIndex} frames={frames} displayIndex={displayIndex} onFrame={setIndex} focus={stop} title={title} blocked={blocked} stopSupported={b.capabilities.stop_forecasts} onCloseStart={()=>setStationClosing(true)} onClose={()=>{setPanel(undefined);setStationClosing(false);}}/>}
         </>}
           {activeCalculation&&d.confirmed&&chartWindows.map(id=><FloatingChart key={id} ordinal={id} geometry={d.confirmed!.geometry} calculation={activeCalculation} frameIndex={frameIndex} frames={frames} displayIndex={displayIndex} onFrame={setIndex} onClose={()=>setChartWindows(w=>w.filter(value=>value!==id))}/>)}
           <div className={`utility-bar ${toolsOpen?'is-open':''}`}>
@@ -127,20 +124,15 @@ function Dispatcher({onLogout}:{onLogout:()=>Promise<void>}){
                 {d.confirmed.route.patterns.map(p=><option key={p.route_pattern_id} value={p.route_pattern_id}>{p.name}</option>)}
               </select>
             )}
-            {c&&!!b?.capabilities.scenario_factors.length&&<button data-popup-trigger onClick={()=>toggle('factors')}>{'\u041f\u041e\u041f\u0420\u0410\u0412\u041a\u0418'}</button>}
-            {selection?.view_mode==='day'&&<button onClick={()=>{setCalendarDay(v=>!v);setIndex(0);}}>{calendarDay?'06:00–01:00':'24 ЧАСА'}</button>}
-            {c&&<button title={activeCalculation ? `CSV: ${dateLabel(activeCalculation.descriptor.selection.window.from,'dd.MM HH:mm')} - ${dateLabel(activeCalculation.descriptor.selection.window.to,'dd.MM HH:mm')} MSK` : 'CSV'} disabled={blocked||exporting||!b?.capabilities.csv_export} onClick={()=>void exportCsv()}>CSV</button>}
+            {c&&<button disabled={blocked||exporting||!b?.capabilities.csv_export} onClick={()=>void exportCsv()}>CSV</button>}
             <button disabled={d.pending} onClick={()=>{setPanel(undefined);setPopup(undefined);setIndex(0);void d.initialize();}}>ОБНОВИТЬ</button>
             <button disabled={!c||!d.confirmed} onClick={()=>{setChartWindows(w=>[...w,nextChartId]);setNextChartId(id=>id+1);}}>ВЫНЕСТИ ГРАФИК</button>
             <button onClick={()=>void onLogout().catch(e=>setExportError(errorText(e)))}>ВЫЙТИ</button>
             </div>
           </div>
-          {d.notice&&!d.pending&&!d.error&&<div className="integration-notice" role="status">{d.notice}</div>}
-          {c?.provenance.runtime_mode==='synthetic_mock'&&<span className="data-mode-badge" role="status">{'\u0414\u0415\u041c\u041e \u00b7 \u0441\u0438\u043d\u0442\u0435\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0435 \u0434\u0430\u043d\u043d\u044b\u0435'}</span>}
           {(d.pending||d.dirty||d.error||exportError)&&<div className="status-message" role={d.error||exportError?'alert':'status'}>
             {d.pending?'Загрузка согласованного расчёта…':d.error||exportError||'Изменения ещё не подтверждены. Показан предыдущий расчёт.'}
             {d.error&&<><button onClick={()=>void d.retry()}>Повторить</button>{MOCK&&<button onClick={()=>{document.cookie='mt_mock_fault=; Path=/; Max-Age=0; SameSite=Strict';location.reload();}}>Сбросить демо-ошибку</button>}{c&&<button onClick={()=>{d.discard();setPopup(undefined);}}>Отменить изменения</button>}</>}
-            {d.dirty&&!d.pending&&!d.error&&<button onClick={()=>{d.discard();setPopup(undefined);}}>{'\u041e\u0442\u043c\u0435\u043d\u0438\u0442\u044c \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f'}</button>}
           </div>}
           {!b&&!d.pending&&!d.error&&<p className="status-message">Подготовка данных…</p>}
           {MOCK&&DEV_TOOLS&&<details className="mock-tools"><summary>ДЕМО · синтетические данные · Проверки демо</summary><select aria-label="Демонстрационная ошибка" defaultValue={document.cookie.split('; ').find(value=>value.startsWith('mt_mock_fault='))?.split('=')[1]??''} onChange={e=>{document.cookie=`mt_mock_fault=${e.target.value}; Path=/; SameSite=Strict`;location.reload();}}>

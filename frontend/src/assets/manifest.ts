@@ -3,8 +3,9 @@ export const icons={logo:'/assets/icons/incoming/mos logo.png',close:'/assets/ic
 export function moodAsset(i:Schema['UiIndicator']):{image:string;flip?:boolean}|undefined {
  if(i.key==='weather'){
   if(i.variant==='clear')return {image:'skc_d.svg'};
-  if(i.variant==='rain')return {image:'ovc_ra.svg'};
-  if(i.variant==='snow')return {image:'ovc_sn.svg'};
+  const intensity=i.tone==='critical'?'+':i.tone==='positive'?'-':'';
+  if(i.variant==='rain')return {image:`ovc_${intensity}ra.svg`};
+  if(i.variant==='snow')return {image:`ovc_${intensity}sn.svg`};
  }
  if(i.key==='trend'&&(i.variant==='down'||i.variant==='up'))return {image:'trend down.png',flip:i.variant==='up'};
  if(i.key==='fleet')return {image:'train_white.png'};

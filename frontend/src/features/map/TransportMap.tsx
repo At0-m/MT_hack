@@ -66,7 +66,7 @@ export function TransportMap(props:{config:Bootstrap['map'];geometry?:Geometry;c
     }
     if(stops.length){const bounds=new maplibregl.LngLatBounds();stops.forEach(s=>bounds.extend(s.geometry.coordinates as [number,number]));map.fitBounds(bounds,{padding:{top:180,bottom:120,left:180,right:180},maxZoom:16,duration:0});}
    }
-    for(const marker of markers){const el=marker.getElement();const reading=calculation?.frames[index]?.routes.find(r=>r.route_id===geometry?.route_id)?.stop_readings.find(r=>r.route_stop_id===el.dataset.stopId&&r.route_pattern_id===el.dataset.patternId);el.style.setProperty('--stop-color',reading?.evaluated.load_index.status==='available'?loadColor(reading.evaluated.load_index.value,calculation?.visualization.thresholds):loadColor(undefined));const label=el.querySelector('.stop-top-index');if(label)label.textContent=reading?.evaluated.load_index.status==='available'?`${Math.round(reading.evaluated.load_index.value*100)}%`:'Н/Д';}
+    for(const marker of markers){const el=marker.getElement();const reading=calculation?.frames[index]?.routes.find(r=>r.route_id===geometry?.route_id)?.stop_readings.find(r=>r.route_stop_id===el.dataset.stopId&&r.route_pattern_id===el.dataset.patternId);el.style.setProperty('--stop-color',reading?.evaluated.load_index.status==='available'?loadColor(reading.evaluated.load_index.value):loadColor(undefined));const label=el.querySelector('.stop-top-index');if(label)label.textContent=reading?.evaluated.load_index.status==='available'?`${Math.round(Math.min(1,Math.max(0,reading.evaluated.load_index.value))*100)}%`:'Н/Д';}
    selectMarkers();
    zoomMarkers();
   };update.current=sync;
@@ -76,7 +76,7 @@ export function TransportMap(props:{config:Bootstrap['map'];geometry?:Geometry;c
    const building=style.layers.find(l=>'source-layer' in l&&l['source-layer']==='building');
    // Keep higher-detail building tiles farther toward the horizon. Tile budgets
    // scale with area; the distance target is approximate and depends on provider data.
-   if(building&&'source' in building&&typeof map.setSourceTileLodParams==='function')map.setSourceTileLodParams(
+   if(building&&'source' in building)map.setSourceTileLodParams(
     1+(9.314-1)/BUILDING_DETAIL_DISTANCE,
     3*BUILDING_DETAIL_DISTANCE**2,
     building.source as string
