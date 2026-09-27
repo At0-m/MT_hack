@@ -1,0 +1,99 @@
+{
+  "status": "draft_not_publishable",
+  "source": "solution.ipynb",
+  "source_sha256": "7a745f159aefc83d65a5cd676511addef16d7439914dbd21c4bd19b919b3053d",
+  "scope": "route_catboost_only",
+  "export_feature_order_verified": false,
+  "input": {
+    "name": "features",
+    "dtype": "float32",
+    "shape": [
+      "N",
+      51
+    ]
+  },
+  "output": {
+    "name": "predictions",
+    "dtype": "float32",
+    "shape": [
+      "N"
+    ]
+  },
+  "columns": [
+    "hour",
+    "dayofweek",
+    "month",
+    "day",
+    "dayofyear",
+    "is_weekend",
+    "is_day_off",
+    "is_working_weekend",
+    "is_holiday",
+    "is_pre_holiday",
+    "is_post_holiday",
+    "is_school_holiday",
+    "block_len",
+    "is_long_block_weekend",
+    "is_nye",
+    "is_pre_nye",
+    "day_factor",
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos",
+    "tram_traffic_norm",
+    "lag_1",
+    "lag_2",
+    "lag_3",
+    "lag_24",
+    "lag_48",
+    "lag_72",
+    "lag_168",
+    "roll_mean_24",
+    "roll_mean_168",
+    "roll_std_24",
+    "route_seasonal_mean",
+    "temperature_2m",
+    "rain",
+    "snowfall",
+    "snow_depth",
+    "wind_speed_10m",
+    "wind_speed_100m",
+    "occupancy_rate",
+    "occupancy_lag_1",
+    "occupancy_lag_24",
+    "occupancy_lag_168",
+    "occupancy_roll_24",
+    "occupancy_roll_168",
+    "is_rain",
+    "is_snow",
+    "temp_below_zero",
+    "weather_is_real",
+    "weather_is_partial",
+    "weather_is_climatology"
+  ],
+  "seeds": [
+    42,
+    43,
+    239
+  ],
+  "aggregation": "mean_of_finite_seed_predictions_then_clamp_zero",
+  "zero_hours_moscow": [
+    2,
+    3
+  ],
+  "zero_route_ids": [
+    5
+  ],
+  "csv_rounding": "numpy.rint: nearest integer, ties to even",
+  "missing_features": "NaN allowed by notebook; backend policy unresolved",
+  "global_feature_columns": null,
+  "global_seed_aggregation": "arithmetic_mean_of_three_predictions",
+  "global_route_blend_weights": {
+    "lightgbm": 0.25,
+    "catboost": 0.75,
+    "source": "user_confirmation"
+  },
+  "blend_formula": "0.25 * mean(global_seed_predictions) + 0.75 * mean(route_seed_predictions)",
+  "quality_metrics": null
+}
