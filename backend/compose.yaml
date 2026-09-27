@@ -3,7 +3,7 @@ services:
     image: postgis/postgis:16-3.5
     environment:
       POSTGRES_USER: tramflow_publisher
-      POSTGRES_PASSWORD: ${DB_PASSWORD:?Generate .env with scripts/init-env.ps1}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Generate .env with scripts/init-env.sh}
       POSTGRES_DB: tramflow
       API_DB_PASSWORD: ${API_DB_PASSWORD:?Generate .env}
     volumes:
@@ -60,6 +60,25 @@ services:
     cpus: 2
     mem_limit: 2g
     restart: unless-stopped
+  fixtures:
+    build:
+      context: .
+      target: build
+    entrypoint: ["/out/fixtures"]
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    profiles: ["tools"]
+  loadtest:
+    build:
+      context: .
+      target: loadtest
+    environment:
+      API_USER: ${API_USER:?Generate .env}
+      API_PASSWORD: ${API_PASSWORD:?Generate .env}
+    volumes:
+      - ./benchmarks/results:/results
+    profiles: ["tools"]
   tests:
     build:
       context: .
