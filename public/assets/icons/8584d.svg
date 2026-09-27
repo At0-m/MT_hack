@@ -1,0 +1,15 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="59.6" height="59.6" viewBox="0 0 59.6 59.6" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="station big">
+<g id="Ellipse 3" filter="url(#filter0_f_0_28)">
+<circle cx="29.8" cy="29.8" r="21" fill="#53DEFA"/>
+</g>
+<circle id="Ellipse 2" cx="29.8" cy="29.8" r="16" fill="#53DEFA" stroke="white" stroke-width="4"/>
+</g>
+<defs>
+<filter id="filter0_f_0_28" x="0" y="0" width="59.6" height="59.6" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="4.4" result="effect1_foregroundBlur_0_28"/>
+</filter>
+</defs>
+</svg>
