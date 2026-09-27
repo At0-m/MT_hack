@@ -1,0 +1,2 @@
+backend/artifacts/ensemble-v1/*.onnx filter=lfs diff=lfs merge=lfs -text
+backend/artifacts/ensemble-v1/*.txt filter=lfs diff=lfs merge=lfs -text
