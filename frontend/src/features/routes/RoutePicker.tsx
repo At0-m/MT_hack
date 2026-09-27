@@ -94,6 +94,8 @@ export function RoutePicker({
         {!routes.length && <p className="no-routes">Ничего не найдено</p>}
         {routes.map((r, i) => {
           const reading = readings?.find((v) => v.route_id === r.route_id);
+          const load=reading?.evaluated.load_index;
+          const severity=load?.status==='available'?(load.value<.25?0:load.value<.5?1:load.value<.75?3:4):undefined;
           const stops = r.route_id === routeDetail.route.route_id ? routeDetail.patterns[0]?.stops : undefined;
           const isSelected = selectedRouteId === r.route_id;
           const isActive = i === active;
@@ -106,7 +108,7 @@ export function RoutePicker({
               onClick={() => onChoose(r.route_id)}
               onMouseEnter={() => setActive(i)}
             >
-              <span className="route-heading"><strong>Трамвай №{r.route_number}</strong><IncomingIcon name={["down down.png","down.png","up.png","up up.png","up up.png"][i%5]} className={`route-trend-icon route-trend-icon--${['double-down','down','up','double-up','triple-up'][i%5]}`}/></span>
+              <span className="route-heading"><strong>Трамвай №{r.route_number}</strong>{severity!==undefined&&<IncomingIcon name={["down down.png","down.png","up.png","up up.png","up up up.png"][severity]} className={`route-trend-icon route-trend-icon--${['double-down','down','up','double-up','triple-up'][severity]}`}/>}</span>
               <span className={isSelected ? 'route-chosen' : 'route-choose'}>
                 {isSelected ? 'ВЫБРАН' : 'ВЫБРАТЬ'}
               </span>
