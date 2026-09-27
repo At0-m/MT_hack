@@ -1,0 +1,21 @@
+PASS Go day accepted by actual frontend assertion
+PASS Go fleet accepted by actual frontend assertion
+PASS Go factors accepted by actual frontend assertion
+PASS Go zero accepted by actual frontend assertion
+PASS Go month accepted by actual frontend assertion
+PASS Go last-day accepted by actual frontend assertion
+PASS all periods preserve expected frame counts
+PASS neutral factor normalization not a false mismatch
+PASS changed demand multiplier is rejected
+PASS fleet object order is immaterial
+PASS direction mismatch is rejected
+PASS incomplete stop array is rejected
+PASS incomplete route frames are rejected
+PASS stale network version is rejected
+PASS zero fleet never turns into zero load index
+PASS fleet scenario never changes boardings
+PASS demand factors apply to stops only inside the window
+PASS summary is bound to exact calculation
+PASS stale requests cannot overwrite confirmed state
+PASS full stop identity selects independent values
+TOTAL 20 passed; real HTTP/React/ONNX not exercised by this boundary test.

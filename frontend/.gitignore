@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env.local
+*.tsbuildinfo
+test-results/
+playwright-report/
+
+.DS_Store
+.idea/
+opencode.json

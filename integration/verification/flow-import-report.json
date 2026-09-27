@@ -1,0 +1,185 @@
+{
+  "hours": 65628,
+  "inputs": [
+    {
+      "file": "train_route_flow_15min_clusters.csv",
+      "sha256": "cd144e73dbc968b294e417a1496ba22fcf04cdbaedbef70f16e8dce02441b5eb"
+    },
+    {
+      "file": "route_flow_15min_clusters.csv",
+      "sha256": "a17b61abbe305c750490a70dd0e6211f35539b1cfe5673c4e7a59ec5159db27a"
+    }
+  ],
+  "labels_sha256": "794bce490e604e311af4636f2c01d4ab3f031a1a9b0c854a1c6e7dd864dc0661",
+  "missing_hours_policy": "absent, never silently zero-filled",
+  "partial_hours": [
+    {
+      "route": 1,
+      "time": "2025-01-01T04:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 1,
+      "time": "2025-09-01T04:00:00+03:00",
+      "boardings": 9,
+      "observed_quarters": 3
+    },
+    {
+      "route": 1,
+      "time": "2025-11-01T01:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 7,
+      "time": "2025-01-01T04:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 7,
+      "time": "2025-09-01T04:00:00+03:00",
+      "boardings": 3,
+      "observed_quarters": 3
+    },
+    {
+      "route": 7,
+      "time": "2025-11-01T01:00:00+03:00",
+      "boardings": 25,
+      "observed_quarters": 3
+    },
+    {
+      "route": 11,
+      "time": "2025-01-01T04:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 11,
+      "time": "2025-09-01T04:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 11,
+      "time": "2025-11-01T01:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 12,
+      "time": "2025-01-01T04:00:00+03:00",
+      "boardings": 2,
+      "observed_quarters": 3
+    },
+    {
+      "route": 12,
+      "time": "2025-09-01T04:00:00+03:00",
+      "boardings": 6,
+      "observed_quarters": 3
+    },
+    {
+      "route": 12,
+      "time": "2025-11-01T01:00:00+03:00",
+      "boardings": 3,
+      "observed_quarters": 3
+    },
+    {
+      "route": 17,
+      "time": "2025-01-01T04:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 17,
+      "time": "2025-09-01T04:00:00+03:00",
+      "boardings": 16,
+      "observed_quarters": 3
+    },
+    {
+      "route": 17,
+      "time": "2025-11-01T01:00:00+03:00",
+      "boardings": 30,
+      "observed_quarters": 3
+    },
+    {
+      "route": 25,
+      "time": "2025-01-01T04:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 25,
+      "time": "2025-09-01T04:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 25,
+      "time": "2025-11-01T01:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 26,
+      "time": "2025-01-01T04:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 26,
+      "time": "2025-09-01T04:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 26,
+      "time": "2025-11-01T01:00:00+03:00",
+      "boardings": 3,
+      "observed_quarters": 3
+    },
+    {
+      "route": 28,
+      "time": "2025-01-01T04:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 28,
+      "time": "2025-09-01T04:00:00+03:00",
+      "boardings": 1,
+      "observed_quarters": 3
+    },
+    {
+      "route": 28,
+      "time": "2025-11-01T01:00:00+03:00",
+      "boardings": 0,
+      "observed_quarters": 3
+    },
+    {
+      "route": 50,
+      "time": "2025-01-01T04:00:00+03:00",
+      "boardings": 3,
+      "observed_quarters": 3
+    },
+    {
+      "route": 50,
+      "time": "2025-09-01T04:00:00+03:00",
+      "boardings": 3,
+      "observed_quarters": 3
+    },
+    {
+      "route": 50,
+      "time": "2025-11-01T01:00:00+03:00",
+      "boardings": 6,
+      "observed_quarters": 3
+    }
+  ],
+  "pipeline_version": "route-flow-hourly-v1",
+  "rows": 262485,
+  "target": "sum of total boardings, not total plus ticket categories",
+  "timestamp_position": "start",
+  "timezone": "Europe/Moscow",
+  "total_boardings": 59667753
+}

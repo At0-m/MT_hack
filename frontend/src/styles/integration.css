@@ -1,0 +1,13 @@
+/* Additive integration UI. The original layout, fonts, artwork and transitions remain intact. */
+.server-summary { margin: 28px 32px 32px; max-width: 560px; font-size: 18px; line-height: 1.5; overflow-wrap: anywhere; }
+.server-summary h2 { font-size: 24px; margin: 0 0 12px; }
+.server-summary .summary-period { font-size: 15px; opacity: .7; }
+.server-summary button, .factors-editor button { border: 1px solid #7ce0ff; border-radius: 9px; padding: 8px 12px; background: #0b2544; color: inherit; cursor: pointer; }
+.popup-factors { left: 1140px; top: 140px; width: 410px; height: auto; padding: 24px; background: rgba(4,26,56,.97); border: 1px solid #7ce0ff; border-radius: 18px; color: #dcecff; }
+.factors-editor h2 { font-size: 25px; margin: 0 0 16px; }
+.factors-editor p { font-size: 16px; line-height: 1.4; }
+.factors-editor label { display: flex; justify-content: space-between; align-items: center; margin: 16px 0; font-size: 22px; }
+.factors-editor input { width: 105px; padding: 6px; border: 1px solid #7ce0ff; border-radius: 8px; background: #041a38; color: #dcecff; font: inherit; }
+.factor-actions { display: flex; gap: 12px; }
+.integration-notice { position: absolute; bottom: 95px; left: 32px; max-width: 650px; padding: 10px 16px; background: rgba(4,26,56,.92); color: #dcecff; border-radius: 8px; font-size: 16px; pointer-events: auto; }
+.data-mode-badge { position: absolute; bottom: 8px; right: 24px; font-size: 13px; color: #bbc5d2; pointer-events: none; }

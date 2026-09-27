@@ -1,0 +1,2 @@
+PASS: main stylesheet and 91 original icons unchanged; six font hashes retained.
+PASS: 9 YAML files parsed; static Compose/COPY/admin routing checks. NOT a Docker/nginx execution.

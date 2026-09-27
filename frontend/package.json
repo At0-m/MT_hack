@@ -1,0 +1,40 @@
+{
+  "name": "mos-transport-dispatch",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "dev:mock": "vite --host 127.0.0.1 --mode mock",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
+    "lint": "eslint src tests scripts",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "generate:api": "node scripts/generate-api.mjs"
+  },
+  "dependencies": {
+    "luxon": "^3.7.2",
+    "maplibre-gl": "^6.11.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "@types/geojson": "^7946.0.16",
+    "@types/luxon": "^3.7.5",
+    "@types/node": "^26.6.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.70.1",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2",
+    "yaml": "^2.9.1"
+  }
+}

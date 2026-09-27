@@ -1,0 +1,13 @@
+import type { components } from './schema';
+export type Schema = components['schemas'];
+export type Selection = Schema['ForecastSelection'];
+export type Calculation = Schema['CalculationResponse'];
+export type Descriptor = Schema['CalculationDescriptor'];
+export type Bootstrap = Schema['Bootstrap'];
+export type Geometry = Schema['RouteGeometry'];
+export type StopFeature = Schema['StopPointFeature'];
+export type StopReading = Schema['StopReading'];
+export type StopFocus = Schema['RouteStopSummaryFocus'];
+export type Reading = Schema['RouteReading'] | StopReading;
+export type Window = Schema['TimeWindow'];
+export type Overrides = Schema['ScenarioOverrides'];
