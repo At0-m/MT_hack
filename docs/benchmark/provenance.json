@@ -1,0 +1,18 @@
+{
+  "source": "User-supplied benchmark summaries in conversation",
+  "new_benchmark_executed": false,
+  "raw_json_available_for": [
+    "smoke",
+    "concurrency=16"
+  ],
+  "other_rows_source": "User-supplied summary.csv",
+  "total_main_requests": 25000,
+  "total_main_errors": 0,
+  "latency_unit": "milliseconds",
+  "resource_metrics_available": false,
+  "server_environment_available": false,
+  "commit_and_image_digest_available": false,
+  "time_series_available": false,
+  "current_dev_build_equivalence_verified": false,
+  "synthetic_fixtures_establish_ml_quality": false
+}
