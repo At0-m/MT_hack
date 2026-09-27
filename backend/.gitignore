@@ -11,3 +11,5 @@ testdata/native-model.json
 testdata/stress-bundle.json
 testdata/stress-model.json
 tmp/
+benchmarks/results/*
+!benchmarks/results/.gitkeep

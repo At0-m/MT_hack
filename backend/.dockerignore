@@ -5,3 +5,4 @@ requirements
 artifacts
 *.exe
 tmp
+benchmarks/results
