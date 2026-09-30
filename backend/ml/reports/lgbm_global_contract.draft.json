@@ -1,0 +1,51 @@
+{
+  "status": "draft_requires_prediction_parity_check",
+  "scope": "three_global_lightgbm_models",
+  "source": "LightGBM text models supplied by ML team",
+  "seeds": [42, 43, 239],
+  "model_sha256": {
+    "42": "2ca3bb377cb408704224579113e3d47da508d02e204c69a5bde5ae2f27771188",
+    "43": "dff1e90579b01029e229ade75199d1c985b01599e04073dcf0fc7b1fcf06d9c2",
+    "239": "a9623dbd1bed72f998a7162c17307a30bf97a8213a211c05ed781ca8b0df5e98"
+  },
+  "feature_order_verified_across_text_models": true,
+  "columns": [
+    "route",
+    "hour",
+    "dayofweek",
+    "is_weekend",
+    "is_day_off",
+    "is_working_weekend",
+    "is_holiday",
+    "is_pre_holiday",
+    "is_post_holiday",
+    "is_school_holiday",
+    "block_len",
+    "day_factor",
+    "hour_sin",
+    "hour_cos",
+    "dow_sin",
+    "dow_cos",
+    "tram_traffic_norm"
+  ],
+  "onnx_input": {
+    "name": "input",
+    "dtype": "float32",
+    "shape": ["N", 17]
+  },
+  "onnx_output": {
+    "name": "variable",
+    "dtype": "float32",
+    "shape": ["N", 1]
+  },
+  "seed_aggregation": "arithmetic_mean_of_three_predictions",
+  "global_route_blend_weights": {
+    "lightgbm": 0.25,
+    "catboost": 0.75
+  },
+  "route_feature": "LightGBM categorical route ID; observed categories in each text model: -1, 1, 7, 11, 12, 17, 25, 26, 28, 50",
+  "remaining_verification": [
+    "Compare each text-model prediction with its exported ONNX model on golden input rows.",
+    "Confirm calendar and tram_traffic_norm preprocessing against the training pipeline."
+  ]
+}

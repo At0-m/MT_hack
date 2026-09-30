@@ -1,0 +1,295 @@
+{"Time":"2026-09-27T19:28:17.900142592Z","Action":"start","Package":"tramflow/internal/domain"}
+{"Time":"2026-09-27T19:28:17.900212805Z","Action":"output","Package":"tramflow/internal/domain","Output":"?   \ttramflow/internal/domain\t[no test files]\n"}
+{"Time":"2026-09-27T19:28:17.90022346Z","Action":"skip","Package":"tramflow/internal/domain","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.316392877Z","Action":"start","Package":"tramflow/internal/engine"}
+{"Time":"2026-09-27T19:28:18.336264856Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestCanonicalGolden"}
+{"Time":"2026-09-27T19:28:18.336293015Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestCanonicalGolden","Output":"=== RUN   TestCanonicalGolden\n"}
+{"Time":"2026-09-27T19:28:18.33658491Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestCanonicalGolden","Output":"--- PASS: TestCanonicalGolden (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.336645398Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestCanonicalGolden","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.336681914Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestRatiosUseSummedDenominators"}
+{"Time":"2026-09-27T19:28:18.336685796Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestRatiosUseSummedDenominators","Output":"=== RUN   TestRatiosUseSummedDenominators\n"}
+{"Time":"2026-09-27T19:28:18.336785647Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestRatiosUseSummedDenominators","Output":"--- PASS: TestRatiosUseSummedDenominators (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.336833883Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestRatiosUseSummedDenominators","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.336867059Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics"}
+{"Time":"2026-09-27T19:28:18.336871022Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics","Output":"=== RUN   TestUnavailableMetrics\n"}
+{"Time":"2026-09-27T19:28:18.336944546Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/unknown_supply"}
+{"Time":"2026-09-27T19:28:18.336949317Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/unknown_supply","Output":"=== RUN   TestUnavailableMetrics/unknown_supply\n"}
+{"Time":"2026-09-27T19:28:18.337056795Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/unknown_supply","Output":"--- PASS: TestUnavailableMetrics/unknown_supply (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.337107357Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/unknown_supply","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.337141595Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/zero_supply"}
+{"Time":"2026-09-27T19:28:18.337145352Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/zero_supply","Output":"=== RUN   TestUnavailableMetrics/zero_supply\n"}
+{"Time":"2026-09-27T19:28:18.337230791Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/zero_supply","Output":"--- PASS: TestUnavailableMetrics/zero_supply (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.33736362Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/zero_supply","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.337432119Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/missing_reference"}
+{"Time":"2026-09-27T19:28:18.337439786Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/missing_reference","Output":"=== RUN   TestUnavailableMetrics/missing_reference\n"}
+{"Time":"2026-09-27T19:28:18.337585441Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/missing_reference","Output":"--- PASS: TestUnavailableMetrics/missing_reference (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.33760721Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/missing_reference","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.337619289Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/zero_reference"}
+{"Time":"2026-09-27T19:28:18.337622772Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/zero_reference","Output":"=== RUN   TestUnavailableMetrics/zero_reference\n"}
+{"Time":"2026-09-27T19:28:18.33768304Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/zero_reference","Output":"--- PASS: TestUnavailableMetrics/zero_reference (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.337704844Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/zero_reference","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.337724054Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/partial_supply"}
+{"Time":"2026-09-27T19:28:18.337727603Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/partial_supply","Output":"=== RUN   TestUnavailableMetrics/partial_supply\n"}
+{"Time":"2026-09-27T19:28:18.337776423Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/partial_supply","Output":"--- PASS: TestUnavailableMetrics/partial_supply (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.33780113Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics/partial_supply","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.337824532Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics","Output":"--- PASS: TestUnavailableMetrics (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.337844453Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestUnavailableMetrics","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.337953696Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestScenarioHourlyWindow"}
+{"Time":"2026-09-27T19:28:18.337958048Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestScenarioHourlyWindow","Output":"=== RUN   TestScenarioHourlyWindow\n"}
+{"Time":"2026-09-27T19:28:18.338505941Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestScenarioHourlyWindow","Output":"--- PASS: TestScenarioHourlyWindow (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.338517516Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestScenarioHourlyWindow","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.338547363Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestDeltaCannotUseUnknownSupply"}
+{"Time":"2026-09-27T19:28:18.338551069Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestDeltaCannotUseUnknownSupply","Output":"=== RUN   TestDeltaCannotUseUnknownSupply\n"}
+{"Time":"2026-09-27T19:28:18.338605251Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestDeltaCannotUseUnknownSupply","Output":"--- PASS: TestDeltaCannotUseUnknownSupply (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.338628885Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestDeltaCannotUseUnknownSupply","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.338636497Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestAbsoluteCanRestoreUnknownSupply"}
+{"Time":"2026-09-27T19:28:18.338639815Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestAbsoluteCanRestoreUnknownSupply","Output":"=== RUN   TestAbsoluteCanRestoreUnknownSupply\n"}
+{"Time":"2026-09-27T19:28:18.338668807Z","Action":"start","Package":"tramflow/internal/inference"}
+{"Time":"2026-09-27T19:28:18.33869418Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestAbsoluteCanRestoreUnknownSupply","Output":"--- PASS: TestAbsoluteCanRestoreUnknownSupply (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.338707103Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestAbsoluteCanRestoreUnknownSupply","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.338714193Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestNegativeFleetRejected"}
+{"Time":"2026-09-27T19:28:18.3387175Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestNegativeFleetRejected","Output":"=== RUN   TestNegativeFleetRejected\n"}
+{"Time":"2026-09-27T19:28:18.338733873Z","Action":"start","Package":"tramflow/internal/telemetry"}
+{"Time":"2026-09-27T19:28:18.338874534Z","Action":"start","Package":"tramflow/cmd/healthcheck"}
+{"Time":"2026-09-27T19:28:18.338884176Z","Action":"output","Package":"tramflow/cmd/healthcheck","Output":"?   \ttramflow/cmd/healthcheck\t[no test files]\n"}
+{"Time":"2026-09-27T19:28:18.338881749Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestNegativeFleetRejected","Output":"--- PASS: TestNegativeFleetRejected (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.338895599Z","Action":"start","Package":"tramflow/cmd/sessioncheck"}
+{"Time":"2026-09-27T19:28:18.338901331Z","Action":"output","Package":"tramflow/cmd/sessioncheck","Output":"?   \ttramflow/cmd/sessioncheck\t[no test files]\n"}
+{"Time":"2026-09-27T19:28:18.338905346Z","Action":"skip","Package":"tramflow/cmd/sessioncheck","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.338895384Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestNegativeFleetRejected","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.338985035Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestFactorProductAndPrecision"}
+{"Time":"2026-09-27T19:28:18.33898934Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFactorProductAndPrecision","Output":"=== RUN   TestFactorProductAndPrecision\n"}
+{"Time":"2026-09-27T19:28:18.338995489Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFactorProductAndPrecision","Output":"--- PASS: TestFactorProductAndPrecision (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.339000451Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestFactorProductAndPrecision","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.338889519Z","Action":"skip","Package":"tramflow/cmd/healthcheck","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.339157193Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestSelectionLimits"}
+{"Time":"2026-09-27T19:28:18.339174567Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits","Output":"=== RUN   TestSelectionLimits\n"}
+{"Time":"2026-09-27T19:28:18.3392943Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/unaligned"}
+{"Time":"2026-09-27T19:28:18.339302111Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/unaligned","Output":"=== RUN   TestSelectionLimits/unaligned\n"}
+{"Time":"2026-09-27T19:28:18.339384305Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/unaligned","Output":"--- PASS: TestSelectionLimits/unaligned (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.339395068Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/unaligned","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.339426021Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/duplicate"}
+{"Time":"2026-09-27T19:28:18.339430732Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/duplicate","Output":"=== RUN   TestSelectionLimits/duplicate\n"}
+{"Time":"2026-09-27T19:28:18.339558169Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/duplicate","Output":"--- PASS: TestSelectionLimits/duplicate (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.33956619Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/duplicate","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.339599954Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/outside"}
+{"Time":"2026-09-27T19:28:18.339604908Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/outside","Output":"=== RUN   TestSelectionLimits/outside\n"}
+{"Time":"2026-09-27T19:28:18.339728887Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/outside","Output":"--- PASS: TestSelectionLimits/outside (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.339741697Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/outside","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.339750427Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/too_wide"}
+{"Time":"2026-09-27T19:28:18.339753549Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/too_wide","Output":"=== RUN   TestSelectionLimits/too_wide\n"}
+{"Time":"2026-09-27T19:28:18.3398178Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/too_wide","Output":"--- PASS: TestSelectionLimits/too_wide (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.33982289Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/too_wide","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.339827175Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/day_alignment"}
+{"Time":"2026-09-27T19:28:18.339830315Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/day_alignment","Output":"=== RUN   TestSelectionLimits/day_alignment\n"}
+{"Time":"2026-09-27T19:28:18.339904141Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/day_alignment","Output":"--- PASS: TestSelectionLimits/day_alignment (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.33995629Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/day_alignment","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.33997269Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/wrong_resolution"}
+{"Time":"2026-09-27T19:28:18.339975787Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/wrong_resolution","Output":"=== RUN   TestSelectionLimits/wrong_resolution\n"}
+{"Time":"2026-09-27T19:28:18.340061777Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/wrong_resolution","Output":"--- PASS: TestSelectionLimits/wrong_resolution (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.340067696Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestSelectionLimits/wrong_resolution","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.340073105Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSelectionLimits","Output":"--- PASS: TestSelectionLimits (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.340097399Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestSelectionLimits","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.340136045Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestMissingWeatherDoesNotReturnPartialSum"}
+{"Time":"2026-09-27T19:28:18.340140996Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestMissingWeatherDoesNotReturnPartialSum","Output":"=== RUN   TestMissingWeatherDoesNotReturnPartialSum\n"}
+{"Time":"2026-09-27T19:28:18.34018448Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestMissingWeatherDoesNotReturnPartialSum","Output":"--- PASS: TestMissingWeatherDoesNotReturnPartialSum (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.340207173Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestMissingWeatherDoesNotReturnPartialSum","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.340289387Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestIncompleteGridRejected"}
+{"Time":"2026-09-27T19:28:18.340295635Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestIncompleteGridRejected","Output":"=== RUN   TestIncompleteGridRejected\n"}
+{"Time":"2026-09-27T19:28:18.340358487Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestIncompleteGridRejected","Output":"--- PASS: TestIncompleteGridRejected (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.340364154Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestIncompleteGridRejected","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.340369351Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestRequiredFleetUsesMaximum"}
+{"Time":"2026-09-27T19:28:18.340372526Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestRequiredFleetUsesMaximum","Output":"=== RUN   TestRequiredFleetUsesMaximum\n"}
+{"Time":"2026-09-27T19:28:18.340509409Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestRequiredFleetUsesMaximum","Output":"--- PASS: TestRequiredFleetUsesMaximum (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.340516689Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestRequiredFleetUsesMaximum","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.340521496Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestCacheEviction"}
+{"Time":"2026-09-27T19:28:18.340525121Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestCacheEviction","Output":"=== RUN   TestCacheEviction\n"}
+{"Time":"2026-09-27T19:28:18.340694608Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestCacheEviction","Output":"--- PASS: TestCacheEviction (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.340703272Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestCacheEviction","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.340708825Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestFixtureHasNoForecastQualityClaim"}
+{"Time":"2026-09-27T19:28:18.340711952Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFixtureHasNoForecastQualityClaim","Output":"=== RUN   TestFixtureHasNoForecastQualityClaim\n"}
+{"Time":"2026-09-27T19:28:18.352696427Z","Action":"run","Package":"tramflow/internal/inference","Test":"TestCancellationTerminatesAndJoinsRun"}
+{"Time":"2026-09-27T19:28:18.352716301Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestCancellationTerminatesAndJoinsRun","Output":"=== RUN   TestCancellationTerminatesAndJoinsRun\n"}
+{"Time":"2026-09-27T19:28:18.352785255Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestCancellationTerminatesAndJoinsRun","Output":"--- PASS: TestCancellationTerminatesAndJoinsRun (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.352790256Z","Action":"pass","Package":"tramflow/internal/inference","Test":"TestCancellationTerminatesAndJoinsRun","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.352795351Z","Action":"run","Package":"tramflow/internal/inference","Test":"TestArtifactLimitUsesRoleNotFilenameExtension"}
+{"Time":"2026-09-27T19:28:18.352798483Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestArtifactLimitUsesRoleNotFilenameExtension","Output":"=== RUN   TestArtifactLimitUsesRoleNotFilenameExtension\n"}
+{"Time":"2026-09-27T19:28:18.352803095Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestArtifactLimitUsesRoleNotFilenameExtension","Output":"--- PASS: TestArtifactLimitUsesRoleNotFilenameExtension (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.352809418Z","Action":"pass","Package":"tramflow/internal/inference","Test":"TestArtifactLimitUsesRoleNotFilenameExtension","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.352813059Z","Action":"run","Package":"tramflow/internal/inference","Test":"TestEvictionCloseDoesNotBlockOtherCachedModels"}
+{"Time":"2026-09-27T19:28:18.352815982Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestEvictionCloseDoesNotBlockOtherCachedModels","Output":"=== RUN   TestEvictionCloseDoesNotBlockOtherCachedModels\n"}
+{"Time":"2026-09-27T19:28:18.353335001Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestEvictionCloseDoesNotBlockOtherCachedModels","Output":"2026/09/27 19:28:18 INFO model load model_version=new duration_ms=0 session_count=4 evicted_version=victim success=true\n"}
+{"Time":"2026-09-27T19:28:18.353356232Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestEvictionCloseDoesNotBlockOtherCachedModels","Output":"--- PASS: TestEvictionCloseDoesNotBlockOtherCachedModels (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.353361781Z","Action":"pass","Package":"tramflow/internal/inference","Test":"TestEvictionCloseDoesNotBlockOtherCachedModels","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.353369447Z","Action":"run","Package":"tramflow/internal/inference","Test":"TestLoadingDoesNotBlockCachedModelsAndCoalescesVersion"}
+{"Time":"2026-09-27T19:28:18.354243427Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestLoadingDoesNotBlockCachedModelsAndCoalescesVersion","Output":"=== RUN   TestLoadingDoesNotBlockCachedModelsAndCoalescesVersion\n"}
+{"Time":"2026-09-27T19:28:18.372046311Z","Action":"run","Package":"tramflow/internal/telemetry","Test":"TestConcurrentMetrics"}
+{"Time":"2026-09-27T19:28:18.372067406Z","Action":"output","Package":"tramflow/internal/telemetry","Test":"TestConcurrentMetrics","Output":"=== RUN   TestConcurrentMetrics\n"}
+{"Time":"2026-09-27T19:28:18.376650344Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestLoadingDoesNotBlockCachedModelsAndCoalescesVersion","Output":"2026/09/27 19:28:18 INFO model load model_version=loading duration_ms=22 session_count=2 evicted_version=\"\" success=true\n"}
+{"Time":"2026-09-27T19:28:18.376955914Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestLoadingDoesNotBlockCachedModelsAndCoalescesVersion","Output":"--- PASS: TestLoadingDoesNotBlockCachedModelsAndCoalescesVersion (0.02s)\n"}
+{"Time":"2026-09-27T19:28:18.37696821Z","Action":"pass","Package":"tramflow/internal/inference","Test":"TestLoadingDoesNotBlockCachedModelsAndCoalescesVersion","Elapsed":0.02}
+{"Time":"2026-09-27T19:28:18.377028249Z","Action":"run","Package":"tramflow/internal/inference","Test":"TestSessionReferencesProtectNativeRun"}
+{"Time":"2026-09-27T19:28:18.377052125Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestSessionReferencesProtectNativeRun","Output":"=== RUN   TestSessionReferencesProtectNativeRun\n"}
+{"Time":"2026-09-27T19:28:18.397156107Z","Action":"output","Package":"tramflow/internal/telemetry","Test":"TestConcurrentMetrics","Output":"--- PASS: TestConcurrentMetrics (0.03s)\n"}
+{"Time":"2026-09-27T19:28:18.397183408Z","Action":"pass","Package":"tramflow/internal/telemetry","Test":"TestConcurrentMetrics","Elapsed":0.03}
+{"Time":"2026-09-27T19:28:18.397195467Z","Action":"run","Package":"tramflow/internal/telemetry","Test":"TestCallbackOutsideLock"}
+{"Time":"2026-09-27T19:28:18.397199047Z","Action":"output","Package":"tramflow/internal/telemetry","Test":"TestCallbackOutsideLock","Output":"=== RUN   TestCallbackOutsideLock\n"}
+{"Time":"2026-09-27T19:28:18.397507823Z","Action":"output","Package":"tramflow/internal/telemetry","Test":"TestCallbackOutsideLock","Output":"--- PASS: TestCallbackOutsideLock (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.397520878Z","Action":"pass","Package":"tramflow/internal/telemetry","Test":"TestCallbackOutsideLock","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.397528325Z","Action":"output","Package":"tramflow/internal/telemetry","Output":"PASS\n"}
+{"Time":"2026-09-27T19:28:18.414076539Z","Action":"output","Package":"tramflow/internal/inference","Test":"TestSessionReferencesProtectNativeRun","Output":"--- PASS: TestSessionReferencesProtectNativeRun (0.04s)\n"}
+{"Time":"2026-09-27T19:28:18.417530886Z","Action":"pass","Package":"tramflow/internal/inference","Test":"TestSessionReferencesProtectNativeRun","Elapsed":0.04}
+{"Time":"2026-09-27T19:28:18.417545521Z","Action":"output","Package":"tramflow/internal/inference","Output":"PASS\n"}
+{"Time":"2026-09-27T19:28:18.706549162Z","Action":"start","Package":"tramflow/cmd/admin-check"}
+{"Time":"2026-09-27T19:28:18.720155633Z","Action":"run","Package":"tramflow/cmd/admin-check","Test":"TestPrivateAdminRoutes"}
+{"Time":"2026-09-27T19:28:18.720187984Z","Action":"output","Package":"tramflow/cmd/admin-check","Test":"TestPrivateAdminRoutes","Output":"=== RUN   TestPrivateAdminRoutes\n"}
+{"Time":"2026-09-27T19:28:18.72363558Z","Action":"output","Package":"tramflow/cmd/admin-check","Test":"TestPrivateAdminRoutes","Output":"--- PASS: TestPrivateAdminRoutes (0.00s)\n"}
+{"Time":"2026-09-27T19:28:18.723658408Z","Action":"pass","Package":"tramflow/cmd/admin-check","Test":"TestPrivateAdminRoutes","Elapsed":0}
+{"Time":"2026-09-27T19:28:18.723665749Z","Action":"output","Package":"tramflow/cmd/admin-check","Output":"PASS\n"}
+{"Time":"2026-09-27T19:28:19.140202631Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFixtureHasNoForecastQualityClaim","Output":"--- PASS: TestFixtureHasNoForecastQualityClaim (0.80s)\n"}
+{"Time":"2026-09-27T19:28:19.140256029Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestFixtureHasNoForecastQualityClaim","Elapsed":0.8}
+{"Time":"2026-09-27T19:28:19.14026856Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestCalendarMonthsAndWeek"}
+{"Time":"2026-09-27T19:28:19.140272065Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestCalendarMonthsAndWeek","Output":"=== RUN   TestCalendarMonthsAndWeek\n"}
+{"Time":"2026-09-27T19:28:19.140446472Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestCalendarMonthsAndWeek","Output":"--- PASS: TestCalendarMonthsAndWeek (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.140456139Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestCalendarMonthsAndWeek","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.140462701Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestSourceCanonicalV2Golden"}
+{"Time":"2026-09-27T19:28:19.140466493Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSourceCanonicalV2Golden","Output":"=== RUN   TestSourceCanonicalV2Golden\n"}
+{"Time":"2026-09-27T19:28:19.140646102Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSourceCanonicalV2Golden","Output":"--- PASS: TestSourceCanonicalV2Golden (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.140658451Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestSourceCanonicalV2Golden","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.140664365Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestCustomAcrossCalendarBoundaries"}
+{"Time":"2026-09-27T19:28:19.140667791Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestCustomAcrossCalendarBoundaries","Output":"=== RUN   TestCustomAcrossCalendarBoundaries\n"}
+{"Time":"2026-09-27T19:28:19.140811241Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestCustomAcrossCalendarBoundaries","Output":"--- PASS: TestCustomAcrossCalendarBoundaries (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.140819684Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestCustomAcrossCalendarBoundaries","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.140858731Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestCustomHourlyTooWideIsNotClipped"}
+{"Time":"2026-09-27T19:28:19.140863265Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestCustomHourlyTooWideIsNotClipped","Output":"=== RUN   TestCustomHourlyTooWideIsNotClipped\n"}
+{"Time":"2026-09-27T19:28:19.140972758Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestCustomHourlyTooWideIsNotClipped","Output":"--- PASS: TestCustomHourlyTooWideIsNotClipped (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.140981722Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestCustomHourlyTooWideIsNotClipped","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.14098746Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestZeroReferenceHasExplicitReason"}
+{"Time":"2026-09-27T19:28:19.140990721Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestZeroReferenceHasExplicitReason","Output":"=== RUN   TestZeroReferenceHasExplicitReason\n"}
+{"Time":"2026-09-27T19:28:19.141058683Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestZeroReferenceHasExplicitReason","Output":"--- PASS: TestZeroReferenceHasExplicitReason (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.141086832Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestZeroReferenceHasExplicitReason","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.141111992Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestNumericAdmissionAndDerivedGuard"}
+{"Time":"2026-09-27T19:28:19.141116388Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestNumericAdmissionAndDerivedGuard","Output":"=== RUN   TestNumericAdmissionAndDerivedGuard\n"}
+{"Time":"2026-09-27T19:28:19.141195003Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestNumericAdmissionAndDerivedGuard","Output":"--- PASS: TestNumericAdmissionAndDerivedGuard (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.141224118Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestNumericAdmissionAndDerivedGuard","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.141263209Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy"}
+{"Time":"2026-09-27T19:28:19.141267801Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy","Output":"=== RUN   TestFleetHourlyAdequacy\n"}
+{"Time":"2026-09-27T19:28:19.14132718Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/false_surplus"}
+{"Time":"2026-09-27T19:28:19.14133223Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/false_surplus","Output":"=== RUN   TestFleetHourlyAdequacy/false_surplus\n"}
+{"Time":"2026-09-27T19:28:19.141453327Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/false_surplus","Output":"--- PASS: TestFleetHourlyAdequacy/false_surplus (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.141465438Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/false_surplus","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.141517541Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/false_deficit"}
+{"Time":"2026-09-27T19:28:19.141522434Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/false_deficit","Output":"=== RUN   TestFleetHourlyAdequacy/false_deficit\n"}
+{"Time":"2026-09-27T19:28:19.141592371Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/false_deficit","Output":"--- PASS: TestFleetHourlyAdequacy/false_deficit (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.141617728Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/false_deficit","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.141646811Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/unknown_hour"}
+{"Time":"2026-09-27T19:28:19.141651273Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/unknown_hour","Output":"=== RUN   TestFleetHourlyAdequacy/unknown_hour\n"}
+{"Time":"2026-09-27T19:28:19.141718263Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/unknown_hour","Output":"--- PASS: TestFleetHourlyAdequacy/unknown_hour (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.141739765Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/unknown_hour","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.141765925Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/zero_supply"}
+{"Time":"2026-09-27T19:28:19.141771366Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/zero_supply","Output":"=== RUN   TestFleetHourlyAdequacy/zero_supply\n"}
+{"Time":"2026-09-27T19:28:19.141838597Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/zero_supply","Output":"--- PASS: TestFleetHourlyAdequacy/zero_supply (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.141877301Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/zero_supply","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.1418826Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/zero_demand"}
+{"Time":"2026-09-27T19:28:19.141886445Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/zero_demand","Output":"=== RUN   TestFleetHourlyAdequacy/zero_demand\n"}
+{"Time":"2026-09-27T19:28:19.141958272Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/zero_demand","Output":"--- PASS: TestFleetHourlyAdequacy/zero_demand (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.141967641Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/zero_demand","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.141986532Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/spare_hour"}
+{"Time":"2026-09-27T19:28:19.141990548Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/spare_hour","Output":"=== RUN   TestFleetHourlyAdequacy/spare_hour\n"}
+{"Time":"2026-09-27T19:28:19.142062868Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/spare_hour","Output":"--- PASS: TestFleetHourlyAdequacy/spare_hour (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.142084354Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy/spare_hour","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.14211906Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy","Output":"--- PASS: TestFleetHourlyAdequacy (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.142155843Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestFleetHourlyAdequacy","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.142164895Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestPartialScenarioIndicators"}
+{"Time":"2026-09-27T19:28:19.14216857Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestPartialScenarioIndicators","Output":"=== RUN   TestPartialScenarioIndicators\n"}
+{"Time":"2026-09-27T19:28:19.143015135Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestPartialScenarioIndicators","Output":"--- PASS: TestPartialScenarioIndicators (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.143029056Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestPartialScenarioIndicators","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.143035269Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestTrendAndWeatherCategories"}
+{"Time":"2026-09-27T19:28:19.143038856Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestTrendAndWeatherCategories","Output":"=== RUN   TestTrendAndWeatherCategories\n"}
+{"Time":"2026-09-27T19:28:19.143161485Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestTrendAndWeatherCategories","Output":"--- PASS: TestTrendAndWeatherCategories (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.143169735Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestTrendAndWeatherCategories","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.143194191Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestDefaultSelectionRejectsUnusableSnapshot"}
+{"Time":"2026-09-27T19:28:19.143200554Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestDefaultSelectionRejectsUnusableSnapshot","Output":"=== RUN   TestDefaultSelectionRejectsUnusableSnapshot\n"}
+{"Time":"2026-09-27T19:28:19.14338065Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestDefaultSelectionRejectsUnusableSnapshot","Output":"--- PASS: TestDefaultSelectionRejectsUnusableSnapshot (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.143389233Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestDefaultSelectionRejectsUnusableSnapshot","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.143394994Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData"}
+{"Time":"2026-09-27T19:28:19.143398334Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData\n"}
+{"Time":"2026-09-27T19:28:19.144084257Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/nan"}
+{"Time":"2026-09-27T19:28:19.144097986Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/nan","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData/nan\n"}
+{"Time":"2026-09-27T19:28:19.144440516Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/nan","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData/nan (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.144459689Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/nan","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.144465979Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/model_missing"}
+{"Time":"2026-09-27T19:28:19.144469614Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/model_missing","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData/model_missing\n"}
+{"Time":"2026-09-27T19:28:19.144740796Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/model_missing","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData/model_missing (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.144752081Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/model_missing","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.14475794Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_coverage"}
+{"Time":"2026-09-27T19:28:19.144762111Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_coverage","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_coverage\n"}
+{"Time":"2026-09-27T19:28:19.145017894Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_coverage","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_coverage (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.145028907Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_coverage","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.145035071Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/missing_row"}
+{"Time":"2026-09-27T19:28:19.1450389Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/missing_row","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData/missing_row\n"}
+{"Time":"2026-09-27T19:28:19.145451088Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/missing_row","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData/missing_row (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.145466076Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/missing_row","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.145515755Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_physical_stop"}
+{"Time":"2026-09-27T19:28:19.145521203Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_physical_stop","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_physical_stop\n"}
+{"Time":"2026-09-27T19:28:19.14587368Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_physical_stop","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_physical_stop (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.145888429Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_physical_stop","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.145894558Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_direction"}
+{"Time":"2026-09-27T19:28:19.14589828Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_direction","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_direction\n"}
+{"Time":"2026-09-27T19:28:19.146396428Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_direction","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_direction (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.146410003Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/wrong_direction","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.146416059Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/omitted_prediction"}
+{"Time":"2026-09-27T19:28:19.146419873Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/omitted_prediction","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData/omitted_prediction\n"}
+{"Time":"2026-09-27T19:28:19.146944325Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/omitted_prediction","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData/omitted_prediction (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.147334491Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/omitted_prediction","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.147420418Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/scope_missing"}
+{"Time":"2026-09-27T19:28:19.147428354Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/scope_missing","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData/scope_missing\n"}
+{"Time":"2026-09-27T19:28:19.147937137Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/scope_missing","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData/scope_missing (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.147949625Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/scope_missing","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.147955554Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_row"}
+{"Time":"2026-09-27T19:28:19.147959005Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_row","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_row\n"}
+{"Time":"2026-09-27T19:28:19.148680915Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_row","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_row (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.14869343Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/duplicate_row","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.148699559Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/future_features"}
+{"Time":"2026-09-27T19:28:19.148703472Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/future_features","Output":"=== RUN   TestStopPublicationRejectsIncompleteOrUntrustedData/future_features\n"}
+{"Time":"2026-09-27T19:28:19.149042728Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/future_features","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData/future_features (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.149054503Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData/future_features","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.149066104Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData","Output":"--- PASS: TestStopPublicationRejectsIncompleteOrUntrustedData (0.01s)\n"}
+{"Time":"2026-09-27T19:28:19.149110606Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopPublicationRejectsIncompleteOrUntrustedData","Elapsed":0.01}
+{"Time":"2026-09-27T19:28:19.149156852Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopScenarioMatchesWindowAndPreservesRouteIndependence"}
+{"Time":"2026-09-27T19:28:19.149162039Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopScenarioMatchesWindowAndPreservesRouteIndependence","Output":"=== RUN   TestStopScenarioMatchesWindowAndPreservesRouteIndependence\n"}
+{"Time":"2026-09-27T19:28:19.159395526Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopScenarioMatchesWindowAndPreservesRouteIndependence","Output":"--- PASS: TestStopScenarioMatchesWindowAndPreservesRouteIndependence (0.01s)\n"}
+{"Time":"2026-09-27T19:28:19.159415054Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopScenarioMatchesWindowAndPreservesRouteIndependence","Elapsed":0.01}
+{"Time":"2026-09-27T19:28:19.15942382Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopZeroSupplyAndSummary"}
+{"Time":"2026-09-27T19:28:19.159427945Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopZeroSupplyAndSummary","Output":"=== RUN   TestStopZeroSupplyAndSummary\n"}
+{"Time":"2026-09-27T19:28:19.160902814Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopZeroSupplyAndSummary","Output":"--- PASS: TestStopZeroSupplyAndSummary (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.160920519Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopZeroSupplyAndSummary","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.160926649Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopCSVHasStableIdentityAndExactValues"}
+{"Time":"2026-09-27T19:28:19.160930463Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopCSVHasStableIdentityAndExactValues","Output":"=== RUN   TestStopCSVHasStableIdentityAndExactValues\n"}
+{"Time":"2026-09-27T19:28:19.16523258Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopCSVHasStableIdentityAndExactValues","Output":"--- PASS: TestStopCSVHasStableIdentityAndExactValues (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.165249979Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopCSVHasStableIdentityAndExactValues","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.165256511Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestStopRequestsReserveBoundedBudget"}
+{"Time":"2026-09-27T19:28:19.165259985Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopRequestsReserveBoundedBudget","Output":"=== RUN   TestStopRequestsReserveBoundedBudget\n"}
+{"Time":"2026-09-27T19:28:19.165351688Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestStopRequestsReserveBoundedBudget","Output":"--- PASS: TestStopRequestsReserveBoundedBudget (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.165361855Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestStopRequestsReserveBoundedBudget","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.165424499Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestSummaryUsesFrameMaximum"}
+{"Time":"2026-09-27T19:28:19.165431616Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSummaryUsesFrameMaximum","Output":"=== RUN   TestSummaryUsesFrameMaximum\n"}
+{"Time":"2026-09-27T19:28:19.165629143Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestSummaryUsesFrameMaximum","Output":"--- PASS: TestSummaryUsesFrameMaximum (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.165639957Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestSummaryUsesFrameMaximum","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.1656535Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestFleetScenarioProvenance"}
+{"Time":"2026-09-27T19:28:19.16565706Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetScenarioProvenance","Output":"=== RUN   TestFleetScenarioProvenance\n"}
+{"Time":"2026-09-27T19:28:19.165753499Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestFleetScenarioProvenance","Output":"--- PASS: TestFleetScenarioProvenance (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.165761872Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestFleetScenarioProvenance","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.165773961Z","Action":"run","Package":"tramflow/internal/engine","Test":"TestWeightedBudgetAtMaximum"}
+{"Time":"2026-09-27T19:28:19.165777714Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestWeightedBudgetAtMaximum","Output":"=== RUN   TestWeightedBudgetAtMaximum\n"}
+{"Time":"2026-09-27T19:28:19.166050106Z","Action":"output","Package":"tramflow/internal/engine","Test":"TestWeightedBudgetAtMaximum","Output":"--- PASS: TestWeightedBudgetAtMaximum (0.00s)\n"}
+{"Time":"2026-09-27T19:28:19.16606211Z","Action":"pass","Package":"tramflow/internal/engine","Test":"TestWeightedBudgetAtMaximum","Elapsed":0}
+{"Time":"2026-09-27T19:28:19.166110352Z","Action":"output","Package":"tramflow/internal/engine","Output":"PASS\n"}
+{"Time":"2026-09-27T19:28:19.399154284Z","Action":"output","Package":"tramflow/internal/telemetry","Output":"ok  \ttramflow/internal/telemetry\t1.060s\n"}
+{"Time":"2026-09-27T19:28:19.399202691Z","Action":"pass","Package":"tramflow/internal/telemetry","Elapsed":1.06}
+{"Time":"2026-09-27T19:28:19.41912732Z","Action":"output","Package":"tramflow/internal/inference","Output":"ok  \ttramflow/internal/inference\t1.080s\n"}
+{"Time":"2026-09-27T19:28:19.419154826Z","Action":"pass","Package":"tramflow/internal/inference","Elapsed":1.08}
+{"Time":"2026-09-27T19:28:19.725014312Z","Action":"output","Package":"tramflow/cmd/admin-check","Output":"ok  \ttramflow/cmd/admin-check\t1.018s\n"}
+{"Time":"2026-09-27T19:28:19.725056681Z","Action":"pass","Package":"tramflow/cmd/admin-check","Elapsed":1.019}
+{"Time":"2026-09-27T19:28:20.170365461Z","Action":"output","Package":"tramflow/internal/engine","Output":"ok  \ttramflow/internal/engine\t1.851s\n"}
+{"Time":"2026-09-27T19:28:20.170447142Z","Action":"pass","Package":"tramflow/internal/engine","Elapsed":1.854}

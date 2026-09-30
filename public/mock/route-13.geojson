@@ -1,0 +1,103 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "route-13-demo-line",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            37.75877062,
+            55.82480968
+          ],
+          [
+            37.75532705,
+            55.82301887
+          ],
+          [
+            37.75089068,
+            55.82072335
+          ],
+          [
+            37.74323705,
+            55.81750915
+          ]
+        ]
+      },
+      "properties": {
+        "route": "13",
+        "geometry_status": "approximate",
+        "note": "Тестовое соединение остановок; не точная геометрия дороги."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3923",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.75877062,
+          55.82480968
+        ]
+      },
+      "properties": {
+        "stop_id": "3923",
+        "name": "Монтажная улица",
+        "sequence_sample": 1,
+        "route": "13"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3924",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.75532705,
+          55.82301887
+        ]
+      },
+      "properties": {
+        "stop_id": "3924",
+        "name": "Консультативно-диагностический центр",
+        "sequence_sample": 2,
+        "route": "13"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3925",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.75089068,
+          55.82072335
+        ]
+      },
+      "properties": {
+        "stop_id": "3925",
+        "name": "Тагильская улица",
+        "sequence_sample": 3,
+        "route": "13"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "3926",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          37.74323705,
+          55.81750915
+        ]
+      },
+      "properties": {
+        "stop_id": "3926",
+        "name": "Плодоовощной комбинат",
+        "sequence_sample": 4,
+        "route": "13"
+      }
+    }
+  ]
+}

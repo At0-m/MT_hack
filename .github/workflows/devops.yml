@@ -1,0 +1,275 @@
+name: DevOps
+
+on:
+  pull_request:
+    paths:
+      - "compose.yaml"
+      - "compose.observability.yaml"
+      - "deploy/**"
+      - "scripts/**"
+      - "loadtest/**"
+      - "benchmarks/**"
+      - "Makefile"
+      - "backend/Dockerfile"
+      - "backend/scripts/**"
+      - ".github/workflows/devops.yml"
+
+  push:
+    branches:
+      - main
+    paths:
+      - "compose.yaml"
+      - "compose.observability.yaml"
+      - "deploy/**"
+      - "scripts/**"
+      - "loadtest/**"
+      - "benchmarks/**"
+      - "Makefile"
+      - "backend/Dockerfile"
+      - "backend/scripts/**"
+      - ".github/workflows/devops.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: devops-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Static validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install validation tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck jq
+
+      - name: Validate Bash scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if find scripts -type f -name '*.sh' -print -quit | grep -q .; then
+            find scripts -type f -name '*.sh' -print0 \
+              | xargs -0 shellcheck
+
+            find scripts -type f -name '*.sh' -print0 \
+              | xargs -0 -n1 bash -n
+          fi
+
+      - name: Validate PostgreSQL init scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if find deploy/postgres -type f -name '*.sh' -print -quit | grep -q .; then
+            find deploy/postgres -type f -name '*.sh' -print0 \
+              | xargs -0 -n1 sh -n
+          fi
+
+      - name: Generate CI environment
+        run: |
+          make init
+
+      - name: Validate main Compose
+        run: |
+          docker compose \
+            --env-file .env \
+            -f compose.yaml \
+            config >/dev/null
+
+      - name: Validate observability Compose
+        run: |
+          docker compose \
+            --env-file .env \
+            -f compose.yaml \
+            -f compose.observability.yaml \
+            config >/dev/null
+
+      - name: Validate Prometheus config
+        run: |
+          docker run --rm \
+            --entrypoint /bin/promtool \
+            -v "$PWD/deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro" \
+            prom/prometheus:v3.5.0 \
+            check config /etc/prometheus/prometheus.yml
+
+      - name: Validate Grafana dashboard JSON
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          find deploy/grafana \
+            -type f \
+            -name '*.json' \
+            -print0 \
+            | xargs -0 -r -n1 jq empty
+
+      - name: Validate k6 scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for script in loadtest/*.js; do
+            [ -e "$script" ] || continue
+
+            echo "Validating $script"
+
+            docker run --rm \
+              -v "$PWD:/work:ro" \
+              -w /work \
+              grafana/k6:0.54.0 \
+              inspect "$script" >/dev/null
+          done
+
+  container-smoke:
+    name: Container smoke
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Generate CI environment
+        run: |
+          make init
+
+      - name: Start complete stack
+        run: |
+          docker compose \
+            --env-file .env \
+            -f compose.yaml \
+            -f compose.observability.yaml \
+            up -d --build
+
+      - name: Wait for gateway
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for attempt in $(seq 1 60); do
+            if curl -fsS \
+              http://127.0.0.1:8080/health/ready \
+              >/dev/null 2>&1; then
+
+              echo "API is ready"
+              exit 0
+            fi
+
+            echo "Waiting for API ($attempt/60)"
+            sleep 2
+          done
+
+          echo "API failed to become ready"
+          exit 1
+
+      - name: Verify seed completed
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SEED_ID="$(
+            docker compose \
+              --env-file .env \
+              -f compose.yaml \
+              -f compose.observability.yaml \
+              ps -a -q seed
+          )"
+
+          EXIT_CODE="$(
+            docker inspect \
+              --format '{{.State.ExitCode}}' \
+              "$SEED_ID"
+          )"
+
+          test "$EXIT_CODE" = "0"
+
+      - name: Smoke HTTP endpoints
+        run: |
+          curl -fsS http://127.0.0.1:8080/
+          curl -fsS http://127.0.0.1:8080/health/live
+          curl -fsS http://127.0.0.1:8080/health/ready
+
+      - name: Wait for Prometheus
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for attempt in $(seq 1 30); do
+            if curl -fsS \
+              http://127.0.0.1:9091/-/ready \
+              >/dev/null 2>&1; then
+              exit 0
+            fi
+
+            sleep 2
+          done
+
+          exit 1
+
+      - name: Verify Grafana
+        run: |
+          curl -fsS http://127.0.0.1:3000/api/health
+
+      - name: Wait for Prometheus targets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for attempt in $(seq 1 30); do
+            TARGETS="$(
+              curl -fsS \
+                http://127.0.0.1:9091/api/v1/targets
+            )"
+
+            if echo "$TARGETS" | jq -e '
+              (.data.activeTargets | length) > 0
+              and
+              ([.data.activeTargets[].health] | all(. == "up"))
+            ' >/dev/null; then
+
+              echo "All Prometheus targets are UP"
+              exit 0
+            fi
+
+            echo "Waiting for Prometheus targets ($attempt/30)"
+            sleep 2
+          done
+
+          echo "Some Prometheus targets are DOWN"
+          curl -fsS http://127.0.0.1:9091/api/v1/targets | jq .
+          exit 1
+
+      - name: Show state on failure
+        if: failure()
+        run: |
+          docker compose \
+            --env-file .env \
+            -f compose.yaml \
+            -f compose.observability.yaml \
+            ps -a
+
+          docker compose \
+            --env-file .env \
+            -f compose.yaml \
+            -f compose.observability.yaml \
+            logs --no-color
+
+      - name: Stop stack
+        if: always()
+        run: |
+          docker compose \
+            --env-file .env \
+            -f compose.yaml \
+            -f compose.observability.yaml \
+            down -v --remove-orphans

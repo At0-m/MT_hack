@@ -1,0 +1,32 @@
+{
+  "client_arch": "amd64",
+  "client_cpus": 8,
+  "client_go": "go1.26.8",
+  "client_os": "linux",
+  "notes": "Full HTTP endpoint; record server/DB CPU and total process/native RSS separately. Synthetic fixture results do not establish ML quality.",
+  "selection": {
+    "selection": {
+      "forecast_snapshot_id": "demo-september-2026-v1",
+      "route_ids": [
+        "demo-01"
+      ],
+      "view_mode": "day",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-01T21:00:00Z"
+      },
+      "resolution": "hour",
+      "spatial_detail": "route"
+    }
+  },
+  "target": "http://api:8080",
+  "concurrency": 16,
+  "requests": 5000,
+  "rps": 660.5220036991576,
+  "p50_ms": 23.517,
+  "p95_ms": 33.522,
+  "p99_ms": 40.51,
+  "errors": 0,
+  "elapsed_seconds": 7.569770533,
+  "timestamp": "2026-09-27T11:43:08.798095496Z"
+}

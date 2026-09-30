@@ -1,0 +1,26 @@
+{
+  "kind": "scenario",
+  "selection": {
+    "forecast_snapshot_id": "demo-september-2026-v1-stops-v1",
+    "route_ids": [
+      "demo-01"
+    ],
+    "view_mode": "day",
+    "window": {
+      "from": "2026-08-31T21:00:00Z",
+      "to": "2026-09-01T21:00:00Z"
+    },
+    "resolution": "hour",
+    "spatial_detail": "route_stop"
+  },
+  "overrides": {
+    "effective_window": {
+      "from": "2026-08-31T21:00:00Z",
+      "to": "2026-08-31T22:00:00Z"
+    },
+    "fleet": {
+      "kind": "absolute",
+      "vehicle_count": 12
+    }
+  }
+}

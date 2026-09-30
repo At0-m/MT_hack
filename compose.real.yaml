@@ -1,0 +1,14 @@
+services:
+  seed:
+    entrypoint: [/app/publisher]
+    command: [--migrate]
+    environment:
+      ARTIFACTS_ROOT: /data/artifacts
+    volumes:
+      - ./backend/artifacts:/data/artifacts:ro
+      - ./data:/data/bundles:ro
+  api:
+    environment:
+      ARTIFACTS_ROOT: /data/artifacts
+    volumes:
+      - ./backend/artifacts:/data/artifacts:ro

@@ -1,0 +1,222 @@
+{
+  "provenance": {
+    "stop_model_version": "synthetic-stop-output-v1",
+    "stop_feature_schema_version": "synthetic-stop-features-v1",
+    "forecast_snapshot_id": "demo-september-2026-v1-stops-v1",
+    "forecast_origin_at": "2026-08-31T21:00:00Z",
+    "observations_complete_through": "2026-08-31T19:00:00Z",
+    "model_version": "synthetic-no-onnx",
+    "feature_schema_version": "features-v1",
+    "history_version": "synthetic-history-v1",
+    "weather_snapshot_id": "synthetic-weather-v1",
+    "supply_profile_version": "synthetic-supply-v1",
+    "reference_version": "synthetic-reference-v1",
+    "scenario_policy_version": "scenario-formulas-v1",
+    "network_version": "synthetic-network-v1-stops-v1",
+    "runtime_mode": "synthetic_mock"
+  },
+  "created_at": "2026-08-31T21:00:00Z",
+  "coverage": [
+    {
+      "route_id": "demo-01",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-30T21:00:00Z"
+      },
+      "resolutions": [
+        "hour",
+        "day"
+      ],
+      "prediction_scopes": [
+        "route",
+        "route_stop"
+      ],
+      "stop_forecast_status": "experimental",
+      "max_lead_hours": 720,
+      "status": "experimental"
+    },
+    {
+      "route_id": "demo-02",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-30T21:00:00Z"
+      },
+      "resolutions": [
+        "hour",
+        "day"
+      ],
+      "prediction_scopes": [
+        "route",
+        "route_stop"
+      ],
+      "stop_forecast_status": "experimental",
+      "max_lead_hours": 720,
+      "status": "experimental"
+    },
+    {
+      "route_id": "demo-03",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-30T21:00:00Z"
+      },
+      "resolutions": [
+        "hour",
+        "day"
+      ],
+      "prediction_scopes": [
+        "route",
+        "route_stop"
+      ],
+      "stop_forecast_status": "experimental",
+      "max_lead_hours": 720,
+      "status": "experimental"
+    },
+    {
+      "route_id": "demo-04",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-30T21:00:00Z"
+      },
+      "resolutions": [
+        "hour",
+        "day"
+      ],
+      "prediction_scopes": [
+        "route",
+        "route_stop"
+      ],
+      "stop_forecast_status": "experimental",
+      "max_lead_hours": 720,
+      "status": "experimental"
+    },
+    {
+      "route_id": "demo-05",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-30T21:00:00Z"
+      },
+      "resolutions": [
+        "hour",
+        "day"
+      ],
+      "prediction_scopes": [
+        "route",
+        "route_stop"
+      ],
+      "stop_forecast_status": "experimental",
+      "max_lead_hours": 720,
+      "status": "experimental"
+    },
+    {
+      "route_id": "demo-06",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-30T21:00:00Z"
+      },
+      "resolutions": [
+        "hour",
+        "day"
+      ],
+      "prediction_scopes": [
+        "route",
+        "route_stop"
+      ],
+      "stop_forecast_status": "experimental",
+      "max_lead_hours": 720,
+      "status": "experimental"
+    },
+    {
+      "route_id": "demo-07",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-30T21:00:00Z"
+      },
+      "resolutions": [
+        "hour",
+        "day"
+      ],
+      "prediction_scopes": [
+        "route",
+        "route_stop"
+      ],
+      "stop_forecast_status": "experimental",
+      "max_lead_hours": 720,
+      "status": "experimental"
+    },
+    {
+      "route_id": "demo-08",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-30T21:00:00Z"
+      },
+      "resolutions": [
+        "hour",
+        "day"
+      ],
+      "prediction_scopes": [
+        "route",
+        "route_stop"
+      ],
+      "stop_forecast_status": "experimental",
+      "max_lead_hours": 720,
+      "status": "experimental"
+    },
+    {
+      "route_id": "demo-09",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-30T21:00:00Z"
+      },
+      "resolutions": [
+        "hour",
+        "day"
+      ],
+      "prediction_scopes": [
+        "route",
+        "route_stop"
+      ],
+      "stop_forecast_status": "experimental",
+      "max_lead_hours": 720,
+      "status": "experimental"
+    },
+    {
+      "route_id": "demo-10",
+      "window": {
+        "from": "2026-08-31T21:00:00Z",
+        "to": "2026-09-30T21:00:00Z"
+      },
+      "resolutions": [
+        "hour",
+        "day"
+      ],
+      "prediction_scopes": [
+        "route",
+        "route_stop"
+      ],
+      "stop_forecast_status": "experimental",
+      "max_lead_hours": 720,
+      "status": "experimental"
+    }
+  ],
+  "view_modes": [
+    "day",
+    "week",
+    "month",
+    "custom"
+  ],
+  "reference_quantile": 0.9,
+  "target_load_index": 0.75,
+  "retention_hours_after_deactivation": 24,
+  "limitations": [
+    {
+      "code": "SYNTHETIC_MOCK",
+      "message": "Синтетические данные для интеграции; качество модели не измерено.",
+      "severity": "warning"
+    },
+    {
+      "code": "OBSERVED_FLEET_PROXY",
+      "message": "Выпуск — наблюдаемая прокси, индекс не равен заполненности салона.",
+      "severity": "warning"
+    }
+  ]
+}

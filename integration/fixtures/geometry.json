@@ -1,0 +1,94 @@
+{
+        "features": [
+          {
+            "geometry": {
+              "coordinates": [
+                [
+                  37.596,
+                  55.75
+                ],
+                [
+                  37.606,
+                  55.753
+                ],
+                [
+                  37.616,
+                  55.756
+                ]
+              ],
+              "type": "LineString"
+            },
+            "id": "demo-01-out",
+            "properties": {
+              "kind": "route_line",
+              "route_id": "demo-01",
+              "route_pattern_id": "demo-01-out"
+            },
+            "type": "Feature"
+          },
+          {
+            "geometry": {
+              "coordinates": [
+                37.596,
+                55.75
+              ],
+              "type": "Point"
+            },
+            "id": "demo-01-out-1",
+            "properties": {
+              "kind": "stop",
+              "name": "Synthetic stop 1",
+              "route_id": "demo-01",
+              "route_pattern_id": "demo-01-out",
+              "route_stop_id": "demo-01-out-1",
+              "sequence": 1,
+              "stop_id": "demo-01-stop-1"
+            },
+            "type": "Feature"
+          },
+          {
+            "geometry": {
+              "coordinates": [
+                37.606,
+                55.753
+              ],
+              "type": "Point"
+            },
+            "id": "demo-01-out-2",
+            "properties": {
+              "kind": "stop",
+              "name": "Synthetic stop 2",
+              "route_id": "demo-01",
+              "route_pattern_id": "demo-01-out",
+              "route_stop_id": "demo-01-out-2",
+              "sequence": 2,
+              "stop_id": "demo-01-stop-2"
+            },
+            "type": "Feature"
+          },
+          {
+            "geometry": {
+              "coordinates": [
+                37.616,
+                55.756
+              ],
+              "type": "Point"
+            },
+            "id": "demo-01-out-3",
+            "properties": {
+              "kind": "stop",
+              "name": "Synthetic stop 3",
+              "route_id": "demo-01",
+              "route_pattern_id": "demo-01-out",
+              "route_stop_id": "demo-01-out-3",
+              "sequence": 3,
+              "stop_id": "demo-01-stop-3"
+            },
+            "type": "Feature"
+          }
+        ],
+        "network_version": "synthetic-network-v1-stops-v1",
+        "route_id": "demo-01",
+        "source_id": "synthetic-geometry",
+        "type": "FeatureCollection"
+      }

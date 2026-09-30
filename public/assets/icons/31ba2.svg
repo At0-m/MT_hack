@@ -1,0 +1,20 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="100.81" height="100.81" viewBox="0 0 100.81 100.81" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="GREEN RAIN">
+<g id="Ellipse 7" filter="url(#filter0_f_0_13)">
+<circle cx="50.4048" cy="50.4048" r="39.7048" fill="#15FF00"/>
+</g>
+<circle id="Ellipse 8" cx="50.4048" cy="50.4048" r="36.7048" fill="black" fill-opacity="0.2" stroke="#D1E6FF" stroke-width="6"/>
+<g id="ovc_-ra 1">
+<path id="Vector" fill-rule="evenodd" clip-rule="evenodd" d="M39.8483 56.14C35.1842 56.14 31.4032 52.359 31.4032 47.6947C31.4032 43.0306 35.1842 39.2496 39.8483 39.2496C40.728 39.2496 41.5763 39.3841 42.3738 39.6337C43.5634 35.7444 47.1816 32.9158 51.4605 32.9158C56.7076 32.9158 60.9613 37.1694 60.9613 42.4166C60.9613 42.9119 60.9232 43.3981 60.8503 43.873C61.5418 43.6138 62.2906 43.4722 63.0725 43.4722C66.5705 43.4722 69.4063 46.3079 69.4063 49.8061C69.4063 53.3041 66.5705 56.14 63.0725 56.14H39.8483Z" fill="#D1E6FF"/>
+<path id="Vector_2" d="M42.1888 61.3402L39.9719 66.6173C39.6332 67.4236 40.0122 68.3518 40.8185 68.6905C41.6248 69.0292 42.553 68.6501 42.8917 67.844L45.1086 62.5669C45.4473 61.7606 45.0682 60.8324 44.2619 60.4937C43.4557 60.155 42.5275 60.5341 42.1888 61.3402Z" fill="#D1E6FF"/>
+<path id="Vector_3" d="M52.7453 59.229L50.5284 64.506C50.1897 65.3123 50.5687 66.2404 51.375 66.5791C52.1813 66.9178 53.1095 66.5389 53.4482 65.7326L55.665 60.4555C56.0037 59.6492 55.6247 58.721 54.8184 58.3823C54.0121 58.0436 53.084 58.4227 52.7453 59.229Z" fill="#D1E6FF"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_f_0_13" x="-3.8743e-07" y="0" width="100.81" height="100.81" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="5.35" result="effect1_foregroundBlur_0_13"/>
+</filter>
+</defs>
+</svg>
