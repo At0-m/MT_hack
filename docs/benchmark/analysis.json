@@ -1,0 +1,5923 @@
+{
+  "report_date": "2026-10-03",
+  "runs_count": 18,
+  "capacity_runs_count": 17,
+  "runs": [
+    {
+      "id": "R01",
+      "run_id": "20261003T115101Z-login-50rps-410549",
+      "script": "login",
+      "configuration": {},
+      "report": {
+        "format": "tramflow-functional-v1",
+        "functional_passed": true,
+        "http_slo_passed": false,
+        "exit_code": 0,
+        "note": "Functional/low-rate auth check only. Not a service capacity benchmark."
+      },
+      "functional": true,
+      "source_sha256": null,
+      "source_files": {
+        "benchmark.md": "cc4c5f7c0962ffbe506f12b1d20980e2bb641e6cfbac1c65cf9269e2922cb086",
+        "k6-summary.json": "e774d319a40abbb9853a846135cc3825eb2cd05a7f1450662dd36c508f21cbf9",
+        "report.json": "0f2595b2617edb6629b7ad571ba3fa0c09483145bd0b780de1e28c356c4e282d",
+        "system.csv": "a2d084e8979413e0053de17d271d7f540ec9febdc6d7fc8c4b41e74ee19254dc"
+      },
+      "failed_thresholds": [],
+      "endpoints": {},
+      "requests": 55,
+      "failed": 0,
+      "rps": 0.45375986711517086,
+      "latency_ms": {
+        "med": 105.326528,
+        "p(95)": 135.9386938,
+        "p(99)": 144.49989208000002,
+        "max": 149.229994,
+        "avg": 110.10714836363636
+      },
+      "passed": true,
+      "replicas": null
+    },
+    {
+      "id": "R02",
+      "run_id": "20261003T115646Z-bootstrap-50rps-245729",
+      "script": "bootstrap",
+      "configuration": {
+        "kind": "bootstrap",
+        "warmup": "30s",
+        "duration": "2m",
+        "rate": 50,
+        "pre": 25,
+        "max": 100,
+        "warmSeconds": 30
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 6001,
+        "successful_requests": 6001,
+        "target_rps": 50,
+        "requests_per_scheduled_second": 50.00833333333333,
+        "completion_window_seconds": 120.002,
+        "completed_rps_including_drain": 50.00749987500208,
+        "successful_rps_including_drain": 50.00749987500208,
+        "latency_ms": {
+          "min": 0.71197,
+          "med": 1.478751,
+          "max": 9.206108,
+          "p(90)": 2.482324,
+          "p(95)": 2.641791,
+          "p(99)": 3.023082,
+          "avg": 1.660981936843859
+        },
+        "client_wall_ms": {
+          "max": 9,
+          "p(90)": 3,
+          "p(95)": 3,
+          "p(99)": 3,
+          "avg": 1.779870021663056,
+          "min": 0,
+          "med": 2
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 1.5453846153846154,
+              "max": 1.99,
+              "min": 1.2,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 13585108.676923076,
+              "max": 13851688.96,
+              "min": 13568573.44,
+              "count": 26
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 165408831.0153846,
+              "max": 165570150.4,
+              "min": 165150720.0,
+              "count": 26
+            }
+          },
+          "b7c565ec6661ac4cd4c7838eda93bd230b11bd5f3fee66fad1dab2a69ddcec51": {
+            "name": "tramflow-k6-1791028607477885868",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 3.095,
+              "max": 4.33,
+              "min": 2.22,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 30926942.52307692,
+              "max": 32474398.72,
+              "min": 29444014.08,
+              "count": 26
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 11552484.430769231,
+              "max": 12436111.36,
+              "min": 10978590.72,
+              "count": 26
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.8619230769230769,
+              "max": 4.27,
+              "min": 0.0,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 70816386.75692308,
+              "max": 76493619.2,
+              "min": 65986887.68,
+              "count": 26
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 2.9559615384615383,
+              "max": 4.175,
+              "min": 2.065,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 30755540.676923078,
+              "max": 31016878.08,
+              "min": 30618419.2,
+              "count": 26
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 2.5317307692307693,
+              "max": 6.655,
+              "min": 0.97,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 57874539.12615385,
+              "max": 60146319.36,
+              "min": 57692651.52,
+              "count": 26
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 26,
+            "rss_bytes": {
+              "avg": 30970486.153846152,
+              "max": 31338496.0,
+              "min": 30752768.0,
+              "count": 26
+            },
+            "rss_first_bytes": 30842880.0,
+            "rss_last_bytes": 30846976.0,
+            "cache_cell_hit_ratio": null,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.0009506609845190468,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T115646Z-bootstrap-50rps-245729",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T115646Z-bootstrap-50rps-245729",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "61b7f5735b1d955545d7ef70f42214e34e29d758dcdc7cfcb551223e95e4007a",
+        "k6-summary.json": "8ef387f08bd1015ac65912031bd3528fa583a32c8a001ed5c03e17a9b5544fbe",
+        "report.json": "aab5b6a78e5ebe70af2e651051a0c4f897ecccc1c067d4babea62f2ef58062b7",
+        "system.csv": "65623426dc6776ad5d13f27a4eaf27139858bacdd202bc02d641dd95db0969c5"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "bootstrap": {
+          "requests": 6001,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.660981936843859,
+            "min": 0.71197,
+            "med": 1.478751,
+            "max": 9.206108,
+            "p(90)": 2.482324,
+            "p(95)": 2.641791,
+            "p(99)": 3.023082
+          }
+        }
+      },
+      "requests": 6001,
+      "failed": 0,
+      "rps": 50.00749987500208,
+      "latency_ms": {
+        "min": 0.71197,
+        "med": 1.478751,
+        "max": 9.206108,
+        "p(90)": 2.482324,
+        "p(95)": 2.641791,
+        "p(99)": 3.023082,
+        "avg": 1.660981936843859
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791028652883,
+      "end_ms": 1791028772885,
+      "start_utc": "2026-10-03T11:57:32.883000+00:00",
+      "end_utc": "2026-10-03T11:59:32.885000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R03",
+      "run_id": "20261003T120230Z-route-geometry-50rps-43819",
+      "script": "route-geometry",
+      "configuration": {
+        "kind": "geometry",
+        "warmup": "30s",
+        "duration": "2m",
+        "rate": 50,
+        "pre": 25,
+        "max": 100,
+        "warmSeconds": 30
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 6000,
+        "successful_requests": 6000,
+        "target_rps": 50,
+        "requests_per_scheduled_second": 50.0,
+        "completion_window_seconds": 119.981,
+        "completed_rps_including_drain": 50.00791792033739,
+        "successful_rps_including_drain": 50.00791792033739,
+        "latency_ms": {
+          "avg": 1.4701142410000023,
+          "min": 0.642913,
+          "med": 1.2234120000000002,
+          "max": 4.993814,
+          "p(90)": 2.2821562,
+          "p(95)": 2.4261808000000005,
+          "p(99)": 2.6983543400000007
+        },
+        "client_wall_ms": {
+          "med": 1,
+          "max": 5,
+          "p(90)": 3,
+          "p(95)": 3,
+          "p(99)": 3,
+          "avg": 1.6015,
+          "min": 0
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 1.6932692307692307,
+              "max": 4.5,
+              "min": 1.015,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 58955782.30153846,
+              "max": 59202600.96,
+              "min": 58940456.96,
+              "count": 26
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.6584615384615384,
+              "max": 3.94,
+              "min": 0.0,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 72310607.55692308,
+              "max": 80698408.96,
+              "min": 65976401.92,
+              "count": 26
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 2.4442307692307694,
+              "max": 3.275,
+              "min": 1.46,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 30785788.06153846,
+              "max": 31467765.76,
+              "min": 30492590.08,
+              "count": 26
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 168461800.36923078,
+              "max": 168820736.0,
+              "min": 168191590.4,
+              "count": 26
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 1.2784615384615385,
+              "max": 1.66,
+              "min": 0.92,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 13614146.166153846,
+              "max": 13841203.2,
+              "min": 13579059.2,
+              "count": 26
+            }
+          },
+          "a32d3f2d4489ae9b111fb7776b350c36763ba76967f77e5b0d8448f41e62e8f5": {
+            "name": "tramflow-k6-1791028951649125456",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 2.8151923076923078,
+              "max": 4.305,
+              "min": 1.795,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 30334497.083076924,
+              "max": 31897681.92,
+              "min": 28080865.28,
+              "count": 26
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 11659761.821538461,
+              "max": 12572426.24,
+              "min": 11072962.56,
+              "count": 26
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 26,
+            "rss_bytes": {
+              "avg": 30941026.46153846,
+              "max": 31162368.0,
+              "min": 30699520.0,
+              "count": 26
+            },
+            "rss_first_bytes": 30781440.0,
+            "rss_last_bytes": 30945280.0,
+            "cache_cell_hit_ratio": null,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.0009767653656348138,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T120230Z-route-geometry-50rps-43819",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T120230Z-route-geometry-50rps-43819",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "824c56898f1cbf58adf1af1016c7a089d301d0d73b5a1b9df95d57de6ba26b16",
+        "k6-summary.json": "5852fb5d79a9a1b1400c27a0b122db3baa7d5ed52579993bca1a21c6d3ea4662",
+        "report.json": "da79c5980d9e5f2d68ae4b7ffffa153c509540e51de3801b7698276b9a71624b",
+        "system.csv": "fecfbab79576ba1d3edc1deb2aa51d4d6792cade35e75ced687a08c80a8cd29a"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "geometry": {
+          "requests": 6000,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.4701142410000023,
+            "min": 0.642913,
+            "med": 1.2234120000000002,
+            "max": 4.993814,
+            "p(90)": 2.2821562,
+            "p(95)": 2.4261808000000005,
+            "p(99)": 2.6983543400000007
+          }
+        }
+      },
+      "requests": 6000,
+      "failed": 0,
+      "rps": 50.00791792033739,
+      "latency_ms": {
+        "avg": 1.4701142410000023,
+        "min": 0.642913,
+        "med": 1.2234120000000002,
+        "max": 4.993814,
+        "p(90)": 2.2821562,
+        "p(95)": 2.4261808000000005,
+        "p(99)": 2.6983543400000007
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791028997044,
+      "end_ms": 1791029117025,
+      "start_utc": "2026-10-03T12:03:17.044000+00:00",
+      "end_utc": "2026-10-03T12:05:17.025000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R04",
+      "run_id": "20261003T120656Z-forecast-day-50rps-967048",
+      "script": "forecast-day",
+      "configuration": {
+        "kind": "day",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 50,
+        "pre": 25,
+        "max": 100,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 9001,
+        "successful_requests": 9001,
+        "target_rps": 50,
+        "requests_per_scheduled_second": 50.00555555555555,
+        "completion_window_seconds": 180.004,
+        "completed_rps_including_drain": 50.00444434568121,
+        "successful_rps_including_drain": 50.00444434568121,
+        "latency_ms": {
+          "p(90)": 6.517895,
+          "p(95)": 6.82953,
+          "p(99)": 7.624518,
+          "avg": 3.979590502277496,
+          "min": 2.211677,
+          "med": 3.448711,
+          "max": 11.344668
+        },
+        "client_wall_ms": {
+          "p(90)": 7,
+          "p(95)": 7,
+          "p(99)": 8,
+          "avg": 4.164092878569048,
+          "min": 2,
+          "med": 4,
+          "max": 12
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 5.412875,
+              "max": 7.175,
+              "min": 0.5,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 38324666.368,
+              "max": 38839255.04,
+              "min": 37853593.6,
+              "count": 40
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 11642077.184,
+              "max": 12719226.88,
+              "min": 11114905.6,
+              "count": 40
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 5.920875,
+              "max": 8.565,
+              "min": 0.45,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 60937732.096,
+              "max": 64183336.96,
+              "min": 60702064.64,
+              "count": 40
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.7595,
+              "max": 4.23,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 74155032.576,
+              "max": 81348526.08,
+              "min": 68377640.96,
+              "count": 40
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 156277145.6,
+              "max": 156447539.2,
+              "min": 156237824.0,
+              "count": 40
+            }
+          },
+          "56c02538f1eb61d49936df640e403f75a3586f37cdba26f5f2538dea0d86d8fc": {
+            "name": "tramflow-k6-1791029216822595617",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 7.292625,
+              "max": 10.18,
+              "min": 0.84,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 32971161.6,
+              "max": 35620126.72,
+              "min": 29412556.8,
+              "count": 40
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 2.275,
+              "max": 3.2,
+              "min": 0.21,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 13618118.656000001,
+              "max": 13851688.96,
+              "min": 13589544.96,
+              "count": 40
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 40,
+            "rss_bytes": {
+              "avg": 34759065.6,
+              "max": 35336192.0,
+              "min": 34361344.0,
+              "count": 40
+            },
+            "rss_first_bytes": 34762752.0,
+            "rss_last_bytes": 34983936.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.004609361702127659,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T120656Z-forecast-day-50rps-967048",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T120656Z-forecast-day-50rps-967048",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "16f8ea82dc65a1b039fc6d81118ff30e4fbe3f359baef6cbb374dc8203badcf7",
+        "k6-summary.json": "c2bdd8f7f5b1af42511056efbf92303bcd60627e2a5d82875482c969468db9c2",
+        "report.json": "2a922fc6d9cff778f32a946df94555f8651028fd9e436696620336484ae69941",
+        "system.csv": "d698d09fbf5314da45bc824ad5606221fdd5fdf5edd7ad85dbf8c4c7a1ae175e"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "day": {
+          "requests": 9001,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 3.979590502277496,
+            "min": 2.211677,
+            "med": 3.448711,
+            "max": 11.344668,
+            "p(90)": 6.517895,
+            "p(95)": 6.82953,
+            "p(99)": 7.624518
+          }
+        }
+      },
+      "requests": 9001,
+      "failed": 0,
+      "rps": 50.00444434568121,
+      "latency_ms": {
+        "p(90)": 6.517895,
+        "p(95)": 6.82953,
+        "p(99)": 7.624518,
+        "avg": 3.979590502277496,
+        "min": 2.211677,
+        "med": 3.448711,
+        "max": 11.344668
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791029292146,
+      "end_ms": 1791029472150,
+      "start_utc": "2026-10-03T12:08:12.146000+00:00",
+      "end_utc": "2026-10-03T12:11:12.150000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R05",
+      "run_id": "20261003T121315Z-forecast-week-50rps-222329",
+      "script": "forecast-week",
+      "configuration": {
+        "kind": "week",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 50,
+        "pre": 25,
+        "max": 100,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 9001,
+        "successful_requests": 9001,
+        "target_rps": 50,
+        "requests_per_scheduled_second": 50.00555555555555,
+        "completion_window_seconds": 180.009,
+        "completed_rps_including_drain": 50.00305540278542,
+        "successful_rps_including_drain": 50.00305540278542,
+        "latency_ms": {
+          "max": 22.355907,
+          "p(90)": 9.18704,
+          "p(95)": 9.940408,
+          "p(99)": 11.198946,
+          "avg": 5.615015348294613,
+          "min": 2.950129,
+          "med": 4.72878
+        },
+        "client_wall_ms": {
+          "p(99)": 11,
+          "avg": 5.758915676035996,
+          "min": 3,
+          "med": 5,
+          "max": 22,
+          "p(90)": 9,
+          "p(95)": 10
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 7.738375,
+              "max": 9.995,
+              "min": 2.56,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 61731241.984,
+              "max": 61981327.36,
+              "min": 61719183.36,
+              "count": 40
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 11652825.088,
+              "max": 12687769.6,
+              "min": 11041505.28,
+              "count": 40
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 10.04025,
+              "max": 11.985,
+              "min": 1.085,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 38488244.224,
+              "max": 39468400.64,
+              "min": 37801164.8,
+              "count": 40
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.877,
+              "max": 4.6,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 75468898.30399999,
+              "max": 82072043.52,
+              "min": 70537707.52,
+              "count": 40
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 156762112.0,
+              "max": 156971827.2,
+              "min": 156657254.4,
+              "count": 40
+            }
+          },
+          "d08be264c190d4ee5bd7cc3daca8130bf9d403dfde9b08f7eff60012b4d52646": {
+            "name": "tramflow-k6-1791029596070958506",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 4.4315,
+              "max": 5.18,
+              "min": 0.69,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 32863158.272,
+              "max": 35431383.04,
+              "min": 29538385.92,
+              "count": 40
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 1.68325,
+              "max": 1.97,
+              "min": 0.18,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 13667401.728,
+              "max": 13904117.76,
+              "min": 13631488.0,
+              "count": 40
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 40,
+            "rss_bytes": {
+              "avg": 35128422.4,
+              "max": 35692544.0,
+              "min": 34164736.0,
+              "count": 40
+            },
+            "rss_first_bytes": 34848768.0,
+            "rss_last_bytes": 34164736.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.00790896292820272,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T121315Z-forecast-week-50rps-222329",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T121315Z-forecast-week-50rps-222329",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "7fbf98735a324ae33b607594ed685eea3b567940e1d7355565ce13b9e5400031",
+        "k6-summary.json": "48c57652f607cade912e7913642f3c0814bf1e22528b4434907c663fe4cae49e",
+        "report.json": "0860c21dfa80e5d0861d0310bcab474644b911319641b9cd995b87e8fcdebb1c",
+        "system.csv": "d34a709cd4a2e5d151a2bc672de84d879752e984047c49e24148e45bff614243"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "week": {
+          "requests": 9001,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 5.615015348294613,
+            "min": 2.950129,
+            "med": 4.72878,
+            "max": 22.355907,
+            "p(90)": 9.18704,
+            "p(95)": 9.940408,
+            "p(99)": 11.198946
+          }
+        }
+      },
+      "requests": 9001,
+      "failed": 0,
+      "rps": 50.00305540278542,
+      "latency_ms": {
+        "max": 22.355907,
+        "p(90)": 9.18704,
+        "p(95)": 9.940408,
+        "p(99)": 11.198946,
+        "avg": 5.615015348294613,
+        "min": 2.950129,
+        "med": 4.72878
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791029671392,
+      "end_ms": 1791029851401,
+      "start_utc": "2026-10-03T12:14:31.392000+00:00",
+      "end_utc": "2026-10-03T12:17:31.401000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R06",
+      "run_id": "20261003T121952Z-forecast-month-50rps-192319",
+      "script": "forecast-month",
+      "configuration": {
+        "kind": "month",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 50,
+        "pre": 25,
+        "max": 100,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 9001,
+        "successful_requests": 9001,
+        "target_rps": 50,
+        "requests_per_scheduled_second": 50.00555555555555,
+        "completion_window_seconds": 180.011,
+        "completed_rps_including_drain": 50.00249984723156,
+        "successful_rps_including_drain": 50.00249984723156,
+        "latency_ms": {
+          "avg": 12.658127101988688,
+          "min": 9.818578,
+          "med": 12.048894,
+          "max": 66.427518,
+          "p(90)": 15.097459,
+          "p(95)": 16.648433,
+          "p(99)": 22.132604
+        },
+        "client_wall_ms": {
+          "max": 67,
+          "p(90)": 15,
+          "p(95)": 17,
+          "p(99)": 22,
+          "avg": 12.779024552827464,
+          "min": 10,
+          "med": 12
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 1.988,
+              "max": 2.31,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 13355974.656,
+              "max": 13778288.64,
+              "min": 12320768.0,
+              "count": 40
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 20.655874999999998,
+              "max": 25.49,
+              "min": 2.925,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 37993578.496,
+              "max": 41859153.92,
+              "min": 23068672.0,
+              "count": 40
+            }
+          },
+          "0375ec2e3b7a9add042dd8ae1cfb283f069cc244abe9dbfed1902fc98222ba20": {
+            "name": "tramflow-k6-1791029993688058815",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 7.3626249999999995,
+              "max": 9.19,
+              "min": 1.165,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 33917763.584,
+              "max": 37780193.28,
+              "min": 29496442.88,
+              "count": 40
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 20.31325,
+              "max": 25.535,
+              "min": 2.55,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 88592613.376,
+              "max": 93155491.84,
+              "min": 84200652.8,
+              "count": 40
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.80775,
+              "max": 4.48,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 73897345.024,
+              "max": 85752545.28,
+              "min": 63407390.72,
+              "count": 40
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 160980008.96,
+              "max": 182032793.6,
+              "min": 142291763.2,
+              "count": 40
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 11360036.4544,
+              "max": 12824084.48,
+              "min": 10043260.928,
+              "count": 40
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 40,
+            "rss_bytes": {
+              "avg": 37046579.2,
+              "max": 38305792.0,
+              "min": 35561472.0,
+              "count": 40
+            },
+            "rss_first_bytes": 36323328.0,
+            "rss_last_bytes": 36810752.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.020761410788381746,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T121952Z-forecast-month-50rps-192319",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T121952Z-forecast-month-50rps-192319",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "601cbd3c852d8a87dff0ea5eb888f03614a6619dd511a3cfc32ab9d16ba022aa",
+        "k6-summary.json": "3872cadad273070fb32b241ca5e5b9687851045468852b0cbb0335e3ef48d219",
+        "report.json": "3cfb3c3eb799e4310c28f5be1fd6b3dfb01f3c00ca00042659b5e4caa59663c5",
+        "system.csv": "1112ddfcf2d3b3ffb47e4eae3fe58c50dbf43f4fc3c845a52dc88bce00751c76"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "month": {
+          "requests": 9001,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 12.658127101988688,
+            "min": 9.818578,
+            "med": 12.048894,
+            "max": 66.427518,
+            "p(90)": 15.097459,
+            "p(95)": 16.648433,
+            "p(99)": 22.132604
+          }
+        }
+      },
+      "requests": 9001,
+      "failed": 0,
+      "rps": 50.00249984723156,
+      "latency_ms": {
+        "avg": 12.658127101988688,
+        "min": 9.818578,
+        "med": 12.048894,
+        "max": 66.427518,
+        "p(90)": 15.097459,
+        "p(95)": 16.648433,
+        "p(99)": 22.132604
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791030069017,
+      "end_ms": 1791030249028,
+      "start_utc": "2026-10-03T12:21:09.017000+00:00",
+      "end_utc": "2026-10-03T12:24:09.028000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R07",
+      "run_id": "20261003T122630Z-scenario-50rps-812845",
+      "script": "scenario",
+      "configuration": {
+        "kind": "scenario",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 50,
+        "pre": 25,
+        "max": 100,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 9001,
+        "successful_requests": 9001,
+        "target_rps": 50,
+        "requests_per_scheduled_second": 50.00555555555555,
+        "completion_window_seconds": 180.001,
+        "completed_rps_including_drain": 50.005277748456955,
+        "successful_rps_including_drain": 50.005277748456955,
+        "latency_ms": {
+          "p(90)": 5.041806,
+          "p(95)": 5.244161,
+          "p(99)": 6.004911,
+          "avg": 3.6651446327074697,
+          "min": 1.552235,
+          "med": 3.764265,
+          "max": 12.730972
+        },
+        "client_wall_ms": {
+          "med": 4,
+          "max": 13,
+          "p(90)": 5,
+          "p(95)": 6,
+          "p(99)": 6,
+          "avg": 3.8407954671703144,
+          "min": 1
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 7.12425,
+              "max": 8.37,
+              "min": 1.17,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 23679467.52,
+              "max": 25060966.4,
+              "min": 23246929.92,
+              "count": 40
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.8805000000000001,
+              "max": 4.59,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 74087661.568,
+              "max": 82963333.12,
+              "min": 68115496.96,
+              "count": 40
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 163808542.72,
+              "max": 165465292.8,
+              "min": 162738995.2,
+              "count": 40
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 2.7047499999999998,
+              "max": 3.19,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 12723159.04,
+              "max": 13212057.6,
+              "min": 12687769.6,
+              "count": 40
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 3.10175,
+              "max": 4.905,
+              "min": 1.555,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 74441555.968,
+              "max": 75057070.08,
+              "min": 69814190.08,
+              "count": 40
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 10630384.844800001,
+              "max": 11827937.28,
+              "min": 9989783.552,
+              "count": 40
+            }
+          },
+          "0c8521d79634d61b6ea430d3e3021d426afd87161b178c0a2311621bf975b4a1": {
+            "name": "tramflow-k6-1791030391819859623",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 8.080125,
+              "max": 10.305,
+              "min": 1.82,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 45297696.768,
+              "max": 47951380.48,
+              "min": 41439723.52,
+              "count": 40
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 40,
+            "rss_bytes": {
+              "avg": 30927974.4,
+              "max": 31498240.0,
+              "min": 30343168.0,
+              "count": 40
+            },
+            "rss_first_bytes": 31428608.0,
+            "rss_last_bytes": 30957568.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.004299412915851272,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T122630Z-scenario-50rps-812845",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T122630Z-scenario-50rps-812845",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "8f90c739773b12319cda024a8105d0fe26b067f096577335878d654766139297",
+        "k6-summary.json": "e4c3bb987bf5e9a93a38c7e5b8d6f6f4b25429eaebeed580684ea4d32d65d6ee",
+        "report.json": "635166b2fc44ef57249de597a495064c6e54ab3f546f8577b78458346c80ceba",
+        "system.csv": "522361d3b5188b8fbe324f310843d16f58521f58eb61147323bd375c80d98fb2"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "scenario": {
+          "requests": 9001,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 12.730972,
+            "p(90)": 5.041806,
+            "p(95)": 5.244161,
+            "p(99)": 6.004911,
+            "avg": 3.6651446327074697,
+            "min": 1.552235,
+            "med": 3.764265
+          }
+        }
+      },
+      "requests": 9001,
+      "failed": 0,
+      "rps": 50.005277748456955,
+      "latency_ms": {
+        "p(90)": 5.041806,
+        "p(95)": 5.244161,
+        "p(99)": 6.004911,
+        "avg": 3.6651446327074697,
+        "min": 1.552235,
+        "med": 3.764265,
+        "max": 12.730972
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791030467260,
+      "end_ms": 1791030647261,
+      "start_utc": "2026-10-03T12:27:47.260000+00:00",
+      "end_utc": "2026-10-03T12:30:47.261000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R08",
+      "run_id": "20261003T123310Z-summary-50rps-813420",
+      "script": "summary",
+      "configuration": {
+        "kind": "summary",
+        "warmup": "30s",
+        "duration": "2m",
+        "rate": 50,
+        "pre": 25,
+        "max": 100,
+        "warmSeconds": 30
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 6001,
+        "successful_requests": 6001,
+        "target_rps": 50,
+        "requests_per_scheduled_second": 50.00833333333333,
+        "completion_window_seconds": 120.004,
+        "completed_rps_including_drain": 50.00666644445185,
+        "successful_rps_including_drain": 50.00666644445185,
+        "latency_ms": {
+          "avg": 3.6005803247792008,
+          "min": 1.247482,
+          "med": 3.919638,
+          "max": 8.904988,
+          "p(90)": 4.346241,
+          "p(95)": 4.554822,
+          "p(99)": 5.404767
+        },
+        "client_wall_ms": {
+          "p(90)": 5,
+          "p(95)": 5,
+          "p(99)": 6,
+          "avg": 3.7567072154640893,
+          "min": 1,
+          "med": 4,
+          "max": 10
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 6.633269230769231,
+              "max": 7.505,
+              "min": 5.475,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 23491328.78769231,
+              "max": 24012390.4,
+              "min": 23110615.04,
+              "count": 26
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.6276923076923077,
+              "max": 3.85,
+              "min": 0.0,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 76478293.85846154,
+              "max": 83110133.76,
+              "min": 68891443.2,
+              "count": 26
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 1.7357692307692307,
+              "max": 1.93,
+              "min": 1.57,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 12707934.523076924,
+              "max": 13201571.84,
+              "min": 12687769.6,
+              "count": 26
+            }
+          },
+          "d7beea1b590c2515966a39bf1a0673a9ddc9fd2fa3d6f1265e6d9b36178889ca": {
+            "name": "tramflow-k6-1791030791250447280",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 3.6040384615384617,
+              "max": 4.47,
+              "min": 3.04,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 40617397.956923075,
+              "max": 42635100.16,
+              "min": 38881198.08,
+              "count": 26
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 167469686.15384614,
+              "max": 167667302.4,
+              "min": 167352729.6,
+              "count": 26
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 4.079615384615384,
+              "max": 6.245,
+              "min": 3.06,
+              "count": 26
+            },
+            "docker_working_set_bytes": {
+              "avg": 69930340.03692308,
+              "max": 70537707.52,
+              "min": 69866618.88,
+              "count": 26
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 10651918.966153845,
+              "max": 12069109.76,
+              "min": 10313793.536,
+              "count": 26
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 26,
+            "rss_bytes": {
+              "avg": 30581523.692307692,
+              "max": 30949376.0,
+              "min": 30212096.0,
+              "count": 26
+            },
+            "rss_first_bytes": 30339072.0,
+            "rss_last_bytes": 30408704.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.004483427029458061,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T123310Z-summary-50rps-813420",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T123310Z-summary-50rps-813420",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "915556db67c3738f190e1d6aeb40ec51f3171d72183becece39019433f5ad44b",
+        "k6-summary.json": "01742970cb98a6fca13bb5873797ad5cd63cbeb14025b0b033d9398b922c3af2",
+        "report.json": "76f8f39770ef60450c07433c652746b01035113a1f093ae2b75607951dc1f5b3",
+        "system.csv": "89dd2c68691f931a44837e923b54bf303897fe9051f5cb071b2879981c88288d"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "summary": {
+          "requests": 6001,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 8.904988,
+            "p(90)": 4.346241,
+            "p(95)": 4.554822,
+            "p(99)": 5.404767,
+            "avg": 3.6005803247792008,
+            "min": 1.247482,
+            "med": 3.919638
+          }
+        }
+      },
+      "requests": 6001,
+      "failed": 0,
+      "rps": 50.00666644445185,
+      "latency_ms": {
+        "avg": 3.6005803247792008,
+        "min": 1.247482,
+        "med": 3.919638,
+        "max": 8.904988,
+        "p(90)": 4.346241,
+        "p(95)": 4.554822,
+        "p(99)": 5.404767
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791030836596,
+      "end_ms": 1791030956600,
+      "start_utc": "2026-10-03T12:33:56.596000+00:00",
+      "end_utc": "2026-10-03T12:35:56.600000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R09",
+      "run_id": "20261003T125735Z-mixed-workload-50rps-609940",
+      "script": "mixed-workload",
+      "configuration": {
+        "kind": "mixed",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 50,
+        "pre": 25,
+        "max": 100,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 9001,
+        "successful_requests": 9001,
+        "target_rps": 50,
+        "requests_per_scheduled_second": 50.00555555555555,
+        "completion_window_seconds": 180.006,
+        "completed_rps_including_drain": 50.00388875926358,
+        "successful_rps_including_drain": 50.00388875926358,
+        "latency_ms": {
+          "avg": 4.2007562366403945,
+          "min": 0.599507,
+          "med": 4.154,
+          "max": 40.373775,
+          "p(90)": 5.250865,
+          "p(95)": 6.24217,
+          "p(99)": 24.476442
+        },
+        "client_wall_ms": {
+          "avg": 4.390734362848573,
+          "min": 0,
+          "med": 4,
+          "max": 41,
+          "p(90)": 6,
+          "p(95)": 7,
+          "p(99)": 25
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 119959715.84,
+              "max": 133483724.8,
+              "min": 118698803.2,
+              "count": 40
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 10197585.1008,
+              "max": 11408506.88,
+              "min": 9523167.232,
+              "count": 40
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 7.593,
+              "max": 9.445,
+              "min": 2.48,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 25427968.0,
+              "max": 26560430.08,
+              "min": 24756879.36,
+              "count": 40
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 2.58025,
+              "max": 3.07,
+              "min": 0.45,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 12443975.68,
+              "max": 12687769.6,
+              "min": 12404654.08,
+              "count": 40
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 4.719,
+              "max": 7.715,
+              "min": 0.005,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 62678892.544,
+              "max": 66920120.32,
+              "min": 62547558.4,
+              "count": 40
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.13225,
+              "max": 1.36,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 68694310.912,
+              "max": 75570872.32,
+              "min": 63858278.4,
+              "count": 40
+            }
+          },
+          "a758e98db05cb245bd8d1b45f80aa5b50505ff06d87e5c702d1a5b9ca6e9e167": {
+            "name": "tramflow-k6-1791032256206137815",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 8.003625,
+              "max": 10.525,
+              "min": 2.23,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 71732822.016,
+              "max": 74847354.88,
+              "min": 68776099.84,
+              "count": 40
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 40,
+            "rss_bytes": {
+              "avg": 30601420.8,
+              "max": 31690752.0,
+              "min": 29761536.0,
+              "count": 40
+            },
+            "rss_first_bytes": 30035968.0,
+            "rss_last_bytes": 31281152.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.004618355945730247,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T125735Z-mixed-workload-50rps-609940",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T125735Z-mixed-workload-50rps-609940",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "6338df714136be5fb68bad762cce955f823a82a5158c90e5d91720b448545a2f",
+        "k6-summary.json": "d744bdcb0da92cb52c7a93dc281a8b6d151f29b947d9f62cfb16c966a0a9f167",
+        "report.json": "adcdc3ded72798c6e79b95da6c8e174a44ae981cbe0630528f66da598c948991",
+        "system.csv": "96e0269880457ee1ee08de077b431e5b7b97f5ea82f03d25d861bb951f78c9e4"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "bootstrap": {
+          "requests": 450,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 2.129687986666667,
+            "min": 0.765302,
+            "med": 2.3233505,
+            "max": 4.128483,
+            "p(90)": 2.7334059,
+            "p(95)": 2.8844535499999995,
+            "p(99)": 3.210090459999999
+          }
+        },
+        "day": {
+          "requests": 5401,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 1.474741,
+            "med": 4.447089,
+            "max": 12.884224,
+            "p(90)": 5.137116,
+            "p(95)": 5.431481,
+            "p(99)": 6.293072,
+            "avg": 3.942078092945747
+          }
+        },
+        "export": {
+          "requests": 270,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(99)": 5.614387940000001,
+            "avg": 3.619841381481482,
+            "min": 1.456825,
+            "med": 3.9723495,
+            "max": 6.774966,
+            "p(90)": 4.5304486,
+            "p(95)": 4.9150157
+          }
+        },
+        "routes": {
+          "requests": 450,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.457708215555557,
+            "min": 0.599507,
+            "med": 1.583919,
+            "max": 3.277179,
+            "p(90)": 1.879447,
+            "p(95)": 1.95619225,
+            "p(99)": 2.10885553
+          }
+        },
+        "month": {
+          "requests": 270,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 27.21494135,
+            "p(99)": 28.89997633,
+            "avg": 20.938429292592577,
+            "min": 11.690488,
+            "med": 23.000786,
+            "max": 40.373775,
+            "p(90)": 26.3394121
+          }
+        },
+        "geometry": {
+          "requests": 450,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 0.795014,
+            "med": 2.153743,
+            "max": 4.068024,
+            "p(90)": 2.5016338,
+            "p(95)": 2.60081455,
+            "p(99)": 2.846967569999999,
+            "avg": 1.978591213333333
+          }
+        },
+        "week": {
+          "requests": 180,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 8.752361,
+            "max": 13.143984,
+            "p(90)": 10.6051759,
+            "p(95)": 11.062294099999994,
+            "p(99)": 11.749808670000002,
+            "avg": 7.535813677777777,
+            "min": 3.292386
+          }
+        },
+        "summary": {
+          "requests": 180,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 3.7580910000000003,
+            "max": 5.523178,
+            "p(90)": 4.3818516,
+            "p(95)": 4.80102375,
+            "p(99)": 5.418077200000001,
+            "avg": 3.3931549666666716,
+            "min": 1.303914
+          }
+        },
+        "scenario": {
+          "requests": 1350,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 4.570069,
+            "max": 9.43967,
+            "p(90)": 5.1933058,
+            "p(95)": 5.34423565,
+            "p(99)": 6.1313488099999995,
+            "avg": 4.012741726666666,
+            "min": 1.664828
+          }
+        }
+      },
+      "requests": 9001,
+      "failed": 0,
+      "rps": 50.00388875926358,
+      "latency_ms": {
+        "avg": 4.2007562366403945,
+        "min": 0.599507,
+        "med": 4.154,
+        "max": 40.373775,
+        "p(90)": 5.250865,
+        "p(95)": 6.24217,
+        "p(99)": 24.476442
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791032331625,
+      "end_ms": 1791032511631,
+      "start_utc": "2026-10-03T12:58:51.625000+00:00",
+      "end_utc": "2026-10-03T13:01:51.631000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R10",
+      "run_id": "20261003T130200Z-mixed-workload-100rps-158780",
+      "script": "mixed-workload",
+      "configuration": {
+        "kind": "mixed",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 100,
+        "pre": 50,
+        "max": 200,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 18001,
+        "successful_requests": 18001,
+        "target_rps": 100,
+        "requests_per_scheduled_second": 100.00555555555556,
+        "completion_window_seconds": 179.993,
+        "completed_rps_including_drain": 100.00944481174268,
+        "successful_rps_including_drain": 100.00944481174268,
+        "latency_ms": {
+          "avg": 2.2159552555969286,
+          "min": 0.442114,
+          "med": 1.732687,
+          "max": 25.763932,
+          "p(90)": 3.075715,
+          "p(95)": 4.202843,
+          "p(99)": 13.949819
+        },
+        "client_wall_ms": {
+          "p(90)": 3,
+          "p(95)": 4,
+          "p(99)": 14,
+          "avg": 2.3251486028553967,
+          "min": 0,
+          "med": 2,
+          "max": 26
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.187,
+              "max": 3.41,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 69968330.752,
+              "max": 79387688.96,
+              "min": 66217574.4,
+              "count": 40
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 4.983875,
+              "max": 6.82,
+              "min": 0.02,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 62646910.976,
+              "max": 62673387.52,
+              "min": 62641930.24,
+              "count": 40
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 7.860625,
+              "max": 9.105,
+              "min": 0.99,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 26033782.784,
+              "max": 27231518.72,
+              "min": 24882708.48,
+              "count": 40
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 2.8185000000000002,
+              "max": 3.34,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 12497453.056,
+              "max": 12740198.4,
+              "min": 12467568.64,
+              "count": 40
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 135470776.32,
+              "max": 138202316.8,
+              "min": 132644864.0,
+              "count": 40
+            }
+          },
+          "940225fa0819ebb13901c650bfefa83f3fdfd74d9d4ca7581d20fd999f47939f": {
+            "name": "tramflow-k6-1791032521261551422",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 10.14575,
+              "max": 12.55,
+              "min": 0.28,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 78482767.872,
+              "max": 84127252.48,
+              "min": 72802631.68,
+              "count": 40
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 10530612.8384,
+              "max": 11607736.32,
+              "min": 9862905.856,
+              "count": 40
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 40,
+            "rss_bytes": {
+              "avg": 30892953.6,
+              "max": 32727040.0,
+              "min": 30138368.0,
+              "count": 40
+            },
+            "rss_first_bytes": 30154752.0,
+            "rss_last_bytes": 31182848.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.0010122731201382862,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T130200Z-mixed-workload-100rps-158780",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T130200Z-mixed-workload-100rps-158780",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "d29af8a223edf0e32ae8c3cd0c51f3ed39f4ad23da71eb1e45306858050ebb71",
+        "k6-summary.json": "01ab611213c0797d2613f749b07728b96b139ac8fe027f8d1d61defdf9b4a864",
+        "report.json": "b5dc142778c8d26b2d13ba7f1e6db04cbdba1a5a74ef54d1b77d1bb5db243df9",
+        "system.csv": "b33b9b98ae7ce5302d81ff608ba437ed5911b1feb7fe93b988c6ffcead79c979"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "export": {
+          "requests": 540,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.7326054037037049,
+            "min": 1.160728,
+            "med": 1.52977,
+            "max": 4.728333,
+            "p(90)": 2.3181086000000004,
+            "p(95)": 2.8829059999999993,
+            "p(99)": 4.0406441
+          }
+        },
+        "month": {
+          "requests": 540,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 13.749606881481473,
+            "min": 10.952214,
+            "med": 13.2371125,
+            "max": 25.763932,
+            "p(90)": 16.3754259,
+            "p(95)": 18.037603299999986,
+            "p(99)": 21.645688980000003
+          }
+        },
+        "summary": {
+          "requests": 360,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 2.949761,
+            "p(99)": 3.7451742800000005,
+            "avg": 1.7500483194444432,
+            "min": 1.175387,
+            "med": 1.571009,
+            "max": 3.928441,
+            "p(90)": 2.3171972000000003
+          }
+        },
+        "bootstrap": {
+          "requests": 900,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 0.967782,
+            "max": 3.229748,
+            "p(90)": 1.3736168000000002,
+            "p(95)": 1.6650632999999995,
+            "p(99)": 2.3123637899999996,
+            "avg": 1.0449135288888887,
+            "min": 0.648023
+          }
+        },
+        "routes": {
+          "requests": 900,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(99)": 1.6236795099999999,
+            "avg": 0.7469853600000007,
+            "min": 0.442114,
+            "med": 0.6848445000000001,
+            "max": 4.615497,
+            "p(90)": 0.977812,
+            "p(95)": 1.1783112
+          }
+        },
+        "scenario": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 2.9173768499999997,
+            "p(99)": 4.34717038,
+            "avg": 1.933016287037038,
+            "min": 1.352246,
+            "med": 1.7723685,
+            "max": 7.64589,
+            "p(90)": 2.4448855
+          }
+        },
+        "week": {
+          "requests": 360,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(90)": 4.755236100000001,
+            "p(95)": 5.27392645,
+            "p(99)": 8.179630590000018,
+            "avg": 3.9150363472222227,
+            "min": 3.006324,
+            "med": 3.71095,
+            "max": 10.239716
+          }
+        },
+        "day": {
+          "requests": 10801,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 2.017541780020373,
+            "min": 1.305188,
+            "med": 1.77631,
+            "max": 14.400307,
+            "p(90)": 2.737203,
+            "p(95)": 3.444975,
+            "p(99)": 4.740383
+          }
+        },
+        "geometry": {
+          "requests": 900,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 0.570613,
+            "med": 0.879342,
+            "max": 3.895522,
+            "p(90)": 1.3247592000000001,
+            "p(95)": 1.6585354499999994,
+            "p(99)": 2.19471508,
+            "avg": 0.9625152233333332
+          }
+        }
+      },
+      "requests": 18001,
+      "failed": 0,
+      "rps": 100.00944481174268,
+      "latency_ms": {
+        "avg": 2.2159552555969286,
+        "min": 0.442114,
+        "med": 1.732687,
+        "max": 25.763932,
+        "p(90)": 3.075715,
+        "p(95)": 4.202843,
+        "p(99)": 13.949819
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791032596730,
+      "end_ms": 1791032776723,
+      "start_utc": "2026-10-03T13:03:16.730000+00:00",
+      "end_utc": "2026-10-03T13:06:16.723000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R11",
+      "run_id": "20261003T130631Z-mixed-workload-200rps-833642",
+      "script": "mixed-workload",
+      "configuration": {
+        "kind": "mixed",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 200,
+        "pre": 100,
+        "max": 400,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 36001,
+        "successful_requests": 36001,
+        "target_rps": 200,
+        "requests_per_scheduled_second": 200.00555555555556,
+        "completion_window_seconds": 180.001,
+        "completed_rps_including_drain": 200.0044444197532,
+        "successful_rps_including_drain": 200.0044444197532,
+        "latency_ms": {
+          "avg": 1.9371193762395602,
+          "min": 0.35322,
+          "med": 1.49394,
+          "max": 27.817455,
+          "p(90)": 2.485854,
+          "p(95)": 3.642025,
+          "p(99)": 13.032953
+        },
+        "client_wall_ms": {
+          "p(95)": 4,
+          "p(99)": 13,
+          "avg": 2.0082219938335046,
+          "min": 0,
+          "med": 2,
+          "max": 28,
+          "p(90)": 3
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 9127906.5088,
+              "max": 10423894.016,
+              "min": 8462008.32,
+              "count": 40
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.27825,
+              "max": 4.09,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 69372215.296,
+              "max": 85343600.64,
+              "min": 65777172.48,
+              "count": 40
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 125068902.4,
+              "max": 142816051.2,
+              "min": 120271667.2,
+              "count": 40
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 5.0040000000000004,
+              "max": 6.08,
+              "min": 0.39,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 12863668.224000001,
+              "max": 13348372.48,
+              "min": 12792627.2,
+              "count": 40
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 8.155625,
+              "max": 11.485,
+              "min": 3.465,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 69978816.512,
+              "max": 73284976.64,
+              "min": 69835161.6,
+              "count": 40
+            }
+          },
+          "f71df606dd15cbdff9e5992e833b26f3dccffd743b66cba6f0e732bc19651e4a": {
+            "name": "tramflow-k6-1791032792264078064",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 19.563875,
+              "max": 23.39,
+              "min": 2.64,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 110741422.08,
+              "max": 121844531.2,
+              "min": 97182023.68,
+              "count": 40
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 13.557625,
+              "max": 16.72,
+              "min": 1.17,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 28102885.376000002,
+              "max": 29957816.32,
+              "min": 27105689.6,
+              "count": 40
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 40,
+            "rss_bytes": {
+              "avg": 30856192.0,
+              "max": 31940608.0,
+              "min": 30064640.0,
+              "count": 40
+            },
+            "rss_first_bytes": 31223808.0,
+            "rss_last_bytes": 31485952.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.0009839068362771117,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T130631Z-mixed-workload-200rps-833642",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T130631Z-mixed-workload-200rps-833642",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "3ec9d2c0c1cf56c557511872eea88906e48a9606b5dd207564d1f68448051904",
+        "k6-summary.json": "329d88b956cb00643a579f9fb19c60a62d0dcc39e19261acf9e7e4161d06e8db",
+        "report.json": "1efeffa9ab4315bf46c9e7fc50b3df0ea7e9e8c56a1e43fec033320e1aaf0235",
+        "system.csv": "6126c079913f657f341ac4e818155c88b2f62318003e70adbb3a186f2827ebc5"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "month": {
+          "requests": 1080,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 11.090704,
+            "med": 12.628965,
+            "max": 27.817455,
+            "p(90)": 14.3488831,
+            "p(95)": 16.018041149999995,
+            "p(99)": 19.45002360000001,
+            "avg": 12.98765212037037
+          }
+        },
+        "export": {
+          "requests": 1080,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 1.281708,
+            "max": 9.082695,
+            "p(90)": 1.8314858,
+            "p(95)": 2.1913937999999997,
+            "p(99)": 3.18746289,
+            "avg": 1.416223898148147,
+            "min": 0.992623
+          }
+        },
+        "summary": {
+          "requests": 720,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(99)": 3.1256924199999956,
+            "avg": 1.425311813888888,
+            "min": 0.987195,
+            "med": 1.2672525000000001,
+            "max": 10.814897,
+            "p(90)": 1.9115685,
+            "p(95)": 2.1810253499999983
+          }
+        },
+        "week": {
+          "requests": 720,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 2.790574,
+            "med": 3.279982,
+            "max": 10.238153,
+            "p(90)": 4.305352699999999,
+            "p(95)": 4.6893393,
+            "p(99)": 6.348708909999991,
+            "avg": 3.4809241152777766
+          }
+        },
+        "day": {
+          "requests": 21601,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 1.519827,
+            "max": 26.664037,
+            "p(90)": 2.1925,
+            "p(95)": 2.602484,
+            "p(99)": 4.459379,
+            "avg": 1.7037362319337022,
+            "min": 1.187923
+          }
+        },
+        "routes": {
+          "requests": 1800,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 0.35322,
+            "med": 0.567812,
+            "max": 7.041079,
+            "p(90)": 1.1262630000000002,
+            "p(95)": 1.5339668999999994,
+            "p(99)": 3.4056703099999996,
+            "avg": 0.7343306399999986
+          }
+        },
+        "scenario": {
+          "requests": 5400,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(90)": 2.2712751000000004,
+            "p(95)": 2.71762215,
+            "p(99)": 4.237393440000003,
+            "avg": 1.7541487005555536,
+            "min": 1.245462,
+            "med": 1.5665365,
+            "max": 11.955248
+          }
+        },
+        "bootstrap": {
+          "requests": 1800,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(90)": 1.3627981000000002,
+            "p(95)": 1.7085923,
+            "p(99)": 3.7005906799999977,
+            "avg": 0.9453001138888905,
+            "min": 0.540798,
+            "med": 0.7764095,
+            "max": 10.215862
+          }
+        },
+        "geometry": {
+          "requests": 1800,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 0.666506,
+            "max": 5.282567,
+            "p(90)": 1.0031978000000001,
+            "p(95)": 1.1911540999999999,
+            "p(99)": 1.8729134399999998,
+            "avg": 0.7507855605555556,
+            "min": 0.510318
+          }
+        }
+      },
+      "requests": 36001,
+      "failed": 0,
+      "rps": 200.0044444197532,
+      "latency_ms": {
+        "avg": 1.9371193762395602,
+        "min": 0.35322,
+        "med": 1.49394,
+        "max": 27.817455,
+        "p(90)": 2.485854,
+        "p(95)": 3.642025,
+        "p(99)": 13.032953
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791032867674,
+      "end_ms": 1791033047675,
+      "start_utc": "2026-10-03T13:07:47.674000+00:00",
+      "end_utc": "2026-10-03T13:10:47.675000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R12",
+      "run_id": "20261003T131057Z-mixed-workload-300rps-405847",
+      "script": "mixed-workload",
+      "configuration": {
+        "kind": "mixed",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 300,
+        "pre": 150,
+        "max": 600,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 54001,
+        "successful_requests": 54001,
+        "target_rps": 300,
+        "requests_per_scheduled_second": 300.00555555555553,
+        "completion_window_seconds": 180.0,
+        "completed_rps_including_drain": 300.00555555555553,
+        "successful_rps_including_drain": 300.00555555555553,
+        "latency_ms": {
+          "med": 1.459985,
+          "max": 41.976644,
+          "p(90)": 3.624772,
+          "p(95)": 5.60024,
+          "p(99)": 13.946871,
+          "avg": 2.177243143775115,
+          "min": 0.336844
+        },
+        "client_wall_ms": {
+          "min": 0,
+          "med": 2,
+          "max": 43,
+          "p(90)": 4,
+          "p(95)": 6,
+          "p(99)": 14,
+          "avg": 2.236421547749116
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.71275,
+              "max": 4.89,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 80748478.464,
+              "max": 83047219.2,
+              "min": 73117204.48,
+              "count": 40
+            }
+          },
+          "c065d61349f605aab2409a1243a84dacb8a9c352d40f2ea369dbaa2c80d3b317": {
+            "name": "tramflow-k6-1791033058447321115",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 29.257625,
+              "max": 35.455,
+              "min": 0.24,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 124830351.36,
+              "max": 142291763.2,
+              "min": 109261619.2,
+              "count": 40
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 11.665375,
+              "max": 14.905,
+              "min": 2.895,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 90400096.256,
+              "max": 92494888.96,
+              "min": 86968893.44,
+              "count": 40
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 9285559.9104,
+              "max": 10423894.016,
+              "min": 8433696.768,
+              "count": 40
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 7.25,
+              "max": 8.69,
+              "min": 0.86,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 12767723.52,
+              "max": 13222543.36,
+              "min": 12624855.04,
+              "count": 40
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 149511208.96,
+              "max": 151204659.2,
+              "min": 146171494.4,
+              "count": 40
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 19.70825,
+              "max": 24.1,
+              "min": 1.985,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 30367809.536,
+              "max": 32621199.36,
+              "min": 29244784.64,
+              "count": 40
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 40,
+            "rss_bytes": {
+              "avg": 32941056.0,
+              "max": 35815424.0,
+              "min": 31891456.0,
+              "count": 40
+            },
+            "rss_first_bytes": 32845824.0,
+            "rss_last_bytes": 32436224.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.0009937155650935805,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T131057Z-mixed-workload-300rps-405847",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T131057Z-mixed-workload-300rps-405847",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "f92ba6be77fa2ea98cdb52bb4f7fd06869b767de67361617da50607e0df33d61",
+        "k6-summary.json": "a46735e32b4ca6d6ae7448d05325230229a8bd59baf85dd659c934ba26d72364",
+        "report.json": "e5d8e625395cdfcd34dd8b5cbd435fdc405fce6a4d47fd25697dbeeaa8c1bd75",
+        "system.csv": "7b4fef531c90e05118b8ad3a5ab4781340de8d39d43625abd751b697d10ae019"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "bootstrap": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 0.51984,
+            "med": 0.7270810000000001,
+            "max": 20.996547,
+            "p(90)": 4.049745499999998,
+            "p(95)": 5.144020649999999,
+            "p(99)": 7.655759599999999,
+            "avg": 1.4792496896296297
+          }
+        },
+        "summary": {
+          "requests": 1080,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.5061999083333342,
+            "min": 0.96516,
+            "med": 1.195014,
+            "max": 10.200964,
+            "p(90)": 2.1336946,
+            "p(95)": 3.1062924499999998,
+            "p(99)": 5.19934838
+          }
+        },
+        "scenario": {
+          "requests": 8100,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.9286965716049358,
+            "min": 1.22365,
+            "med": 1.5051565,
+            "max": 28.817331,
+            "p(90)": 3.0056064000000005,
+            "p(95)": 4.060591799999997,
+            "p(99)": 7.282946370000002
+          }
+        },
+        "week": {
+          "requests": 1080,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 19.461441,
+            "p(90)": 5.0413468,
+            "p(95)": 6.415395549999997,
+            "p(99)": 8.74879753000001,
+            "avg": 3.760662341666656,
+            "min": 2.753366,
+            "med": 3.3382725
+          }
+        },
+        "export": {
+          "requests": 1620,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 1.211214,
+            "max": 16.182711,
+            "p(90)": 2.1939640000000007,
+            "p(95)": 3.167393899999999,
+            "p(99)": 5.95540925999999,
+            "avg": 1.5405968092592595,
+            "min": 0.9748
+          }
+        },
+        "month": {
+          "requests": 1620,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 13.1723205,
+            "max": 41.976644,
+            "p(90)": 16.813139700000004,
+            "p(95)": 18.834635149999997,
+            "p(99)": 23.354019099999995,
+            "avg": 13.826073638271582,
+            "min": 10.591152
+          }
+        },
+        "routes": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.2901971977777797,
+            "min": 0.336844,
+            "med": 0.5395155,
+            "max": 15.974128,
+            "p(90)": 3.7140994999999997,
+            "p(95)": 4.6776325000000005,
+            "p(99)": 6.421418609999999
+          }
+        },
+        "geometry": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 0.8751022488888882,
+            "min": 0.479399,
+            "med": 0.628552,
+            "max": 11.348499,
+            "p(90)": 1.2903533999999999,
+            "p(95)": 1.9548379499999957,
+            "p(99)": 4.615159879999975
+          }
+        },
+        "day": {
+          "requests": 32401,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 1.145562,
+            "med": 1.482424,
+            "max": 26.454107,
+            "p(90)": 2.948716,
+            "p(95)": 3.973824,
+            "p(99)": 6.860577,
+            "avg": 1.8989649934878465
+          }
+        }
+      },
+      "requests": 54001,
+      "failed": 0,
+      "rps": 300.00555555555553,
+      "latency_ms": {
+        "med": 1.459985,
+        "max": 41.976644,
+        "p(90)": 3.624772,
+        "p(95)": 5.60024,
+        "p(99)": 13.946871,
+        "avg": 2.177243143775115,
+        "min": 0.336844
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791033133815,
+      "end_ms": 1791033313815,
+      "start_utc": "2026-10-03T13:12:13.815000+00:00",
+      "end_utc": "2026-10-03T13:15:13.815000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R13",
+      "run_id": "20261003T131528Z-mixed-workload-400rps-464926",
+      "script": "mixed-workload",
+      "configuration": {
+        "kind": "mixed",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 400,
+        "pre": 200,
+        "max": 800,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 72001,
+        "successful_requests": 72001,
+        "target_rps": 400,
+        "requests_per_scheduled_second": 400.00555555555553,
+        "completion_window_seconds": 179.999,
+        "completed_rps_including_drain": 400.0077778209879,
+        "successful_rps_including_drain": 400.0077778209879,
+        "latency_ms": {
+          "p(95)": 8.486329,
+          "p(99)": 15.820798,
+          "avg": 2.5818924958403584,
+          "min": 0.335515,
+          "med": 1.513875,
+          "max": 69.919971,
+          "p(90)": 4.99326
+        },
+        "client_wall_ms": {
+          "med": 2,
+          "max": 70,
+          "p(90)": 5,
+          "p(95)": 9,
+          "p(99)": 16,
+          "avg": 2.65639366119915,
+          "min": 0
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 26.428625,
+              "max": 31.835,
+              "min": 3.08,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 27106476.032,
+              "max": 29748101.12,
+              "min": 25564282.88,
+              "count": 40
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.876,
+              "max": 5.61,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 82928992.256,
+              "max": 88468357.12,
+              "min": 78852915.2,
+              "count": 40
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 14.676375,
+              "max": 18.27,
+              "min": 1.54,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 92776955.904,
+              "max": 96332677.12,
+              "min": 92442460.16,
+              "count": 40
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 9099044.4544,
+              "max": 10211033.088,
+              "min": 8462008.32,
+              "count": 40
+            }
+          },
+          "5393ade9b2238eef6c3972019ad854235e96557b73d75e5530e2e15b3f26e3d6": {
+            "name": "tramflow-k6-1791033329286481511",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 40.32725,
+              "max": 48.815,
+              "min": 3.575,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 175814737.92000002,
+              "max": 204472320.0,
+              "min": 149212364.8,
+              "count": 40
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 9.748,
+              "max": 11.98,
+              "min": 0.0,
+              "count": 40
+            },
+            "docker_working_set_bytes": {
+              "avg": 12857901.056,
+              "max": 13086228.48,
+              "min": 12761169.92,
+              "count": 40
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 126065049.6,
+              "max": 127087411.2,
+              "min": 125514547.2,
+              "count": 40
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 40,
+            "rss_bytes": {
+              "avg": 33661952.0,
+              "max": 35983360.0,
+              "min": 32292864.0,
+              "count": 40
+            },
+            "rss_first_bytes": 34471936.0,
+            "rss_last_bytes": 35729408.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.0022565018315018276,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T131528Z-mixed-workload-400rps-464926",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T131528Z-mixed-workload-400rps-464926",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "a7ce73c0dc782994a423d8060b76ca7a7450ed73b3d929e788d79daeb13e566e",
+        "k6-summary.json": "f5a8f2a82bbed36c729d53974913ff25d6f14c74d3488c091b9183e638ca3133",
+        "report.json": "c4149e020f406470b9679e6694ab8a2a47456183d85bf1d9b130831127721430",
+        "system.csv": "8be0154d9006363d9879224f06731247178d4edf1a65afe0c0c704f142dfe0d3"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "day": {
+          "requests": 43201,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(99)": 11.294425,
+            "avg": 2.3727812883729573,
+            "min": 1.161674,
+            "med": 1.573112,
+            "max": 47.687527,
+            "p(90)": 4.397607,
+            "p(95)": 6.230731
+          }
+        },
+        "scenario": {
+          "requests": 10800,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(99)": 11.59022641,
+            "avg": 2.4552983614814825,
+            "min": 1.198204,
+            "med": 1.6740425,
+            "max": 35.372124,
+            "p(90)": 4.3643651,
+            "p(95)": 6.207636149999996
+          }
+        },
+        "bootstrap": {
+          "requests": 3600,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 0.6901554999999999,
+            "max": 30.330263,
+            "p(90)": 2.294489899999997,
+            "p(95)": 4.04345295,
+            "p(99)": 10.89990214999998,
+            "avg": 1.2910489516666646,
+            "min": 0.534868
+          }
+        },
+        "week": {
+          "requests": 1440,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 4.201613838888886,
+            "min": 2.740158,
+            "med": 3.522437,
+            "max": 35.296857,
+            "p(90)": 6.307246900000006,
+            "p(95)": 7.727347799999998,
+            "p(99)": 14.10868056999998
+          }
+        },
+        "routes": {
+          "requests": 3600,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 3.4898474499999983,
+            "p(99)": 8.994679669999943,
+            "avg": 1.0263562266666668,
+            "min": 0.335515,
+            "med": 0.5087975,
+            "max": 35.040967,
+            "p(90)": 1.8371925999999998
+          }
+        },
+        "summary": {
+          "requests": 1440,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.7736992576388904,
+            "min": 0.926891,
+            "med": 1.2137674999999999,
+            "max": 29.625781,
+            "p(90)": 2.758672500000001,
+            "p(95)": 4.062767,
+            "p(99)": 9.35750818999999
+          }
+        },
+        "export": {
+          "requests": 2160,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 24.787696,
+            "p(90)": 2.9384739000000004,
+            "p(95)": 4.589685749999996,
+            "p(99)": 9.332875269999992,
+            "avg": 1.8251679208333393,
+            "min": 0.953728,
+            "med": 1.2423175
+          }
+        },
+        "month": {
+          "requests": 2160,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 21.06324579999998,
+            "p(99)": 28.03186647999997,
+            "avg": 14.729253525462944,
+            "min": 10.67594,
+            "med": 13.5968305,
+            "max": 69.919971,
+            "p(90)": 18.793430700000002
+          }
+        },
+        "geometry": {
+          "requests": 3600,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.158454173611112,
+            "min": 0.479735,
+            "med": 0.6435195,
+            "max": 40.610323,
+            "p(90)": 1.9267619999999992,
+            "p(95)": 3.6630252999999944,
+            "p(99)": 8.99050705999998
+          }
+        }
+      },
+      "requests": 72001,
+      "failed": 0,
+      "rps": 400.0077778209879,
+      "latency_ms": {
+        "p(95)": 8.486329,
+        "p(99)": 15.820798,
+        "avg": 2.5818924958403584,
+        "min": 0.335515,
+        "med": 1.513875,
+        "max": 69.919971,
+        "p(90)": 4.99326
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791033404701,
+      "end_ms": 1791033584700,
+      "start_utc": "2026-10-03T13:16:44.701000+00:00",
+      "end_utc": "2026-10-03T13:19:44.700000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R14",
+      "run_id": "20261003T132003Z-mixed-workload-500rps-361500",
+      "script": "mixed-workload",
+      "configuration": {
+        "kind": "mixed",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 500,
+        "pre": 250,
+        "max": 1000,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 90000,
+        "successful_requests": 90000,
+        "target_rps": 500,
+        "requests_per_scheduled_second": 500.0,
+        "completion_window_seconds": 179.996,
+        "completed_rps_including_drain": 500.0111113580302,
+        "successful_rps_including_drain": 500.0111113580302,
+        "latency_ms": {
+          "p(90)": 7.482417600000001,
+          "p(95)": 13.145956700000005,
+          "p(99)": 22.805155899999995,
+          "avg": 3.400782438488872,
+          "min": 0.330503,
+          "med": 1.7731210000000002,
+          "max": 119.251141
+        },
+        "client_wall_ms": {
+          "p(90)": 8,
+          "p(95)": 13,
+          "p(99)": 23,
+          "avg": 3.546822222222222,
+          "min": 0,
+          "med": 2,
+          "max": 120
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 9281349.474461539,
+              "max": 10653532.16,
+              "min": 8405385.216,
+              "count": 39
+            }
+          },
+          "5f51cf04c49c52d37ba14401dcff1ca1654cbc3e6714f00c5d9fd7d9352d401b": {
+            "name": "tramflow-k6-1791033603904352253",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 49.79282051282051,
+              "max": 62.92,
+              "min": 0.29,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 236671669.16923076,
+              "max": 269169459.2,
+              "min": 198600294.4,
+              "count": 39
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 34.48230769230769,
+              "max": 43.42,
+              "min": 8.0,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 27997248.065641027,
+              "max": 33271316.48,
+              "min": 26434600.96,
+              "count": 39
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 1.2712820512820513,
+              "max": 5.34,
+              "min": 0.0,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 83141859.90564102,
+              "max": 83770736.64,
+              "min": 81558241.28,
+              "count": 39
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 20.145897435897435,
+              "max": 28.37,
+              "min": 4.94,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 93934664.4676923,
+              "max": 101061754.88,
+              "min": 93512007.68,
+              "count": 39
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 128152119.13846155,
+              "max": 129394278.4,
+              "min": 127401984.0,
+              "count": 39
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 12.692820512820512,
+              "max": 15.87,
+              "min": 3.03,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 13007450.847179487,
+              "max": 13453230.08,
+              "min": 12897484.8,
+              "count": 39
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 39,
+            "rss_bytes": {
+              "avg": 34035764.51282051,
+              "max": 36511744.0,
+              "min": 32772096.0,
+              "count": 39
+            },
+            "rss_first_bytes": 35901440.0,
+            "rss_last_bytes": 34992128.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.0033189625360230493,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T132003Z-mixed-workload-500rps-361500",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T132003Z-mixed-workload-500rps-361500",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "4ec51627490ad6900bcc36511e85348e33c68096970bc8895764e7e1672d18e8",
+        "k6-summary.json": "911ed0cf196285cdf43cbe6a83a96487dd73e365f8efed8457953bc94a0fe446",
+        "report.json": "4fc2e67182959e094ced34a860ec78ebb6b61a8a4a72ee78dc763a89941c0f7a",
+        "system.csv": "7ada6b1e54d08a709f26dd773b442b2e4c76d8b5c742a4bd73e2c769f9fff508"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "day": {
+          "requests": 54000,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 1.120664,
+            "med": 1.8339305,
+            "max": 67.233952,
+            "p(90)": 6.261554299999999,
+            "p(95)": 9.250908749999999,
+            "p(99)": 20.93414995000001,
+            "avg": 3.135165406203725
+          }
+        },
+        "geometry": {
+          "requests": 4500,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 6.794265450000002,
+            "p(99)": 20.44554782000002,
+            "avg": 1.7611804120000005,
+            "min": 0.443587,
+            "med": 0.645899,
+            "max": 55.989287,
+            "p(90)": 3.1147212999999985
+          }
+        },
+        "month": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 25.48586884999999,
+            "p(99)": 37.31770938999981,
+            "avg": 16.581305445185237,
+            "min": 10.545035,
+            "med": 15.1183895,
+            "max": 119.251141,
+            "p(90)": 21.950367599999996
+          }
+        },
+        "routes": {
+          "requests": 4500,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 5.696610000000006,
+            "p(99)": 18.920270700000017,
+            "avg": 1.5903876026666695,
+            "min": 0.330503,
+            "med": 0.6588609999999999,
+            "max": 50.226604,
+            "p(90)": 2.7944679
+          }
+        },
+        "export": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 49.865592,
+            "p(90)": 5.791164899999998,
+            "p(95)": 10.024799349999997,
+            "p(99)": 22.668129969999956,
+            "avg": 2.8600855977777746,
+            "min": 0.973084,
+            "med": 1.370005
+          }
+        },
+        "summary": {
+          "requests": 1800,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 47.0904,
+            "p(90)": 3.521080800000003,
+            "p(95)": 6.285379,
+            "p(99)": 17.592183179999996,
+            "avg": 2.177612606111111,
+            "min": 0.943404,
+            "med": 1.2467165
+          }
+        },
+        "week": {
+          "requests": 1800,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 10.375526,
+            "p(99)": 22.12560624999999,
+            "avg": 4.841493707777772,
+            "min": 2.735839,
+            "med": 3.665446,
+            "max": 54.999207,
+            "p(90)": 7.251388500000001
+          }
+        },
+        "bootstrap": {
+          "requests": 4500,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 0.8099395,
+            "max": 58.619252,
+            "p(90)": 5.259360799999999,
+            "p(95)": 9.160606700000011,
+            "p(99)": 20.85968197000006,
+            "avg": 2.2273088515555615,
+            "min": 0.516176
+          }
+        },
+        "scenario": {
+          "requests": 13500,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 2.0450720000000002,
+            "max": 55.245845,
+            "p(90)": 6.8528635000000016,
+            "p(95)": 10.196700199999999,
+            "p(99)": 21.457914580000015,
+            "avg": 3.447436625925936,
+            "min": 1.237184
+          }
+        }
+      },
+      "requests": 90000,
+      "failed": 0,
+      "rps": 500.0111113580302,
+      "latency_ms": {
+        "p(90)": 7.482417600000001,
+        "p(95)": 13.145956700000005,
+        "p(99)": 22.805155899999995,
+        "avg": 3.400782438488872,
+        "min": 0.330503,
+        "med": 1.7731210000000002,
+        "max": 119.251141
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791033679288,
+      "end_ms": 1791033859284,
+      "start_utc": "2026-10-03T13:21:19.288000+00:00",
+      "end_utc": "2026-10-03T13:24:19.284000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R15",
+      "run_id": "20261003T132428Z-mixed-workload-600rps-789005",
+      "script": "mixed-workload",
+      "configuration": {
+        "kind": "mixed",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 600,
+        "pre": 300,
+        "max": 1200,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": false,
+        "exit_code": 99,
+        "requests": 108001,
+        "successful_requests": 107821,
+        "target_rps": 600,
+        "requests_per_scheduled_second": 600.0055555555556,
+        "completion_window_seconds": 179.998,
+        "completed_rps_including_drain": 600.0122223580262,
+        "successful_rps_including_drain": 599.0122112467917,
+        "latency_ms": {
+          "p(99)": 93.827615,
+          "avg": 10.197480806075744,
+          "min": 0.330152,
+          "med": 2.904877,
+          "max": 280.823241,
+          "p(90)": 27.348667,
+          "p(95)": 44.45904
+        },
+        "client_wall_ms": {
+          "avg": 10.283191822297942,
+          "min": 0,
+          "med": 3,
+          "max": 281,
+          "p(90)": 27,
+          "p(95)": 45,
+          "p(99)": 94
+        },
+        "business_error_rate": 0.0016666512347107898,
+        "dropped_iterations": 0,
+        "resources": {
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 16.92102564102564,
+              "max": 22.64,
+              "min": 0.0,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 13292179.561025642,
+              "max": 13946060.8,
+              "min": 13086228.48,
+              "count": 39
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 30.984871794871793,
+              "max": 46.235,
+              "min": 17.86,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 93666605.42358974,
+              "max": 94969528.32,
+              "min": 93543464.96,
+              "count": 39
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 1.2597435897435898,
+              "max": 6.59,
+              "min": 0.0,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 86666957.32512821,
+              "max": 88363499.52,
+              "min": 83414220.8,
+              "count": 39
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 46.83602564102564,
+              "max": 65.78,
+              "min": 25.205,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 28920263.81128205,
+              "max": 32547799.04,
+              "min": 26843545.6,
+              "count": 39
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 130921435.24102564,
+              "max": 131386572.8,
+              "min": 130128281.6,
+              "count": 39
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 9218354.25476923,
+              "max": 10240393.216,
+              "min": 8356102.144,
+              "count": 39
+            }
+          },
+          "d3aed76a8127154927ebbc01e94030484896890fae2f64e5075c185e41240c97": {
+            "name": "tramflow-k6-1791033869045262502",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 67.51923076923077,
+              "max": 92.075,
+              "min": 38.295,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 321861747.5282051,
+              "max": 371091046.4,
+              "min": 281332940.8,
+              "count": 39
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 39,
+            "rss_bytes": {
+              "avg": 35780975.58974359,
+              "max": 38031360.0,
+              "min": 33255424.0,
+              "count": 39
+            },
+            "rss_first_bytes": 35860480.0,
+            "rss_last_bytes": 36409344.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.004872527215947229,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T132428Z-mixed-workload-600rps-789005",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T132428Z-mixed-workload-600rps-789005",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "08aa3bcdf2658e7fed36709caa49bc87cfc8fccb9170f76f35bc14adb31c0697",
+        "k6-summary.json": "e4736ea9c5d93fdb3234fa62e45142b3859fded6c3d2d4b7c6b5fe91f07665fd",
+        "report.json": "d7806b345d765d18d615038866d109ae8ff2b95a185dabe705eb0b5780b239a8",
+        "system.csv": "6b6b421f75f14e21a4ed05a96616f088fcfb61195d272ade067b9f6a0d5394ad"
+      },
+      "failed_thresholds": [
+        {
+          "metric": "business_failures{phase:measurement}",
+          "threshold": "rate<0.001"
+        },
+        {
+          "metric": "business_failures{phase:measurement,endpoint:day}",
+          "threshold": "rate<0.001"
+        },
+        {
+          "metric": "business_failures{phase:measurement,endpoint:week}",
+          "threshold": "rate<0.001"
+        },
+        {
+          "metric": "business_failures{phase:measurement,endpoint:scenario}",
+          "threshold": "rate<0.001"
+        },
+        {
+          "metric": "business_failures{phase:measurement,endpoint:export}",
+          "threshold": "rate<0.001"
+        },
+        {
+          "metric": "business_failures{phase:measurement,endpoint:month}",
+          "threshold": "rate<0.001"
+        },
+        {
+          "metric": "business_failures{phase:measurement,endpoint:summary}",
+          "threshold": "rate<0.001"
+        },
+        {
+          "metric": "business_failures{phase:measurement,endpoint:geometry}",
+          "threshold": "rate<0.001"
+        },
+        {
+          "metric": "checks{phase:measurement}",
+          "threshold": "rate>0.999"
+        },
+        {
+          "metric": "business_failures{phase:measurement,endpoint:routes}",
+          "threshold": "rate<0.001"
+        },
+        {
+          "metric": "business_failures{phase:measurement,endpoint:bootstrap}",
+          "threshold": "rate<0.001"
+        }
+      ],
+      "endpoints": {
+        "export": {
+          "requests": 3240,
+          "failed": 6,
+          "error_rate": 0.001851851851851852,
+          "latency_ms": {
+            "avg": 10.35882117129632,
+            "min": 0.989737,
+            "med": 3.1184025,
+            "max": 175.059242,
+            "p(90)": 26.806910099999996,
+            "p(95)": 43.67377579999998,
+            "p(99)": 98.51534231000026
+          }
+        },
+        "week": {
+          "requests": 2160,
+          "failed": 4,
+          "error_rate": 0.001851851851851852,
+          "latency_ms": {
+            "min": 2.783059,
+            "med": 5.0611975000000005,
+            "max": 187.760992,
+            "p(90)": 30.452857300000005,
+            "p(95)": 48.58644739999998,
+            "p(99)": 104.1865604499998,
+            "avg": 12.359633571296282
+          }
+        },
+        "bootstrap": {
+          "requests": 5400,
+          "failed": 6,
+          "error_rate": 0.0011111111111111111,
+          "latency_ms": {
+            "p(95)": 43.363356200000005,
+            "p(99)": 93.85394414000014,
+            "avg": 9.485070245370387,
+            "min": 0.525857,
+            "med": 2.5909655000000003,
+            "max": 204.251085,
+            "p(90)": 26.452269100000006
+          }
+        },
+        "geometry": {
+          "requests": 5400,
+          "failed": 6,
+          "error_rate": 0.0011111111111111111,
+          "latency_ms": {
+            "p(90)": 26.04410920000004,
+            "p(95)": 43.93198250000012,
+            "p(99)": 90.98441792000007,
+            "avg": 8.586696245740729,
+            "min": 0.474689,
+            "med": 1.251806,
+            "max": 180.713206
+          }
+        },
+        "routes": {
+          "requests": 5400,
+          "failed": 11,
+          "error_rate": 0.002037037037037037,
+          "latency_ms": {
+            "avg": 7.653241324444476,
+            "min": 0.330152,
+            "med": 1.050322,
+            "max": 234.959628,
+            "p(90)": 24.411464300000013,
+            "p(95)": 39.28531445000003,
+            "p(99)": 76.6548194900001
+          }
+        },
+        "scenario": {
+          "requests": 16200,
+          "failed": 23,
+          "error_rate": 0.001419753086419753,
+          "latency_ms": {
+            "med": 3.296101,
+            "max": 261.384086,
+            "p(90)": 26.7397752,
+            "p(95)": 44.06596084999997,
+            "p(99)": 94.61283390000001,
+            "avg": 10.220563674814816,
+            "min": 1.253116
+          }
+        },
+        "day": {
+          "requests": 64801,
+          "failed": 115,
+          "error_rate": 0.0017746639712350118,
+          "latency_ms": {
+            "p(90)": 26.602566,
+            "p(95)": 43.325661,
+            "p(99)": 93.431039,
+            "avg": 9.777568397632749,
+            "min": 1.079773,
+            "med": 2.770549,
+            "max": 266.40276
+          }
+        },
+        "month": {
+          "requests": 3240,
+          "failed": 6,
+          "error_rate": 0.001851851851851852,
+          "latency_ms": {
+            "min": 11.272252,
+            "med": 19.1682865,
+            "max": 280.823241,
+            "p(90)": 45.03067659999999,
+            "p(95)": 65.59983394999999,
+            "p(99)": 114.10264389000014,
+            "avg": 25.88739258518526
+          }
+        },
+        "summary": {
+          "requests": 2160,
+          "failed": 3,
+          "error_rate": 0.001388888888888889,
+          "latency_ms": {
+            "p(90)": 26.2429493,
+            "p(95)": 42.63706924999989,
+            "p(99)": 89.87712249999996,
+            "avg": 8.85148147268517,
+            "min": 0.986995,
+            "med": 1.965456,
+            "max": 175.432203
+          }
+        }
+      },
+      "requests": 108001,
+      "failed": 180,
+      "rps": 599.0122112467917,
+      "latency_ms": {
+        "p(99)": 93.827615,
+        "avg": 10.197480806075744,
+        "min": 0.330152,
+        "med": 2.904877,
+        "max": 280.823241,
+        "p(90)": 27.348667,
+        "p(95)": 44.45904
+      },
+      "passed": false,
+      "replicas": 1,
+      "start_ms": 1791033944470,
+      "end_ms": 1791034124468,
+      "start_utc": "2026-10-03T13:25:44.470000+00:00",
+      "end_utc": "2026-10-03T13:28:44.468000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R16",
+      "run_id": "20261003T134555Z-mixed-workload-300rps-385818",
+      "script": "mixed-workload",
+      "configuration": {
+        "kind": "mixed",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 300,
+        "pre": 150,
+        "max": 600,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 54001,
+        "successful_requests": 54001,
+        "target_rps": 300,
+        "requests_per_scheduled_second": 300.00555555555553,
+        "completion_window_seconds": 180.002,
+        "completed_rps_including_drain": 300.0022221975311,
+        "successful_rps_including_drain": 300.0022221975311,
+        "latency_ms": {
+          "med": 1.553111,
+          "max": 57.972436,
+          "p(90)": 4.114239,
+          "p(95)": 6.842368,
+          "p(99)": 15.239647,
+          "avg": 2.4080772769948537,
+          "min": 0.349368
+        },
+        "client_wall_ms": {
+          "p(90)": 4,
+          "p(95)": 7,
+          "p(99)": 15,
+          "avg": 2.4766393214940465,
+          "min": 0,
+          "med": 2,
+          "max": 58
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 12.435256410256411,
+              "max": 15.795,
+              "min": 10.305,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 97494445.5548718,
+              "max": 98901688.32,
+              "min": 97391738.88,
+              "count": 39
+            }
+          },
+          "13a81df19a3fcccacb868e3ba6f631311a52fba5bd2322e2f4d29a5108de5b58": {
+            "name": "tramflow-k6-1791035155859493615",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 31.247435897435896,
+              "max": 41.37,
+              "min": 6.12,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 127041704.04102564,
+              "max": 151204659.2,
+              "min": 113560780.8,
+              "count": 39
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 21.07846153846154,
+              "max": 24.345,
+              "min": 19.24,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 26901889.444102563,
+              "max": 28017950.72,
+              "min": 26067599.36,
+              "count": 39
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 0.3984615384615385,
+              "max": 4.39,
+              "min": 0.0,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 100086041.46871795,
+              "max": 103861452.8,
+              "min": 96175390.72,
+              "count": 39
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 134655978.9948718,
+              "max": 134846873.6,
+              "min": 134532300.8,
+              "count": 39
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 9193672.388923077,
+              "max": 10737418.24,
+              "min": 8462008.32,
+              "count": 39
+            }
+          },
+          "be6d3309dc9616910c35d6aa3abbd5a51c7018169c2b02be2646b9acf349018b": {
+            "name": "tramflow-api-2",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 0.3880769230769231,
+              "max": 1.47,
+              "min": 0.0,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 38463380.87384615,
+              "max": 40233861.12,
+              "min": 38388367.36,
+              "count": 39
+            }
+          },
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 7.770769230769231,
+              "max": 9.06,
+              "min": 7.13,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 12775150.933333334,
+              "max": 13295943.68,
+              "min": 12645826.56,
+              "count": 39
+            }
+          }
+        },
+        "runtime_samples": {
+          "be6d3309dc9616910c35d6aa3abbd5a51c7018169c2b02be2646b9acf349018b": {
+            "sample_count": 39,
+            "rss_bytes": {
+              "avg": 43898407.384615384,
+              "max": 43905024.0,
+              "min": 43888640.0,
+              "count": 39
+            },
+            "rss_first_bytes": 43888640.0,
+            "rss_last_bytes": 43905024.0,
+            "cache_cell_hit_ratio": null,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": null,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 39,
+            "rss_bytes": {
+              "avg": 33731715.28205128,
+              "max": 35934208.0,
+              "min": 32419840.0,
+              "count": 39
+            },
+            "rss_first_bytes": 34893824.0,
+            "rss_last_bytes": 33538048.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.0015576706003078472,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T134555Z-mixed-workload-300rps-385818",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T134555Z-mixed-workload-300rps-385818",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "1ec3c3e5575a4713f3fbe7a4a0595b0a4c37e80c2621edbbf30fa6bcc0a89e4b",
+        "k6-summary.json": "4d19657cf6c7d57f600ad9448b6cc9c14c48f2a1209470165cb17a7858895cb0",
+        "report.json": "c2a660c426cfaafdfc2c71e944f4ff85e83bd898297b88230a1ede4c9e3364ba",
+        "system.csv": "b15dc984c632341de798eae61ac33051067a6a74ac1154331ed9db93c2ddb91e"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "geometry": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 2.521228749999997,
+            "p(99)": 5.979137499999965,
+            "avg": 0.986842917777778,
+            "min": 0.486838,
+            "med": 0.6775705000000001,
+            "max": 20.06174,
+            "p(90)": 1.4527379
+          }
+        },
+        "scenario": {
+          "requests": 8100,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(99)": 9.06687133000001,
+            "avg": 2.1598454004938237,
+            "min": 1.270417,
+            "med": 1.6094615,
+            "max": 35.517317,
+            "p(90)": 3.4440942,
+            "p(95)": 4.91802325
+          }
+        },
+        "week": {
+          "requests": 1080,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 2.808897,
+            "med": 3.5856640000000004,
+            "max": 31.177696,
+            "p(90)": 5.466991600000001,
+            "p(95)": 6.71008155,
+            "p(99)": 9.685564560000008,
+            "avg": 4.04968568981481
+          }
+        },
+        "day": {
+          "requests": 32401,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 2.1244528616092078,
+            "min": 1.152708,
+            "med": 1.586699,
+            "max": 30.339164,
+            "p(90)": 3.434371,
+            "p(95)": 4.748955,
+            "p(99)": 8.904046
+          }
+        },
+        "export": {
+          "requests": 1620,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.7198792975308612,
+            "min": 0.995124,
+            "med": 1.3131085,
+            "max": 19.233683,
+            "p(90)": 2.616752300000001,
+            "p(95)": 3.75024985,
+            "p(99)": 7.03832283
+          }
+        },
+        "bootstrap": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 5.5688454,
+            "p(99)": 9.347682909999998,
+            "avg": 1.6217998874074087,
+            "min": 0.538793,
+            "med": 0.785192,
+            "max": 23.612554,
+            "p(90)": 4.267659399999999
+          }
+        },
+        "routes": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(95)": 5.0043766999999955,
+            "p(99)": 8.801786179999977,
+            "avg": 1.3940198540740734,
+            "min": 0.349368,
+            "med": 0.57636,
+            "max": 25.746505,
+            "p(90)": 3.8390129
+          }
+        },
+        "summary": {
+          "requests": 1080,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 14.829671,
+            "p(90)": 2.475493,
+            "p(95)": 3.8179875,
+            "p(99)": 6.1088675100000005,
+            "avg": 1.6587532898148123,
+            "min": 0.989822,
+            "med": 1.2716875
+          }
+        },
+        "month": {
+          "requests": 1620,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 13.7982365,
+            "max": 57.972436,
+            "p(90)": 18.498928100000004,
+            "p(95)": 20.80908865,
+            "p(99)": 30.11630692999997,
+            "avg": 14.784523692592597,
+            "min": 10.804446
+          }
+        }
+      },
+      "requests": 54001,
+      "failed": 0,
+      "rps": 300.0022221975311,
+      "latency_ms": {
+        "med": 1.553111,
+        "max": 57.972436,
+        "p(90)": 4.114239,
+        "p(95)": 6.842368,
+        "p(99)": 15.239647,
+        "avg": 2.4080772769948537,
+        "min": 0.349368
+      },
+      "passed": true,
+      "replicas": 2,
+      "start_ms": 1791035231281,
+      "end_ms": 1791035411283,
+      "start_utc": "2026-10-03T13:47:11.281000+00:00",
+      "end_utc": "2026-10-03T13:50:11.283000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R17",
+      "run_id": "20261003T135019Z-mixed-workload-500rps-665159",
+      "script": "mixed-workload",
+      "configuration": {
+        "kind": "mixed",
+        "warmup": "1m",
+        "duration": "3m",
+        "rate": 500,
+        "pre": 250,
+        "max": 1000,
+        "warmSeconds": 60
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 90000,
+        "successful_requests": 90000,
+        "target_rps": 500,
+        "requests_per_scheduled_second": 500.0,
+        "completion_window_seconds": 179.998,
+        "completed_rps_including_drain": 500.00555561728464,
+        "successful_rps_including_drain": 500.00555561728464,
+        "latency_ms": {
+          "avg": 4.220328419122186,
+          "min": 0.332388,
+          "med": 1.9781460000000002,
+          "max": 149.056113,
+          "p(90)": 9.581962300000013,
+          "p(95)": 15.734673450000015,
+          "p(99)": 33.47453016
+        },
+        "client_wall_ms": {
+          "p(90)": 10,
+          "p(95)": 16,
+          "p(99)": 34,
+          "avg": 4.370733333333333,
+          "min": 0,
+          "med": 2,
+          "max": 149
+        },
+        "business_error_rate": 0,
+        "dropped_iterations": 0,
+        "resources": {
+          "6b39db7d8ef60cd55a87e24f7d100cab4e7f9867f769ac6be8de8282f6b295bf": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 13.402564102564103,
+              "max": 18.99,
+              "min": 11.87,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 13081657.764102563,
+              "max": 13820231.68,
+              "min": 12907970.56,
+              "count": 39
+            }
+          },
+          "be6d3309dc9616910c35d6aa3abbd5a51c7018169c2b02be2646b9acf349018b": {
+            "name": "tramflow-api-2",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 0.485,
+              "max": 1.48,
+              "min": 0.0,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 38410145.47692308,
+              "max": 40464547.84,
+              "min": 36962304.0,
+              "count": 39
+            }
+          },
+          "7d6df776a530d1ccd639209886ecadfa705936944327a0d47ede2f9057381d09": {
+            "name": "tramflow-k6-1791035420257472752",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 53.3701282051282,
+              "max": 72.025,
+              "min": 46.225,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 240640126.03076923,
+              "max": 298319872.0,
+              "min": 208037478.4,
+              "count": 39
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 1.1566666666666667,
+              "max": 6.51,
+              "min": 0.0,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 95853827.41333333,
+              "max": 95976161.28,
+              "min": 94633984.0,
+              "count": 39
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 21.34923076923077,
+              "max": 31.375,
+              "min": 5.28,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 97741801.9446154,
+              "max": 103829995.52,
+              "min": 97444167.68,
+              "count": 39
+            }
+          },
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "name": "tramflow-api-1",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 36.78474358974359,
+              "max": 51.26,
+              "min": 32.27,
+              "count": 39
+            },
+            "docker_working_set_bytes": {
+              "avg": 28020101.645128205,
+              "max": 30628904.96,
+              "min": 26287800.32,
+              "count": 39
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 9511041.391589744,
+              "max": 10936647.68,
+              "min": 8614051.84,
+              "count": 39
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 135150691.774359,
+              "max": 136000307.2,
+              "min": 134846873.6,
+              "count": 39
+            }
+          }
+        },
+        "runtime_samples": {
+          "fe353c56861a2289d4dbce9b2f24515a4ba9287d5c5894ee02a97a80c94ca334": {
+            "sample_count": 39,
+            "rss_bytes": {
+              "avg": 34553435.897435896,
+              "max": 37572608.0,
+              "min": 33083392.0,
+              "count": 39
+            },
+            "rss_first_bytes": 35188736.0,
+            "rss_last_bytes": 37572608.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.003857258421285472,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          },
+          "be6d3309dc9616910c35d6aa3abbd5a51c7018169c2b02be2646b9acf349018b": {
+            "sample_count": 39,
+            "rss_bytes": {
+              "avg": 43944828.71794872,
+              "max": 44228608.0,
+              "min": 43905024.0,
+              "count": 39
+            },
+            "rss_first_bytes": 43905024.0,
+            "rss_last_bytes": 44228608.0,
+            "cache_cell_hit_ratio": null,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": null,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T135019Z-mixed-workload-500rps-665159",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T135019Z-mixed-workload-500rps-665159",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "7c8338cad064156eae1e29c323d1349e882ee04cc76d2f38823f0f65b1de0b41",
+      "source_files": {
+        "benchmark.md": "4399e0ba8ee821171d639046dbf3f46e8d4652c02a06469c96e58af9367fefe6",
+        "k6-summary.json": "8dfe53cd44d767f6077f744900efeaab602638dde56d73234cd8d0a7878e5d2f",
+        "report.json": "b58b20dbf0583f31c71e462e43b45dd97b855f2632f71fb0b15f8337fa9885f2",
+        "system.csv": "9c1291a042ae546e58ec719e0d9a293a6ee2a76699967531e5f22909dd6ca926"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "week": {
+          "requests": 1800,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 5.844377828888897,
+            "min": 2.753837,
+            "med": 3.890471,
+            "max": 103.535179,
+            "p(90)": 8.892272900000007,
+            "p(95)": 14.734622499999997,
+            "p(99)": 38.693956629999995
+          }
+        },
+        "geometry": {
+          "requests": 4500,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 0.446046,
+            "med": 0.7244675,
+            "max": 128.44185,
+            "p(90)": 4.709243699999999,
+            "p(95)": 9.971862900000003,
+            "p(99)": 31.552860620000015,
+            "avg": 2.5045432071111025
+          }
+        },
+        "routes": {
+          "requests": 4500,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 0.7375075,
+            "max": 122.531948,
+            "p(90)": 4.3933583,
+            "p(95)": 10.811638800000036,
+            "p(99)": 30.72637427000013,
+            "avg": 2.352705522222221,
+            "min": 0.332388
+          }
+        },
+        "day": {
+          "requests": 54000,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(90)": 7.647189999999998,
+            "p(95)": 12.52378874999999,
+            "p(99)": 32.04682436000004,
+            "avg": 3.9372225292407275,
+            "min": 1.138553,
+            "med": 2.029701,
+            "max": 130.413512
+          }
+        },
+        "scenario": {
+          "requests": 13500,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 1.239228,
+            "med": 2.2536915,
+            "max": 114.946794,
+            "p(90)": 8.430380600000001,
+            "p(95)": 13.180349899999984,
+            "p(99)": 32.50094275000001,
+            "avg": 4.243361005259267
+          }
+        },
+        "month": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "med": 15.6670075,
+            "max": 149.056113,
+            "p(90)": 24.107264699999998,
+            "p(95)": 29.052516099999995,
+            "p(99)": 51.94755409999967,
+            "avg": 17.767659598888912,
+            "min": 10.654492
+          }
+        },
+        "export": {
+          "requests": 2700,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 3.7722634737037017,
+            "min": 1.004465,
+            "med": 1.548032,
+            "max": 110.848204,
+            "p(90)": 7.953351099999996,
+            "p(95)": 15.032198049999996,
+            "p(99)": 35.91266115999994
+          }
+        },
+        "summary": {
+          "requests": 1800,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 0.95012,
+            "med": 1.3805525,
+            "max": 113.653803,
+            "p(90)": 5.308912400000018,
+            "p(95)": 9.350841549999995,
+            "p(99)": 36.19408590999999,
+            "avg": 3.1357797811111157
+          }
+        },
+        "bootstrap": {
+          "requests": 4500,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 127.309434,
+            "p(90)": 6.9948248,
+            "p(95)": 12.737890200000011,
+            "p(99)": 32.626784650000005,
+            "avg": 3.0565493988888828,
+            "min": 0.521216,
+            "med": 0.9605435
+          }
+        }
+      },
+      "requests": 90000,
+      "failed": 0,
+      "rps": 500.00555561728464,
+      "latency_ms": {
+        "avg": 4.220328419122186,
+        "min": 0.332388,
+        "med": 1.9781460000000002,
+        "max": 149.056113,
+        "p(90)": 9.581962300000013,
+        "p(95)": 15.734673450000015,
+        "p(99)": 33.47453016
+      },
+      "passed": true,
+      "replicas": 2,
+      "start_ms": 1791035495668,
+      "end_ms": 1791035675666,
+      "start_utc": "2026-10-03T13:51:35.668000+00:00",
+      "end_utc": "2026-10-03T13:54:35.666000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      }
+    },
+    {
+      "id": "R18",
+      "run_id": "20261003T140829Z-mixed-workload-400rps-208599",
+      "script": "mixed-workload",
+      "configuration": {
+        "kind": "mixed",
+        "warmup": "2m",
+        "duration": "45m",
+        "rate": 400,
+        "pre": 200,
+        "max": 800,
+        "warmSeconds": 120
+      },
+      "report": {
+        "format": "tramflow-report-v2",
+        "http_slo_passed": true,
+        "exit_code": 0,
+        "requests": 1080001,
+        "successful_requests": 1080000,
+        "target_rps": 400,
+        "requests_per_scheduled_second": 400.0003703703704,
+        "completion_window_seconds": 2700.001,
+        "completed_rps_including_drain": 400.0002222221399,
+        "successful_rps_including_drain": 399.99985185190667,
+        "latency_ms": {
+          "med": 1.40468,
+          "max": 120.317698,
+          "p(90)": 4.512394,
+          "p(95)": 9.153687,
+          "p(99)": 16.980589,
+          "avg": 2.4509255183236704,
+          "min": 0.31089
+        },
+        "client_wall_ms": {
+          "avg": 2.528064325866365,
+          "min": 0,
+          "med": 2,
+          "max": 120,
+          "p(90)": 5,
+          "p(95)": 9,
+          "p(99)": 17
+        },
+        "business_error_rate": 9.259250685878995e-07,
+        "dropped_iterations": 0,
+        "resources": {
+          "d50d1ac3d228e6d84751f75c32c61c446b3edba370042804d50d908676d44b6c": {
+            "name": "tramflow-api-3",
+            "service": "api",
+            "cpu_quota_percent": {
+              "avg": 25.971044142614602,
+              "max": 39.15,
+              "min": 0.0,
+              "count": 589
+            },
+            "docker_working_set_bytes": {
+              "avg": 39415740.40556876,
+              "max": 42519756.8,
+              "min": 36008099.84,
+              "count": 589
+            }
+          },
+          "81e708532e1da40deb71e1fcad1a6d934d3516d4974f5edb487fdf8525b433c3": {
+            "name": "tramflow-gateway-1",
+            "service": "gateway",
+            "cpu_quota_percent": {
+              "avg": 9.601918505942274,
+              "max": 14.22,
+              "min": 0.0,
+              "count": 589
+            },
+            "docker_working_set_bytes": {
+              "avg": 12357334.640135823,
+              "max": 13054771.2,
+              "min": 12152995.84,
+              "count": 589
+            }
+          },
+          "5d647426da8cb1eec58a36324cbda9dad4e0ec506df9bcad2a7079692ceb7700": {
+            "name": "tramflow-postgres-exporter-1",
+            "service": "postgres-exporter",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 10247628.212373514,
+              "max": 11806965.76,
+              "min": 8691646.464,
+              "count": 589
+            }
+          },
+          "362dc5399fac20d1b4324e619ac0b3c1635e5f5bcc27a46af184a1629435e9cd": {
+            "name": "tramflow-db-1",
+            "service": "db",
+            "cpu_quota_percent": {
+              "avg": 15.223251273344651,
+              "max": 23.385,
+              "min": 0.0,
+              "count": 589
+            },
+            "docker_working_set_bytes": {
+              "avg": 91140783.9054669,
+              "max": 95441387.52,
+              "min": 83655393.28,
+              "count": 589
+            }
+          },
+          "ede54152f5a5c1465e2a44c7733ce0730459eff4146802817af8d56228588e6d": {
+            "name": "tramflow-grafana-1",
+            "service": "grafana",
+            "cpu_quota_percent": {},
+            "docker_working_set_bytes": {
+              "avg": 132698093.91918506,
+              "max": 141767475.2,
+              "min": 126248550.4,
+              "count": 589
+            }
+          },
+          "f971e0e95ca2f95e81251365b66e044f3c0d40a2b06a211b8c681f0c8c601df8": {
+            "name": "tramflow-prometheus-1",
+            "service": "prometheus",
+            "cpu_quota_percent": {
+              "avg": 1.1955008488964347,
+              "max": 11.68,
+              "min": 0.0,
+              "count": 589
+            },
+            "docker_working_set_bytes": {
+              "avg": 95693099.16794567,
+              "max": 112931635.2,
+              "min": 88069898.24,
+              "count": 589
+            }
+          },
+          "e9d37c3ce16acc4ea77d87c0f55eb8d3fd4f767bbd59d43c4668c0285ed34041": {
+            "name": "tramflow-k6-1791036511239634299",
+            "service": "load-generator",
+            "cpu_quota_percent": {
+              "avg": 35.83522071307301,
+              "max": 70.34,
+              "min": 0.155,
+              "count": 589
+            },
+            "docker_working_set_bytes": {
+              "avg": 463445668.2920204,
+              "max": 820720435.2,
+              "min": 157810688.0,
+              "count": 589
+            }
+          }
+        },
+        "runtime_samples": {
+          "d50d1ac3d228e6d84751f75c32c61c446b3edba370042804d50d908676d44b6c": {
+            "sample_count": 589,
+            "rss_bytes": {
+              "avg": 50521990.30220713,
+              "max": 54075392.0,
+              "min": 30892032.0,
+              "count": 589
+            },
+            "rss_first_bytes": 50343936.0,
+            "rss_last_bytes": 32100352.0,
+            "cache_cell_hit_ratio": 1.0,
+            "onnx_inference_p95_estimate_seconds": null,
+            "storage_operation_p95_estimate_seconds": 0.0016751070500542783,
+            "max_process_swap_bytes": 0.0,
+            "max_cgroup_swap_bytes": 0.0,
+            "swap_observed": true
+          }
+        },
+        "observability": {
+          "grafana_dashboard": "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability?var-testid=20261003T140829Z-mixed-workload-400rps-208599",
+          "prometheus": "http://localhost:9091",
+          "testid": "20261003T140829Z-mixed-workload-400rps-208599",
+          "k6_remote_write": true
+        },
+        "resource_verdict": "REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."
+      },
+      "functional": false,
+      "source_sha256": "85a065a438b221dcc5152db2d2c7fdc5431954ae094f24a5915a5ca8b30412b8",
+      "source_files": {
+        "benchmark.md": "515a38b16274691c5a53f1e9b05068a974817ae726647c1f04018d17581ce601",
+        "k6-summary.json": "45ced11c44ed81a7feca7ecde727488342eb00f3f3014f812f87f0218ce36053",
+        "report.json": "e200e23375731a6f31965eaa44da12557bf717005fccec5bacb44c96b63bab1f",
+        "system.csv": "c3bb7355bd9f3654f6bad2dcc8a45510763cd13ece7de196c3d55fca21165c21"
+      },
+      "failed_thresholds": [],
+      "endpoints": {
+        "routes": {
+          "requests": 54000,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 69.339643,
+            "p(90)": 1.3889155,
+            "p(95)": 2.9097256999999983,
+            "p(99)": 13.457994640000043,
+            "avg": 1.0442280020555772,
+            "min": 0.31089,
+            "med": 0.4890045
+          }
+        },
+        "month": {
+          "requests": 32400,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 10.404599,
+            "med": 13.096837,
+            "max": 112.858177,
+            "p(90)": 17.913830100000002,
+            "p(95)": 20.500933599999996,
+            "p(99)": 29.851866889999922,
+            "avg": 14.174391184506192
+          }
+        },
+        "export": {
+          "requests": 32400,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "min": 0.942513,
+            "med": 1.171392,
+            "max": 98.966896,
+            "p(90)": 2.3057198000000017,
+            "p(95)": 4.511139699999998,
+            "p(99)": 18.23016587999995,
+            "avg": 1.8885156283641906
+          }
+        },
+        "week": {
+          "requests": 21600,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 85.075222,
+            "p(90)": 5.179954500000001,
+            "p(95)": 7.052708999999995,
+            "p(99)": 15.27118972999981,
+            "avg": 3.9488362746759367,
+            "min": 2.704664,
+            "med": 3.3262425
+          }
+        },
+        "scenario": {
+          "requests": 162000,
+          "failed": 1,
+          "error_rate": 6.172839506172839e-06,
+          "latency_ms": {
+            "avg": 2.283249774382682,
+            "min": 0.881869,
+            "med": 1.5074990000000001,
+            "max": 95.30122,
+            "p(90)": 3.4618444000000004,
+            "p(95)": 5.5907822499999975,
+            "p(99)": 13.511662770000012
+          }
+        },
+        "bootstrap": {
+          "requests": 54000,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.302671247574077,
+            "min": 0.506141,
+            "med": 0.6576005,
+            "max": 85.4098,
+            "p(90)": 1.8519553999999998,
+            "p(95)": 4.36695065,
+            "p(99)": 14.490206660000014
+          }
+        },
+        "geometry": {
+          "requests": 54000,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "max": 92.714648,
+            "p(90)": 1.1712045,
+            "p(95)": 2.3962837499999865,
+            "p(99)": 11.65724037000006,
+            "avg": 1.0319374319814825,
+            "min": 0.456254,
+            "med": 0.583961
+          }
+        },
+        "day": {
+          "requests": 648001,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "p(90)": 3.92868,
+            "p(95)": 6.029787,
+            "p(99)": 13.383262,
+            "avg": 2.2460895687923514,
+            "min": 1.1073,
+            "med": 1.42988,
+            "max": 120.317698
+          }
+        },
+        "summary": {
+          "requests": 21600,
+          "failed": 0,
+          "error_rate": 0,
+          "latency_ms": {
+            "avg": 1.5489368296759285,
+            "min": 0.913596,
+            "med": 1.093991,
+            "max": 57.034968,
+            "p(90)": 1.9038361000000004,
+            "p(95)": 3.183727949999998,
+            "p(99)": 10.718665289999993
+          }
+        }
+      },
+      "requests": 1080001,
+      "failed": 1,
+      "rps": 399.99985185190667,
+      "latency_ms": {
+        "med": 1.40468,
+        "max": 120.317698,
+        "p(90)": 4.512394,
+        "p(95)": 9.153687,
+        "p(99)": 16.980589,
+        "avg": 2.4509255183236704,
+        "min": 0.31089
+      },
+      "passed": true,
+      "replicas": 1,
+      "start_ms": 1791036646671,
+      "end_ms": 1791039346672,
+      "start_utc": "2026-10-03T14:10:46.671000+00:00",
+      "end_utc": "2026-10-03T14:55:46.672000+00:00",
+      "limits": {
+        "api": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "db": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 1073741824.0
+        },
+        "gateway": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "grafana": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 402653184.0
+        },
+        "load-generator": {
+          "cpu_limit_cores": 2.0,
+          "memory_limit_bytes": 2147483648.0
+        },
+        "postgres-exporter": {
+          "cpu_limit_cores": 0.0,
+          "memory_limit_bytes": 134217728.0
+        },
+        "prometheus": {
+          "cpu_limit_cores": 1.0,
+          "memory_limit_bytes": 536870912.0
+        }
+      },
+      "time_series_summary": {
+        "api": {
+          "samples": 589,
+          "first_memory_mib": 38.01,
+          "last_memory_mib": 35.93,
+          "peak_memory_mib": 40.55,
+          "cpu_quota_mean_pct": 25.971044142614602,
+          "cpu_docker_mean_pct": 51.942088285229204,
+          "first5_memory_mean_mib": 37.05000000000001,
+          "last5_memory_mean_mib": 37.49153846153847,
+          "first5_cpu_quota_mean_pct": 26.238712121212117,
+          "last5_cpu_quota_mean_pct": 28.27730769230769
+        },
+        "load-generator": {
+          "samples": 589,
+          "first_memory_mib": 150.5,
+          "last_memory_mib": 733.6,
+          "peak_memory_mib": 782.7,
+          "cpu_quota_mean_pct": 35.83522071307301,
+          "cpu_docker_mean_pct": 71.67044142614601,
+          "first5_memory_mean_mib": 189.7621212121212,
+          "last5_memory_mean_mib": 696.2769230769229,
+          "first5_cpu_quota_mean_pct": 37.922272727272734,
+          "last5_cpu_quota_mean_pct": 39.892615384615375
+        },
+        "db": {
+          "samples": 589,
+          "first_memory_mib": 87.01,
+          "last_memory_mib": 79.84,
+          "peak_memory_mib": 91.02,
+          "cpu_quota_mean_pct": 15.22325127334465,
+          "cpu_docker_mean_pct": 30.4465025466893,
+          "first5_memory_mean_mib": 87.04757575757577,
+          "last5_memory_mean_mib": 85.27107692307693,
+          "first5_cpu_quota_mean_pct": 15.155984848484849,
+          "last5_cpu_quota_mean_pct": 17.044769230769234
+        },
+        "gateway": {
+          "samples": 589,
+          "first_memory_mib": 11.66,
+          "last_memory_mib": 12.23,
+          "peak_memory_mib": 12.45,
+          "cpu_quota_mean_pct": 9.601918505942276,
+          "cpu_docker_mean_pct": 9.601918505942276,
+          "first5_memory_mean_mib": 11.707121212121212,
+          "last5_memory_mean_mib": 11.840923076923078,
+          "first5_cpu_quota_mean_pct": 9.777727272727274,
+          "last5_cpu_quota_mean_pct": 10.385076923076923
+        },
+        "prometheus": {
+          "samples": 589,
+          "first_memory_mib": 91.99,
+          "last_memory_mib": 91.36,
+          "peak_memory_mib": 107.7,
+          "cpu_quota_mean_pct": 1.1955008488964345,
+          "cpu_docker_mean_pct": 1.1955008488964345,
+          "first5_memory_mean_mib": 88.66712121212122,
+          "last5_memory_mean_mib": 93.6013846153846,
+          "first5_cpu_quota_mean_pct": 1.0112121212121215,
+          "last5_cpu_quota_mean_pct": 1.9641538461538461
+        },
+        "grafana": {
+          "samples": 589,
+          "first_memory_mib": 129.3,
+          "last_memory_mib": 122.0,
+          "peak_memory_mib": 135.2,
+          "cpu_quota_mean_pct": null,
+          "cpu_docker_mean_pct": 2.073938879456706,
+          "first5_memory_mean_mib": 130.3439393939394,
+          "last5_memory_mean_mib": 123.72307692307692,
+          "first5_cpu_quota_mean_pct": null,
+          "last5_cpu_quota_mean_pct": null
+        },
+        "postgres-exporter": {
+          "samples": 589,
+          "first_memory_mib": 9.465,
+          "last_memory_mib": 9.629,
+          "peak_memory_mib": 11.26,
+          "cpu_quota_mean_pct": null,
+          "cpu_docker_mean_pct": 0.39103565365025467,
+          "first5_memory_mean_mib": 9.33328787878788,
+          "last5_memory_mean_mib": 10.140215384615384,
+          "first5_cpu_quota_mean_pct": null,
+          "last5_cpu_quota_mean_pct": null
+        }
+      }
+    }
+  ],
+  "validation": [
+    {
+      "run": "20261003T115646Z-bootstrap-50rps-245729",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_ede54152f5a5": true,
+        "resources_b7c565ec6661": true,
+        "resources_5d647426da8c": true,
+        "resources_f971e0e95ca2": true,
+        "resources_fe353c56861a": true,
+        "resources_362dc5399fac": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T120230Z-route-geometry-50rps-43819",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_362dc5399fac": true,
+        "resources_f971e0e95ca2": true,
+        "resources_fe353c56861a": true,
+        "resources_ede54152f5a5": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_a32d3f2d4489": true,
+        "resources_5d647426da8c": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T120656Z-forecast-day-50rps-967048",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_fe353c56861a": true,
+        "resources_5d647426da8c": true,
+        "resources_362dc5399fac": true,
+        "resources_f971e0e95ca2": true,
+        "resources_ede54152f5a5": true,
+        "resources_56c02538f1eb": true,
+        "resources_6b39db7d8ef6": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T121315Z-forecast-week-50rps-222329",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_362dc5399fac": true,
+        "resources_5d647426da8c": true,
+        "resources_fe353c56861a": true,
+        "resources_f971e0e95ca2": true,
+        "resources_ede54152f5a5": true,
+        "resources_d08be264c190": true,
+        "resources_6b39db7d8ef6": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T121952Z-forecast-month-50rps-192319",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_fe353c56861a": true,
+        "resources_0375ec2e3b7a": true,
+        "resources_362dc5399fac": true,
+        "resources_f971e0e95ca2": true,
+        "resources_ede54152f5a5": true,
+        "resources_5d647426da8c": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T122630Z-scenario-50rps-812845",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_fe353c56861a": true,
+        "resources_f971e0e95ca2": true,
+        "resources_ede54152f5a5": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_362dc5399fac": true,
+        "resources_5d647426da8c": true,
+        "resources_0c8521d79634": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T123310Z-summary-50rps-813420",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_fe353c56861a": true,
+        "resources_f971e0e95ca2": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_d7beea1b590c": true,
+        "resources_ede54152f5a5": true,
+        "resources_362dc5399fac": true,
+        "resources_5d647426da8c": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T125735Z-mixed-workload-50rps-609940",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_ede54152f5a5": true,
+        "resources_5d647426da8c": true,
+        "resources_fe353c56861a": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_362dc5399fac": true,
+        "resources_f971e0e95ca2": true,
+        "resources_a758e98db05c": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T130200Z-mixed-workload-100rps-158780",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_f971e0e95ca2": true,
+        "resources_362dc5399fac": true,
+        "resources_fe353c56861a": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_ede54152f5a5": true,
+        "resources_940225fa0819": true,
+        "resources_5d647426da8c": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T130631Z-mixed-workload-200rps-833642",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_5d647426da8c": true,
+        "resources_f971e0e95ca2": true,
+        "resources_ede54152f5a5": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_362dc5399fac": true,
+        "resources_f71df606dd15": true,
+        "resources_fe353c56861a": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T131057Z-mixed-workload-300rps-405847",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_f971e0e95ca2": true,
+        "resources_c065d61349f6": true,
+        "resources_362dc5399fac": true,
+        "resources_5d647426da8c": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_ede54152f5a5": true,
+        "resources_fe353c56861a": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T131528Z-mixed-workload-400rps-464926",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_fe353c56861a": true,
+        "resources_f971e0e95ca2": true,
+        "resources_362dc5399fac": true,
+        "resources_5d647426da8c": true,
+        "resources_5393ade9b223": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_ede54152f5a5": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T132003Z-mixed-workload-500rps-361500",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_5d647426da8c": true,
+        "resources_5f51cf04c49c": true,
+        "resources_fe353c56861a": true,
+        "resources_f971e0e95ca2": true,
+        "resources_362dc5399fac": true,
+        "resources_ede54152f5a5": true,
+        "resources_6b39db7d8ef6": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T132428Z-mixed-workload-600rps-789005",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_362dc5399fac": true,
+        "resources_f971e0e95ca2": true,
+        "resources_fe353c56861a": true,
+        "resources_ede54152f5a5": true,
+        "resources_5d647426da8c": true,
+        "resources_d3aed76a8127": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T134555Z-mixed-workload-300rps-385818",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_362dc5399fac": true,
+        "resources_13a81df19a3f": true,
+        "resources_fe353c56861a": true,
+        "resources_f971e0e95ca2": true,
+        "resources_ede54152f5a5": true,
+        "resources_5d647426da8c": true,
+        "resources_be6d3309dc96": true,
+        "resources_6b39db7d8ef6": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T135019Z-mixed-workload-500rps-665159",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_6b39db7d8ef6": true,
+        "resources_be6d3309dc96": true,
+        "resources_7d6df776a530": true,
+        "resources_f971e0e95ca2": true,
+        "resources_362dc5399fac": true,
+        "resources_fe353c56861a": true,
+        "resources_5d647426da8c": true,
+        "resources_ede54152f5a5": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    },
+    {
+      "run": "20261003T140829Z-mixed-workload-400rps-208599",
+      "checks": {
+        "requests_match": true,
+        "success_match": true,
+        "error_count_matches_checks": true,
+        "duration_match": true,
+        "latency_match": true,
+        "resources_d50d1ac3d228": true,
+        "resources_81e708532e1d": true,
+        "resources_5d647426da8c": true,
+        "resources_362dc5399fac": true,
+        "resources_ede54152f5a5": true,
+        "resources_f971e0e95ca2": true,
+        "resources_e9d37c3ce16a": true,
+        "endpoint_totals_match": true
+      },
+      "all_passed": true
+    }
+  ],
+  "archive_sha256": {
+    "bench_export.zip": "e99348db7723b60aa5977e799f4e03b6f25ffa16288e773a97c0ff4761e71e70",
+    "benchs.zip": "920650a321bcda29b609abeb525ccf736caf04f803d7a835e31bc5416ccfad0d"
+  }
+}
