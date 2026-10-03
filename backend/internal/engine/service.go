@@ -8,6 +8,7 @@ import (
 	"time"
 	d "tramflow/internal/domain"
 	"tramflow/internal/inference"
+	"tramflow/internal/telemetry"
 )
 
 type Repository interface {
@@ -32,17 +33,27 @@ type Cache struct {
 }
 
 func NewCache(bytes int) *Cache {
-	return &Cache{limit: bytes / 512, lru: list.New(), values: map[string]*list.Element{}}
+	c := &Cache{limit: bytes / 512, lru: list.New(), values: map[string]*list.Element{}}
+	telemetry.Default.Gauge("forecast_cache_entries", func() float64 {
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		return float64(len(c.values))
+	})
+	return c
 }
 func (c *Cache) Get(k string) (float64, bool) {
 	c.mu.Lock()
-	defer c.mu.Unlock()
 	e, ok := c.values[k]
 	if !ok {
+		c.mu.Unlock()
+		telemetry.Default.Add("forecast_cache_misses_total", nil, 1)
 		return 0, false
 	}
 	c.lru.MoveToFront(e)
-	return e.Value.(cacheEntry).value, true
+	v := e.Value.(cacheEntry).value
+	c.mu.Unlock()
+	telemetry.Default.Add("forecast_cache_hits_total", nil, 1)
+	return v, true
 }
 func (c *Cache) Set(k string, v float64) {
 	c.mu.Lock()
@@ -68,6 +79,12 @@ type Service struct {
 }
 
 func (s *Service) Calculate(ctx context.Context, desc d.Descriptor) (d.Response, error) {
+	kind := desc.Kind
+	if kind != "forecast" && kind != "scenario" {
+		kind = "invalid"
+	}
+	done := telemetry.Timer("forecast_duration_seconds", telemetry.Labels{"kind": kind})
+	defer done()
 	snap, model, err := s.Repo.Snapshot(ctx, desc.Selection.SnapshotID)
 	if err != nil {
 		return d.Response{}, err

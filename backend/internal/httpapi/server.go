@@ -17,6 +17,7 @@ import (
 	d "tramflow/internal/domain"
 	"tramflow/internal/engine"
 	"tramflow/internal/inference"
+	"tramflow/internal/telemetry"
 )
 
 type Store interface {
@@ -97,7 +98,13 @@ func (s *Server) Handler() http.Handler {
 			if status == 0 {
 				status = http.StatusOK
 			}
-			slog.Info("http", "request_id", id, "method", r.Method, "route", routePattern, "status", status, "user_id", d.UserID(r.Context()), "duration_ms", time.Since(start).Milliseconds())
+			elapsed := time.Since(start)
+			endpoint := routePattern
+			if _, path, ok := strings.Cut(routePattern, " "); ok {
+				endpoint = path
+			}
+			telemetry.Default.HTTP(r.Method, endpoint, status, elapsed)
+			slog.Info("http", "request_id", id, "method", r.Method, "route", routePattern, "status", status, "user_id", d.UserID(r.Context()), "duration_ms", elapsed.Milliseconds())
 		}()
 		if origin := r.Header.Get("Origin"); origin != "" {
 			if origin != s.Origin {

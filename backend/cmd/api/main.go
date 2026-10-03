@@ -16,6 +16,7 @@ import (
 	"tramflow/internal/httpapi"
 	"tramflow/internal/inference"
 	"tramflow/internal/storage"
+	"tramflow/internal/telemetry"
 )
 
 func run() error {
@@ -56,21 +57,45 @@ func run() error {
 		IdleTimeout:       60 * time.Second,
 		MaxHeaderBytes:    16384,
 	}
-	done := make(chan error, 1)
+	adminMux := http.NewServeMux()
+	adminMux.Handle("GET /metrics", telemetry.Default.Handler())
+	admin := &http.Server{
+		Addr:              c.AdminAddr,
+		Handler:           adminMux,
+		ReadHeaderTimeout: 3 * time.Second,
+		ReadTimeout:       5 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       30 * time.Second,
+		MaxHeaderBytes:    8192,
+	}
+	done := make(chan error, 2)
 	go func() {
 		slog.Info("api started", "address", c.Addr)
 		done <- server.ListenAndServe()
+	}()
+	go func() {
+		slog.Info("admin started", "address", c.AdminAddr)
+		done <- admin.ListenAndServe()
 	}()
 	select {
 	case err := <-done:
 		if errors.Is(err, http.ErrServerClosed) {
 			return nil
 		}
+		shutdown, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+		defer cancel()
+		_ = server.Shutdown(shutdown)
+		_ = admin.Shutdown(shutdown)
 		return err
 	case <-ctx.Done():
 		shutdown, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 		defer cancel()
-		return server.Shutdown(shutdown)
+		apiErr := server.Shutdown(shutdown)
+		adminErr := admin.Shutdown(shutdown)
+		if apiErr != nil {
+			return apiErr
+		}
+		return adminErr
 	}
 }
 func main() {

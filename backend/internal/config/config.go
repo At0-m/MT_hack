@@ -9,9 +9,9 @@ import (
 )
 
 type Config struct {
-	TrustedProxies                                              []netip.Prefix
-	Database, Artifacts, Contract, Addr, User, Password, Origin string
-	Pool                                                        int32
+	TrustedProxies                                                         []netip.Prefix
+	Database, Artifacts, Contract, Addr, AdminAddr, User, Password, Origin string
+	Pool                                                                   int32
 }
 
 func Load() (Config, error) {
@@ -20,6 +20,7 @@ func Load() (Config, error) {
 		Artifacts: env("ARTIFACTS_ROOT", "artifacts"),
 		Contract:  env("OPENAPI_PATH", "openapi/openapi.yaml"),
 		Addr:      env("HTTP_ADDR", "127.0.0.1:8080"),
+		AdminAddr: env("ADMIN_ADDR", "127.0.0.1:9090"),
 		User:      os.Getenv("API_USER"),
 		Password:  os.Getenv("API_PASSWORD"),
 		Origin:    os.Getenv("CORS_ORIGIN"),

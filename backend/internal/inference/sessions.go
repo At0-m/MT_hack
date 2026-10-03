@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"time"
 	d "tramflow/internal/domain"
+	"tramflow/internal/telemetry"
 )
 
 // Conservative admission cap; native working memory still depends on the model.
@@ -48,13 +49,17 @@ func (m *Manager) run(ctx context.Context, model d.Model, rows [][]float32) ([]f
 		return nil, err
 	}
 	defer m.release(session)
+	waitStarted := time.Now()
 	select {
 	case m.slots <- struct{}{}:
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	}
+	telemetry.Default.Observe("onnx_admission_wait_seconds", nil, time.Since(waitStarted))
 	defer func() { <-m.slots }()
 	// Cooperative termination requests do not release buffers/session before Run exits.
+	done := telemetry.Timer("onnx_inference_duration_seconds", nil)
+	defer done()
 	return session.predictor.Predict(ctx, rows)
 }
 

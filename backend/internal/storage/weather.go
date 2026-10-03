@@ -9,6 +9,7 @@ import (
 	"time"
 	d "tramflow/internal/domain"
 	"tramflow/internal/engine"
+	"tramflow/internal/telemetry"
 )
 
 func validateWeatherMetadata(b d.Bundle) error {
@@ -58,6 +59,8 @@ func validateWeatherMetadata(b d.Bundle) error {
 }
 
 func (s *Store) WeatherMetadata(ctx context.Context, version string) (d.WeatherSnapshot, error) {
+	done := telemetry.Timer("storage_operation_duration_seconds", telemetry.Labels{"operation": "weather"})
+	defer done()
 	var raw []byte
 	var metadata d.WeatherSnapshot
 	err := s.Pool.QueryRow(ctx, "SELECT metadata FROM weather_snapshots WHERE version=$1", version).Scan(&raw)

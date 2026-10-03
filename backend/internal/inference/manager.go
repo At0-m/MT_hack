@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 	d "tramflow/internal/domain"
+	"tramflow/internal/telemetry"
 )
 
 type Predictor interface {
@@ -50,6 +51,11 @@ type Manager struct {
 func New(root string) *Manager {
 	m := &Manager{Root: root, sessions: map[string]*modelSession{}, loading: map[string]*modelLoad{}, changed: make(chan struct{}), slots: make(chan struct{}, 2)}
 	m.open = m.load
+	telemetry.Default.Gauge("onnx_model_sessions", func() float64 {
+		m.mu.Lock()
+		defer m.mu.Unlock()
+		return float64(len(m.sessions))
+	})
 	return m
 }
 func (m *Manager) file(path, hash string, limit int64) (string, error) {

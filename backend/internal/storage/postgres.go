@@ -9,6 +9,7 @@ import (
 	"time"
 	d "tramflow/internal/domain"
 	"tramflow/internal/engine"
+	"tramflow/internal/telemetry"
 )
 
 type Store struct{ Pool *pgxpool.Pool }
@@ -35,6 +36,10 @@ func openPool(ctx context.Context, url string, max int32, timeout, application s
 	if err != nil {
 		return nil, err
 	}
+	telemetry.Default.Gauge("db_pool_acquired", func() float64 { return float64(p.Stat().AcquiredConns()) })
+	telemetry.Default.Gauge("db_pool_idle", func() float64 { return float64(p.Stat().IdleConns()) })
+	telemetry.Default.Gauge("db_pool_total", func() float64 { return float64(p.Stat().TotalConns()) })
+	telemetry.Default.Gauge("db_pool_max", func() float64 { return float64(p.Stat().MaxConns()) })
 	return &Store{p}, nil
 }
 func dependency(err error) error {
@@ -55,6 +60,8 @@ func decodeSnapshot(meta, model []byte) (d.Snapshot, d.Model, error) {
 	return s, m, nil
 }
 func (s *Store) Snapshot(ctx context.Context, id string) (d.Snapshot, d.Model, error) {
+	done := telemetry.Timer("storage_operation_duration_seconds", telemetry.Labels{"operation": "snapshot"})
+	defer done()
 	var meta, model []byte
 	var deleted *time.Time
 	err := s.Pool.QueryRow(ctx, "SELECT s.metadata,m.metadata,s.deleted_at FROM forecast_snapshots s JOIN models m ON m.version=s.model_version WHERE s.id=$1", id).Scan(&meta, &model, &deleted)
@@ -81,6 +88,8 @@ func (s *Store) Active(ctx context.Context) (d.Snapshot, d.Model, error) {
 	return decodeSnapshot(meta, model)
 }
 func (s *Store) Hours(ctx context.Context, snap d.Snapshot, q engine.SelectionInput) ([]d.Hour, error) {
+	done := telemetry.Timer("storage_operation_duration_seconds", telemetry.Labels{"operation": "hours"})
+	defer done()
 	p := snap.Provenance
 	rows, err := s.Pool.Query(ctx, `SELECT f.route_id,f.target_hour,f.calendar_flags,f.available_at,f.synthetic_boardings,
  sp.fleet,sp.source,sp.is_proxy,r.reference,r.typical,w.point
@@ -116,6 +125,8 @@ func (s *Store) Hours(ctx context.Context, snap d.Snapshot, q engine.SelectionIn
 	return out, nil
 }
 func (s *Store) Routes(ctx context.Context, network string) ([]json.RawMessage, error) {
+	done := telemetry.Timer("storage_operation_duration_seconds", telemetry.Labels{"operation": "routes"})
+	defer done()
 	rows, err := s.Pool.Query(ctx, "SELECT detail->'route' FROM routes WHERE network_version=$1 ORDER BY route_id", network)
 	if err != nil {
 		return nil, dependency(err)
@@ -138,6 +149,8 @@ func (s *Store) Routes(ctx context.Context, network string) ([]json.RawMessage, 
 	return out, nil
 }
 func (s *Store) Route(ctx context.Context, network, route string) (json.RawMessage, error) {
+	done := telemetry.Timer("storage_operation_duration_seconds", telemetry.Labels{"operation": "route"})
+	defer done()
 	var b []byte
 	err := s.Pool.QueryRow(ctx, "SELECT detail FROM routes WHERE network_version=$1 AND route_id=$2", network, route).Scan(&b)
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -149,6 +162,8 @@ func (s *Store) Route(ctx context.Context, network, route string) (json.RawMessa
 	return b, nil
 }
 func (s *Store) Geometry(ctx context.Context, network, route string) (json.RawMessage, error) {
+	done := telemetry.Timer("storage_operation_duration_seconds", telemetry.Labels{"operation": "geometry"})
+	defer done()
 	detail, err := s.Route(ctx, network, route)
 	if err != nil {
 		return nil, err
@@ -212,6 +227,8 @@ func (s *Store) Geometry(ctx context.Context, network, route string) (json.RawMe
 	return b, err
 }
 func (s *Store) Report(ctx context.Context, id, kind string) (json.RawMessage, error) {
+	done := telemetry.Timer("storage_operation_duration_seconds", telemetry.Labels{"operation": "report"})
+	defer done()
 	column := "quality"
 	if kind == "data-sources" {
 		column = "sources"

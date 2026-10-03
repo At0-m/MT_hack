@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"time"
 	d "tramflow/internal/domain"
+	"tramflow/internal/telemetry"
 )
 
 // Only requested misses are fetched; both caller and repository bound the batch.
 func (s *Store) Features(ctx context.Context, snap d.Snapshot, hours []d.Hour) ([]d.Hour, error) {
+	done := telemetry.Timer("storage_operation_duration_seconds", telemetry.Labels{"operation": "features"})
+	defer done()
 	if len(hours) == 0 {
 		return []d.Hour{}, nil
 	}
