@@ -1,8 +1,8 @@
 {
   "uid": "tramflow-perf",
-  "title": "Tramflow / Performance",
+  "title": "TramFlow / Benchmark observability",
   "schemaVersion": 40,
-  "version": 1,
+  "version": 3,
   "refresh": "5s",
   "time": {
     "from": "now-30m",
@@ -10,8 +10,8 @@
   },
   "panels": [
     {
-      "id": 1,
-      "title": "Business API RPS",
+      "id": 101,
+      "title": "k6 achieved business RPS",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -26,8 +26,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(http_requests_total{endpoint=~\"/api/v1/.*\"}[1m]))",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "sum(rate(k6_business_requests_total{phase=\"measurement\",testid=~\"$testid\"}[$__rate_interval]))",
+          "legendFormat": "business RPS"
         }
       ],
       "fieldConfig": {
@@ -35,11 +35,12 @@
           "unit": "reqps"
         },
         "overrides": []
-      }
+      },
+      "description": "Client-side achieved business request rate from k6 remote-write."
     },
     {
-      "id": 2,
-      "title": "API p95 (seconds)",
+      "id": 102,
+      "title": "k6 client p95",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -54,8 +55,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.95,sum by(le)(rate(http_request_duration_seconds_bucket{endpoint=~\"/api/v1/.*\"}[1m])))",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "avg(k6_http_req_duration_p95{phase=\"measurement\",testid=~\"$testid\"})",
+          "legendFormat": "p95"
         }
       ],
       "fieldConfig": {
@@ -63,11 +64,12 @@
           "unit": "s"
         },
         "overrides": []
-      }
+      },
+      "description": "Client-observed HTTP request p95 for the measurement phase."
     },
     {
-      "id": 3,
-      "title": "API error ratio (4xx + 5xx)",
+      "id": 103,
+      "title": "k6 client p99",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -82,8 +84,124 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(http_requests_total{endpoint=~\"/api/v1/.*\",status=~\"[45]..\"}[1m])) / clamp_min(sum(rate(http_requests_total{endpoint=~\"/api/v1/.*\"}[1m])),0.0001)",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "avg(k6_http_req_duration_p99{phase=\"measurement\",testid=~\"$testid\"})",
+          "legendFormat": "p99"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "description": "Client-observed HTTP request p99 for the measurement phase."
+    },
+    {
+      "id": 104,
+      "title": "k6 semantic failure ratio",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "avg(k6_business_failures_rate{phase=\"measurement\",testid=~\"$testid\"})",
+          "legendFormat": "failures"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "description": "Business failures include HTTP and response-contract validation failures."
+    },
+    {
+      "id": 1,
+      "title": "Business API RPS",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 6,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_requests_total{endpoint=~\"/api/v1/.*\"}[$__rate_interval]))",
+          "legendFormat": "API total"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "description": "Request rate observed inside the Go API. Compare with k6 achieved RPS in benchmark.md."
+    },
+    {
+      "id": 2,
+      "title": "API p95 (seconds)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 8,
+        "w": 6,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95,sum by(le)(rate(http_request_duration_seconds_bucket{endpoint=~\"/api/v1/.*\"}[$__rate_interval])))",
+          "legendFormat": "API p95"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "description": "Server-side handler latency. Client-side latency is reported by k6."
+    },
+    {
+      "id": 3,
+      "title": "API error ratio (4xx + 5xx)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 6,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_requests_total{endpoint=~\"/api/v1/.*\",status=~\"[45]..\"}[$__rate_interval])) / clamp_min(sum(rate(http_requests_total{endpoint=~\"/api/v1/.*\"}[$__rate_interval])),0.0001)",
+          "legendFormat": "Error ratio"
         }
       ],
       "fieldConfig": {
@@ -103,15 +221,15 @@
       },
       "gridPos": {
         "x": 18,
-        "y": 0,
+        "y": 8,
         "w": 6,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "rate(process_cpu_seconds_total[1m])",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "rate(process_cpu_seconds_total[$__rate_interval])",
+          "legendFormat": "{{instance}} CPU"
         }
       ],
       "fieldConfig": {
@@ -131,7 +249,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 8,
+        "y": 16,
         "w": 6,
         "h": 8
       },
@@ -139,7 +257,7 @@
         {
           "refId": "A",
           "expr": "process_resident_memory_bytes or go_memstats_heap_alloc_bytes",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "legendFormat": "{{instance}} {{__name__}}"
         }
       ],
       "fieldConfig": {
@@ -159,15 +277,15 @@
       },
       "gridPos": {
         "x": 6,
-        "y": 8,
+        "y": 16,
         "w": 6,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.95,sum by(le,kind)(rate(forecast_duration_seconds_bucket[1m])))",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "histogram_quantile(0.95,sum by(le,kind)(rate(forecast_duration_seconds_bucket[$__rate_interval])))",
+          "legendFormat": "{{kind}}"
         }
       ],
       "fieldConfig": {
@@ -187,15 +305,15 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 8,
+        "y": 16,
         "w": 6,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.95,sum by(le)(rate(onnx_inference_duration_seconds_bucket[1m])))",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "histogram_quantile(0.95,sum by(le)(rate(onnx_inference_duration_seconds_bucket[$__rate_interval])))",
+          "legendFormat": "{{instance}}"
         }
       ],
       "fieldConfig": {
@@ -203,11 +321,12 @@
           "unit": "s"
         },
         "overrides": []
-      }
+      },
+      "description": "Available for native ONNX runs; synthetic mode can legitimately have no samples."
     },
     {
       "id": 8,
-      "title": "PostgreSQL query p95",
+      "title": "Storage operation p95",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -215,15 +334,15 @@
       },
       "gridPos": {
         "x": 18,
-        "y": 8,
+        "y": 16,
         "w": 6,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.95,sum by(le)(rate(db_query_duration_seconds_bucket[1m])))",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "histogram_quantile(0.95,sum by(le,operation)(rate(storage_operation_duration_seconds_bucket[$__rate_interval])))",
+          "legendFormat": "{{operation}}"
         }
       ],
       "fieldConfig": {
@@ -231,7 +350,8 @@
           "unit": "s"
         },
         "overrides": []
-      }
+      },
+      "description": "End-to-end storage repository operation latency, including row scan/decoding where applicable."
     },
     {
       "id": 9,
@@ -243,15 +363,15 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 16,
+        "y": 24,
         "w": 6,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(forecast_cache_hits_total[1m])) / clamp_min(sum(rate(forecast_cache_hits_total[1m])+rate(forecast_cache_misses_total[1m])),0.0001)",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "sum(rate(forecast_cache_hits_total[$__rate_interval])) / clamp_min(sum(rate(forecast_cache_hits_total[$__rate_interval])+rate(forecast_cache_misses_total[$__rate_interval])),0.0001)",
+          "legendFormat": "Cache hit ratio"
         }
       ],
       "fieldConfig": {
@@ -259,11 +379,12 @@
           "unit": "percentunit"
         },
         "overrides": []
-      }
+      },
+      "description": "Prediction cache hits divided by hits + misses."
     },
     {
       "id": 10,
-      "title": "Acquired connections / pool limit",
+      "title": "API DB pool connections",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -271,15 +392,15 @@
       },
       "gridPos": {
         "x": 6,
-        "y": 16,
+        "y": 24,
         "w": 6,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "db_pool_acquired or db_pool_max",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "db_pool_acquired or db_pool_idle or db_pool_max",
+          "legendFormat": "{{instance}} {{__name__}}"
         }
       ],
       "fieldConfig": {
@@ -299,7 +420,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 16,
+        "y": 24,
         "w": 6,
         "h": 8
       },
@@ -307,7 +428,7 @@
         {
           "refId": "A",
           "expr": "go_goroutines or onnx_model_sessions",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "legendFormat": "{{instance}} {{__name__}}"
         }
       ],
       "fieldConfig": {
@@ -327,7 +448,7 @@
       },
       "gridPos": {
         "x": 18,
-        "y": 16,
+        "y": 24,
         "w": 6,
         "h": 8
       },
@@ -335,7 +456,7 @@
         {
           "refId": "A",
           "expr": "forecast_cache_entries",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "legendFormat": "{{instance}} cache entries"
         }
       ],
       "fieldConfig": {
@@ -355,15 +476,15 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 24,
+        "y": 32,
         "w": 6,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "rate(go_gc_pause_seconds_total[1m])",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "rate(go_gc_pause_seconds_total[$__rate_interval])",
+          "legendFormat": "{{instance}} GC"
         }
       ],
       "fieldConfig": {
@@ -383,7 +504,7 @@
       },
       "gridPos": {
         "x": 6,
-        "y": 24,
+        "y": 32,
         "w": 6,
         "h": 8
       },
@@ -391,7 +512,7 @@
         {
           "refId": "A",
           "expr": "pg_stat_database_numbackends{datname=\"tramflow\"}",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "legendFormat": "PostgreSQL"
         }
       ],
       "fieldConfig": {
@@ -411,7 +532,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 24,
+        "y": 32,
         "w": 6,
         "h": 8
       },
@@ -419,7 +540,7 @@
         {
           "refId": "A",
           "expr": "process_swap_bytes or container_swap_current_bytes",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "legendFormat": "{{instance}} {{__name__}}"
         }
       ],
       "fieldConfig": {
@@ -439,15 +560,15 @@
       },
       "gridPos": {
         "x": 18,
-        "y": 24,
+        "y": 32,
         "w": 6,
         "h": 8
       },
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.95,sum by(le)(rate(onnx_admission_wait_seconds_bucket[1m])))",
-          "legendFormat": "{{instance}} {{kind}} {{__name__}}"
+          "expr": "histogram_quantile(0.95,sum by(le)(rate(onnx_admission_wait_seconds_bucket[$__rate_interval])))",
+          "legendFormat": "{{instance}}"
         }
       ],
       "fieldConfig": {
@@ -459,7 +580,37 @@
     }
   ],
   "tags": [
-    "hackathon",
+    "benchmark",
+    "observability",
     "synthetic-until-real-data"
-  ]
+  ],
+  "description": "Live backend observability for benchmark runs. k6 remains the source of truth for client-side RPS/latency.",
+  "templating": {
+    "list": [
+      {
+        "name": "testid",
+        "label": "k6 test run",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "query": {
+          "query": "label_values(k6_business_requests_total, testid)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "definition": "label_values(k6_business_requests_total, testid)",
+        "refresh": 2,
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": false,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "sort": 2
+      }
+    ]
+  }
 }
