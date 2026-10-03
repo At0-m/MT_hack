@@ -56,6 +56,7 @@ def main() -> int:
     p.add_argument('--no-start',action='store_true',help='Use existing deployment; do not run seed or rebuild')
     p.add_argument('--output',type=Path)
     p.add_argument('--no-raw',action='store_true')
+    p.add_argument('--prometheus-rw',action='store_true',help='Send live k6 metrics to the Prometheus remote-write receiver')
     a=p.parse_args()
     if not 1<=a.rate<=10000 or duration_seconds(a.duration)<=0 or duration_seconds(a.warmup)<0:p.error('Invalid rate/duration')
     if not shutil.which('docker'):p.error('Docker is required; no test was run')
@@ -78,6 +79,7 @@ def main() -> int:
     stamp=time.strftime('%Y%m%dT%H%M%SZ',time.gmtime())
     out=(a.output or ROOT/'benchmarks'/'results'/f'{stamp}-{a.script}-{a.rate}rps-{time.time_ns()%1000000}').resolve()
     out.mkdir(parents=True,exist_ok=False)
+    testid=out.name
     api=API(f"http://127.0.0.1:{env.get('HTTP_PORT','8080')}")
     api.login(env);status,b,_=api.request('/api/v1/bootstrap');api.logout()
     if status!=200:raise RuntimeError(f'Bootstrap failed: {status}')
@@ -85,6 +87,7 @@ def main() -> int:
     manifest=host_metadata(env)
     manifest.update(provenance=b['active_snapshot']['provenance'],containers=containers,
         run={'script':a.script,'rate':a.rate,'duration':a.duration,'duration_seconds':duration_seconds(a.duration),'warmup':a.warmup,'replicas':a.replicas,
+             'testid':testid,'prometheus_remote_write':a.prometheus_rw,
              'load_generator':'Docker on same host; see container resource samples','k6_image':env.get('K6_IMAGE','grafana/k6:1.8.1'),
              'route_count':env.get('ROUTE_COUNT','1'),'route_ids':env.get('ROUTE_IDS',''),'day_offset':env.get('DAY_OFFSET','0'),
              'prediction_cache_bytes':[c['settings'].get('FORECAST_CACHE_BYTES') for c in containers if c['service']=='api']})
@@ -92,17 +95,22 @@ def main() -> int:
     for cid in api_ids:(out/f'metrics-before-{cid[:12]}.prom').write_text(scrape(cid,env))
     gen=f'tramflow-k6-{time.time_ns()}'
     env.update(BASE_URL='http://gateway:8080',RATE=str(a.rate),DURATION=a.duration,WARMUP=a.warmup,K6_NO_USAGE_REPORT='true')
+    if a.prometheus_rw:
+        env.update(K6_PROMETHEUS_RW_SERVER_URL='http://prometheus:9090/api/v1/write',
+                   K6_PROMETHEUS_RW_TREND_STATS='p(50),p(95),p(99),avg,max')
     env.setdefault('API_USER','devops')
     keys=['BASE_URL','API_USER','API_PASSWORD','RATE','DURATION','WARMUP','K6_NO_USAGE_REPORT','ROUTE_COUNT','ROUTE_IDS','DAY_OFFSET','PRE_VUS','MAX_VUS',
-          'P95_MS','WALL_P95_MS','FORECAST_P95_MS','EXPECTED_RUNTIME_MODE','EXPECTED_MODEL_VERSION','REQUEST_TIMEOUT']
+          'P95_MS','WALL_P95_MS','FORECAST_P95_MS','EXPECTED_RUNTIME_MODE','EXPECTED_MODEL_VERSION','REQUEST_TIMEOUT',
+          'K6_PROMETHEUS_RW_SERVER_URL','K6_PROMETHEUS_RW_TREND_STATS']
     command=['docker','run','--name',gen,'--network',network,'--user',f'{os.getuid()}:{os.getgid()}',
              '--cpus',env.get('LOADGEN_CPUS','2'),'--memory',env.get('LOADGEN_MEMORY','2g'),'--memory-swap',env.get('LOADGEN_MEMORY','2g'),
              '--read-only','--tmpfs','/tmp:rw,size=64m','--cap-drop','ALL','--security-opt','no-new-privileges:true',
              '-v',f'{ROOT / "loadtest"}:/work:ro','-v',f'{out}:/out:rw']
     for key in keys:
         if key in env:command += ['-e',key] 
-    command += [env.get('K6_IMAGE','grafana/k6:1.8.1'),'run']
+    command += [env.get('K6_IMAGE','grafana/k6:1.8.1'),'run','--tag',f'testid={testid}']
     if not a.no_raw:command += ['--out','json=/out/raw.json.gz']
+    if a.prometheus_rw:command += ['--out','experimental-prometheus-rw']
     command += [f'/work/{a.script}.js']
     print(f'Running {a.script}; artifacts: {out}',flush=True)
     sampler=Sampler(out,env,containers,api_ids,gen)

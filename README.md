@@ -32,6 +32,8 @@ flowchart LR
 
 Go 1.26.8, PostgreSQL 16/PostGIS, ONNX Runtime 1.24.1, React, TypeScript, MapLibre, Docker Compose. Конфигурации Prometheus/Grafana находятся в deploy; их запуск описан отдельно.
 
+Для воспроизводимого нагрузочного прогона с живыми графиками используйте `make benchmark-observed`: команда поднимает Prometheus, Grafana и postgres-exporter, затем запускает k6 benchmark и отправляет k6 time-series в Prometheus через remote-write. Grafana доступна на `http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability`, Prometheus — на `http://localhost:9091`. Итоговые численные результаты всё равно сохраняются в `benchmarks/results/.../benchmark.md` и `report.json`; dashboard нужен для временных рядов и диагностики.
+
 ## Структура
 
 | Путь | Назначение |
@@ -58,6 +60,14 @@ Go 1.26.8, PostgreSQL 16/PostGIS, ONNX Runtime 1.24.1, React, TypeScript, MapLib
 - [Benchmark PDF](docs/benchmark/Tramflow_Benchmark_Report.pdf), [таблица результатов](docs/benchmark/summary.md), [происхождение и границы измерений](docs/benchmark/provenance.json).
 
 ## Производительность
+
+Для новых замеров используйте текущий benchmark runner, а не цифры ниже как результат текущей сборки:
+
+```bash
+make benchmark-observed RATE=50 DURATION=2m WARMUP=30s BENCH_SCRIPT=mixed-workload
+```
+
+Для поиска устойчивой области нагрузки сначала выполните `make sweep`, затем повторите выбранную точку более длинным прогоном. `make benchmark-observed` удобен для одного диагностического запуска с Grafana; результаты k6 и `system.csv` остаются источником итоговых цифр.
 
 В переданном отчёте пять коротких HTTP-запусков по 5000 запросов: **25000 запросов, ошибок 0**. Максимум — **662,64 запроса/с** при concurrency=24, p95=46,555 мс. При concurrency=16 — 660,52 запроса/с, p95=33,522 мс, p99=40,510 мс.
 

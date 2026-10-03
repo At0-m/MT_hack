@@ -142,4 +142,21 @@ def wait_ready(env: dict[str, str], timeout: float = 180) -> None:
     raise RuntimeError(f"Readiness did not pass within {timeout}s ({last})")
 
 def scrape(cid: str, env: dict[str, str]) -> str:
-    return execute(["docker", "exec", cid, "/app/healthcheck", "--url", "http://127.0.0.1:9090/metrics", "--print", "--timeout", "5s"], env=env, timeout=10).stdout
+    result = execute(
+        [
+            "docker",
+            "exec",
+            cid,
+            "curl",
+            "-fsS",
+            "--max-time",
+            "5",
+            "http://127.0.0.1:9090/metrics",
+        ],
+        env=env,
+        timeout=10,
+        check=False,
+    )
+    if result.returncode != 0:
+        return ""
+    return result.stdout

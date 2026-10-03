@@ -8,9 +8,9 @@ REPLICAS ?= 1
 BENCH_SCRIPT ?= forecast-day
 RATES ?= 50,100,200,300,400
 
-.PHONY: help init up down smoke benchmark sweep stress soak cold scale-check observability test-devops microbench profile reset-demo
+.PHONY: help init up down smoke benchmark benchmark-observed sweep stress soak cold scale-check observability observability-down test-devops microbench profile reset-demo
 help:
-	@printf '%s\n' 'make up                 - build and start native SYNTHETIC demo' 'make smoke              - strict functional API checks, existing stack' 'make benchmark          - warmup + constant-arrival-rate + report' 'make sweep              - independent RPS steps; stops at first failure' 'make stress             - shorter stress steps up to 600 RPS' 'make soak RATE=150      - 45 minute mixed soak (choose measured rate first)' 'make cold               - RESTART one API; record readiness + first forecast' 'make scale-check        - two replicas + direct cross-replica session checks' 'make observability      - optional Prometheus / Grafana / postgres-exporter' 'make test-devops        - offline Python/Node tests' 'make microbench         - host Go CPU/allocation benchmarks, not HTTP RPS' 'make profile            - internal 30s CPU pprof, enable pprof explicitly'
+	@printf '%s\n' 'make up                 - build and start native SYNTHETIC demo' 'make smoke              - strict functional API checks, existing stack' 'make benchmark          - warmup + constant-arrival-rate + report' 'make benchmark-observed - start Prometheus/Grafana, then run benchmark' 'make sweep              - independent RPS steps; stops at first failure' 'make stress             - shorter stress steps up to 600 RPS' 'make soak RATE=150      - 45 minute mixed soak (choose measured rate first)' 'make cold               - RESTART one API; record readiness + first forecast' 'make scale-check        - two replicas + direct cross-replica session checks' 'make observability      - Prometheus / Grafana / postgres-exporter' 'make observability-down - stop only observability services' 'make test-devops        - offline Python/Node tests' 'make microbench         - host Go CPU/allocation benchmarks, not HTTP RPS' 'make profile            - internal 30s CPU pprof, enable pprof explicitly'
 init:
 	python3 scripts/init_env.py
 up: init
@@ -23,6 +23,8 @@ smoke: init
 	python3 scripts/benchmark.py --script smoke --duration 30s --warmup 0s --replicas $(REPLICAS) --no-start
 benchmark: init
 	python3 scripts/benchmark.py --script $(BENCH_SCRIPT) --rate $(RATE) --duration $(DURATION) --warmup $(WARMUP) --replicas $(REPLICAS)
+benchmark-observed: observability
+	python3 scripts/benchmark.py --script $(BENCH_SCRIPT) --rate $(RATE) --duration $(DURATION) --warmup $(WARMUP) --replicas $(REPLICAS) --no-start --prometheus-rw
 sweep: init
 	python3 scripts/sweep.py --rates $(RATES) --script $(BENCH_SCRIPT) --duration $(DURATION) --warmup $(WARMUP) --replicas $(REPLICAS)
 stress: init
@@ -34,7 +36,10 @@ cold:
 scale-check:
 	python3 scripts/scale_check.py
 observability: init
-	docker compose -f compose.yaml -f compose.observability.yaml up -d --build --wait --wait-timeout 300
+	docker compose -f compose.yaml -f compose.observability.yaml up -d --build --wait --wait-timeout 300 --scale api=$(REPLICAS)
+	@printf '%s\n' 'Grafana:    http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability' 'Prometheus: http://localhost:9091'
+observability-down:
+	docker compose -f compose.yaml -f compose.observability.yaml stop grafana prometheus postgres-exporter
 
 microbench:
 	out="benchmarks/results/microbench-$$(date -u +%Y%m%dT%H%M%SZ)"; mkdir -p "$$out"; cd backend; go test -run '^$$' -bench 'Benchmark(Calculate|Scenario|Cache|CSV|Observe)' -benchmem -count=5 ./internal/engine ./internal/httpapi ./internal/telemetry | tee "../$$out/go-bench.txt"

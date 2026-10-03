@@ -194,3 +194,28 @@ pnpm lint
 Приём 15-минутных CSV описан в [критерии данных](CRITERION_COEFFICIENTS.md), погода/occupancy — в [ML_EXTERNAL_INPUTS.md](../backend/docs/ML_EXTERNAL_INPUTS.md). Реальные артефакты требуют [ML-контракта](../backend/docs/ML_HANDOFF.md), подготовленного bundle и отдельной публикации. Запуск demo не подключает автоматически все 30 переданных моделей.
 
 Ссылки для жюри: [текст формы](SUBMISSION_FORM.md), [benchmark PDF](benchmark/Tramflow_Benchmark_Report.pdf), [исходные результаты](benchmark/summary.csv).
+
+### Новый benchmark + Grafana
+
+После успешного `make smoke` можно запустить наблюдаемый benchmark:
+
+```powershell
+make benchmark-observed RATE=50 DURATION=2m WARMUP=30s BENCH_SCRIPT=mixed-workload
+```
+
+Команда поднимает основной backend вместе с Prometheus, Grafana и postgres-exporter, а затем запускает k6 на существующем стеке. k6 отправляет временные ряды в Prometheus через remote-write и помечает каждый запуск уникальным `testid`. Откройте:
+
+- Grafana: `http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability`
+- Prometheus: `http://localhost:9091`
+
+Логин Grafana — `admin`, пароль находится в корневом `.env` в `GRAFANA_PASSWORD`. Не публикуйте его.
+
+Dashboard показывает client-side k6 RPS/p95/p99/semantic error ratio, а также API RPS, server-side p95, ошибки, CPU/RSS, forecast p95, cache hit ratio, storage p95, DB pool, PostgreSQL connections, swap и native ONNX метрики. Вверху dashboard можно выбрать `testid` конкретного запуска. Для synthetic demo панели native inference могут оставаться без данных — это ожидаемо.
+
+Численный итог прогона сохраняется в `benchmarks/results/<run>/benchmark.md` и `report.json`. Grafana предназначена для временных рядов; при расхождении итоговых чисел источником benchmark-результата считаются k6 summary и сохранённые артефакты run directory.
+
+Остановить только monitoring-сервисы:
+
+```powershell
+make observability-down
+```

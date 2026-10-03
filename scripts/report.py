@@ -97,43 +97,79 @@ def render(directory: Path) -> dict:
                 a,b=first.get(metric),last.get(metric)
                 return b-a if a is not None and b is not None and b>=a else None
             hits,misses = delta("forecast_cache_hits_total"),delta("forecast_cache_misses_total")
+            storage_p95 = percentile_from_histogram(first,last,"storage_operation_duration_seconds")
+            if storage_p95 is None:
+                # Backward compatibility with older benchmark artifacts.
+                storage_p95 = percentile_from_histogram(first,last,"db_query_duration_seconds")
             runtime[cid] = {"sample_count":len(subset),"rss_bytes":stats(mem),"rss_first_bytes":mem[0] if mem else None,"rss_last_bytes":mem[-1] if mem else None,
                 "cache_cell_hit_ratio": hits/(hits+misses) if hits is not None and misses is not None and hits+misses else None,
                 "onnx_inference_p95_estimate_seconds":percentile_from_histogram(first,last,"onnx_inference_duration_seconds"),
-                "db_query_p95_estimate_seconds":percentile_from_histogram(first,last,"db_query_duration_seconds"),
+                "storage_operation_p95_estimate_seconds":storage_p95,
                 "max_process_swap_bytes":max((s["metrics"].get("process_swap_bytes",0) for s in subset),default=0),
                 "max_cgroup_swap_bytes":max((s["metrics"].get("container_swap_current_bytes",0) for s in subset),default=0),
                 "swap_observed": all("process_swap_bytes" in s["metrics"] for s in subset)}
-    result = {"format":"tramflow-report-v1","http_slo_passed":http_pass,"exit_code":code,"requests":count,"successful_requests":success,
+    testid = manifest.get("run",{}).get("testid")
+    grafana_url = "http://localhost:3000/d/tramflow-perf/tramflow-benchmark-observability"
+    if testid:
+        grafana_url += f"?var-testid={testid}"
+    result = {"format":"tramflow-report-v2","http_slo_passed":http_pass,"exit_code":code,"requests":count,"successful_requests":success,
         "target_rps":manifest["run"]["rate"],"requests_per_scheduled_second":count/duration if duration else None,
         "completion_window_seconds":elapsed,"completed_rps_including_drain":count/elapsed if elapsed else None,
         "successful_rps_including_drain":success/elapsed if elapsed else None,"latency_ms":lat,"client_wall_ms":wall,
         "business_error_rate":errors,"dropped_iterations":drops,"resources":resources,"runtime_samples":runtime,
+        "observability":{"grafana_dashboard":grafana_url,"prometheus":"http://localhost:9091","testid":testid,
+                         "k6_remote_write":bool(manifest.get("run",{}).get("prometheus_remote_write"))},
         "resource_verdict":"REVIEW_REQUIRED: CPU, RAM plateau, swap, DB contention and generator saturation must be reviewed; HTTP pass alone is not sustainable capacity."}
     (directory/"report.json").write_text(json.dumps(result,indent=2)+"\n")
     def fmt(v, digits=2): return "not measured" if v is None else f"{v:.{digits}f}"
     provenance = manifest.get("provenance",{})
-    text = ["# Performance evidence", "",f"Status: **{'HTTP SLO PASS' if http_pass else 'FAIL / NOT VALIDATED'}**. Resource verdict: **review required**.","",
-        f"Commit: `{manifest.get('commit')}`; dirty: `{manifest.get('dirty')}`; UTC: `{manifest.get('utc')}`.",
-        f"Source SHA-256: `{manifest.get('source_sha256')}`.",
-        f"Runtime mode: **{provenance.get('runtime_mode','unknown')}**; model: `{provenance.get('model_version','unknown')}`; snapshot: `{provenance.get('forecast_snapshot_id','unknown')}`.",
-        "Synthetic data / MatMul results do not establish trained-model performance or WAPE.","",
-        "## Measurement window", "",f"Script: `{manifest['run']['script']}`. Target: {manifest['run']['rate']} RPS. Warm-up: {manifest['run']['warmup']}. Scheduled measurement: {duration}s.",
+    runtime_mode = provenance.get('runtime_mode','unknown')
+    model_version = provenance.get('model_version','unknown')
+    snapshot_id = provenance.get('forecast_snapshot_id','unknown')
+    data_note = ("This run uses the synthetic demo snapshot. It measures service performance, not trained-model quality or WAPE."
+                 if runtime_mode.startswith("synthetic") else
+                 "This report measures serving performance only. Model quality/WAPE must be established by a separate evaluation dataset.")
+    text = ["# TramFlow benchmark report", "",
+        f"**Status:** {'HTTP SLO PASS' if http_pass else 'FAIL / NOT VALIDATED'}  ",
+        "**Capacity interpretation:** review required; one passing load point is not proof of maximum sustainable RPS.", "",
+        "## Executive summary", "",
+        "| Metric | Result |", "|---|---:|",
+        f"| Target arrival rate | {manifest['run']['rate']} RPS |",
+        f"| Successful RPS, incl. final drain | {fmt(result['successful_rps_including_drain'])} |",
+        f"| HTTP latency p50 | {fmt(lat.get('med'))} ms |",
+        f"| HTTP latency p95 | {fmt(lat.get('p(95)'))} ms |",
+        f"| HTTP latency p99 | {fmt(lat.get('p(99)'))} ms |",
+        f"| Business error ratio | {fmt(errors,6)} |",
+        f"| Dropped iterations | {drops} |",
+        f"| Successful / completed requests | {success} / {count} |", "",
+        f"Runtime mode: **{runtime_mode}**; model: `{model_version}`; snapshot: `{snapshot_id}`.",
+        data_note, "",
+        "## Run identity", "",
+        f"Commit: `{manifest.get('commit')}`; dirty working tree: `{manifest.get('dirty')}`; captured UTC: `{manifest.get('utc')}`.",
+        f"Source SHA-256: `{manifest.get('source_sha256')}`.", "",
+        "## Load profile", "",
+        f"Script: `{manifest['run']['script']}`. Target: {manifest['run']['rate']} RPS. Warm-up: {manifest['run']['warmup']}. Scheduled measurement: {duration}s.",
         "Authentication, setup and warm-up are excluded from business percentiles. Each measured iteration issues one business HTTP request. No retries.","",
         "| Metric | Value |", "|---|---:|",f"| Completed business requests | {count} |",f"| Successful business requests | {success} |",
         f"| Requests / scheduled second | {fmt(result['requests_per_scheduled_second'])} |",f"| Completed RPS, incl. final drain | {fmt(result['completed_rps_including_drain'])} |",
         f"| Successful RPS, incl. final drain | {fmt(result['successful_rps_including_drain'])} |",f"| p50 / p95 / p99 HTTP ms | {fmt(lat.get('med'))} / {fmt(lat.get('p(95)'))} / {fmt(lat.get('p(99)'))} |",
         f"| p95 client wall ms (incl. connection overhead) | {fmt(wall.get('p(95)'))} |",f"| Business error ratio (HTTP + semantic) | {fmt(errors,6)} |",f"| Dropped iterations | {drops} |",f"| k6 exit code | {code} |", "",
+        "## Grafana / Prometheus", "",
+        "For live time-series diagnostics, start observability **before** the benchmark:", "",
+        "```bash", f"make benchmark-observed RATE={manifest['run']['rate']} DURATION={manifest['run'].get('duration', str(duration)+'s')} WARMUP={manifest['run']['warmup']} BENCH_SCRIPT={manifest['run']['script']}", "```", "",
+        f"- Grafana dashboard for this run: `{grafana_url}`",
+        "- Prometheus: `http://localhost:9091`",
+        "- Grafana shows trends during the run; the files in this result directory remain the reproducible source of truth for the benchmark result.", "",
         "## Containers: measurement phase only", "", "CPU is Docker CPU% divided by the actual CPU quota in cores: 140% / 2 cores = 70% of the quota.",
         "Docker memory is its working-set-style reading, not process RSS. Native ONNX memory is included in process RSS below.", "",
         "| Container | CPU quota avg/max % | Docker memory max MiB | Samples |", "|---|---:|---:|---:|"]
     for entry in resources.values():
         cpu,mem=entry['cpu_quota_percent'],entry['docker_working_set_bytes']
         text.append(f"| {entry['name']} | {fmt(cpu.get('avg'))} / {fmt(cpu.get('max'))} | {fmt(mem.get('max',0)/1048576)} | {mem.get('count',0)} |")
-    text += ["", "## Backend internals", "", "Approximate native/DB p95 uses differences of Prometheus histogram buckets between in-window scrapes. No observations means **not measured**, not 0 ms.", ""]
+    text += ["", "## Backend internals", "", "Approximate native/storage p95 uses differences of Prometheus histogram buckets between in-window scrapes. No observations means **not measured**, not 0 ms.", ""]
     for cid,entry in runtime.items():
         text += [f"### `{cid[:12]}`", f"RSS first/last/max MiB: {fmt(entry['rss_first_bytes']/1048576 if entry['rss_first_bytes'] is not None else None)} / {fmt(entry['rss_last_bytes']/1048576 if entry['rss_last_bytes'] is not None else None)} / {fmt(entry['rss_bytes'].get('max',0)/1048576)}.",
-            f"Cache hourly-cell hit ratio: {fmt(entry['cache_cell_hit_ratio'],4)}. ONNX p95 estimate seconds: {fmt(entry['onnx_inference_p95_estimate_seconds'],6)}. DB p95 estimate seconds: {fmt(entry['db_query_p95_estimate_seconds'],6)}.",
+            f"Cache hourly-cell hit ratio: {fmt(entry['cache_cell_hit_ratio'],4)}. ONNX p95 estimate seconds: {fmt(entry['onnx_inference_p95_estimate_seconds'],6)}. Storage-operation p95 estimate seconds: {fmt(entry['storage_operation_p95_estimate_seconds'],6)}.",
             f"Swap observed: {entry['swap_observed']}; process max bytes: {entry['max_process_swap_bytes']}; cgroup max bytes: {entry['max_cgroup_swap_bytes']}.",""]
     text += ["## Required interpretation", "", "This is one measured point, not proof of maximum sustainable RPS. Review system.csv/metrics.ndjson for CPU headroom, GC, DB pool waiting, RSS plateau, restart/OOM and swap. Repeated 2/4-CPU sweeps and a 30-60 minute soak are separate runs.",
         "Shared-host contention and the load generator's CPU/memory must be disclosed. Absence of resource samples invalidates resource claims. Kernel page caches were not flushed.", "",
